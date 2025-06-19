@@ -1,0 +1,50 @@
+/* @import './base.css'; */
+@import 'vuetify/styles';
+
+@import 'tailwindcss';
+
+/* #app {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-weight: normal;
+} */
+
+body {
+  background-color: #000;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('@/assets/font/Inter.ttf');
+}
+
+@font-face {
+  font-family: 'Inter-Italic';
+  src: url('@/assets/font/Inter-Italic.ttf');
+}
+
+@font-face {
+  font-family: 'din';
+  src: url('@/assets/font/din-black.ttf');
+}
+
+@font-face {
+  font-family: 'darker';
+  src: url('@/assets/font/darker.ttf');
+}
+
+@font-face {
+  font-family: 'aksarabaligalang';
+  src: url('@/assets/font/aksarabaligalang.ttf');
+}
+
+@font-face {
+  font-family: 'abhayaLibre';
+  src: url('@/assets/font/abhayaLibre.otf');
+}
+
+@font-face {
+  font-family: 'bebas';
+  src: url('@/assets/font/bebas.otf');
+}
