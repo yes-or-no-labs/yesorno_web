@@ -1,5 +1,5 @@
 // https://github.com/wevm/viem/blob/main/src/chains/index.ts
-import { polygon, bsc, avalanche, fantom, coreDao,bscTestnet  } from 'viem/chains'
+import { polygon, bsc, avalanche, fantom, coreDao,bscTestnet, monadTestnet  } from 'viem/chains'
 // import BSC from './56'
 
 export const networks = {
@@ -10,12 +10,13 @@ export const networks = {
   //   BSC,
   // ),
 
-  [bsc.id]: bsc,
-  [bscTestnet.id]:bscTestnet,
-  [polygon.id]: polygon,
-  [avalanche.id]: avalanche,
-  [fantom.id]: fantom,
-  [coreDao.id]: coreDao,
+  // [bsc.id]: bsc,
+  // [bscTestnet.id]:bscTestnet,
+  // [polygon.id]: polygon,
+  // [avalanche.id]: avalanche,
+  // [fantom.id]: fantom,
+  // [coreDao.id]: coreDao,
+  [monadTestnet.id]: monadTestnet,
 }
 
 export const DEVICE_TYPES = {

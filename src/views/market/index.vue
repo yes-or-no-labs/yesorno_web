@@ -1,5 +1,6 @@
 <script setup>
 import { reactive } from 'vue'
+import Footer from '@/components/Footer/index.vue'
 
 const state = reactive({
   menuList: [
@@ -71,9 +72,10 @@ const state = reactive({
     </div>
     <div class="w-full grid grid-cols-3 gap-[20px] !mt-[20px] !px-[38px]">
       <div
-        class="h-[270px] rounded-[20px] bg-[#1B1B1B] !px-[25px] !py-[15px]"
+        class="h-[270px] rounded-[20px] bg-[#1B1B1B] !px-[25px] !py-[15px] cursor-pointer boxItem"
         v-for="item in 10"
         :key="item"
+        @click="$router.push('/marketDetail')"
       >
         <div class="flex justify-between items-center">
           <div
@@ -125,6 +127,7 @@ const state = reactive({
             class="flex-1 rounded-l-[10px] !py-[12px] !pl-[23px] flex flex-col gap-[5px] cursor-pointer"
             style="background: rgba(255, 255, 255, 0.05)"
             v-ripple
+            @click.stop="()=> console.log('Yes clicked')"
           >
             <div class="text-[#A2D00C] text-[20px] leading-[20px]" style="font-family: Inter">
               Yes
@@ -137,6 +140,7 @@ const state = reactive({
             class="flex-1 rounded-r-[10px] !py-[12px] !pl-[23px] flex flex-col gap-[5px] cursor-pointer"
             style="background: rgba(255, 255, 255, 0.05)"
             v-ripple
+             @click.stop="()=> console.log('No clicked')"
           >
             <div class="text-[#5D2FE7] text-[20px] leading-[20px]" style="font-family: Inter">
               No
@@ -148,28 +152,13 @@ const state = reactive({
         </div>
         <div class="!px-[20px] !mt-[10px] flex items-center justify-between">
           <div class="text-[16px] text-[#787878]">RTG:85127848.00</div>
-          <v-icon icon="mdi-star-outline" size="20" class="cursor-pointer" />
+          <!-- <v-icon icon="mdi-star-outline" size="20" class="cursor-pointer" /> -->
+          <img src="@/assets/img/star.png" class="w-[20px] h-[20px] cursor-pointer">
         </div>
       </div>
     </div>
-    <div
-      class="w-full !mt-[20px] h-[180px] bg-[#1B1B1B] rounded-[25px] !py-[35px] flex flex-col justify-center items-center gap-[27px]"
-    >
-      <div class="flex items-center gap-[72px]">
-        <div
-          class="w-[62px] h-[62px] rounded-full bg-[#767676] flex justify-center items-center cursor-pointer"
-          v-ripple
-        >
-          <img src="@/assets/img/icon1.png" class="w-full h-full" />
-        </div>
-        <div
-          class="w-[62px] h-[62px] rounded-full bg-[#767676] flex justify-center items-center cursor-pointer"
-          v-ripple
-        >
-          <img src="@/assets/img/icon2.png" class="w-full h-full" />
-        </div>
-      </div>
-      <div class="text-[14px] text-[#837575]">© 2025 Yesorno. All rights reserved.</div>
+    <div class="!px-[38px]">
+      <Footer/>
     </div>
   </div>
 </template>
@@ -178,5 +167,11 @@ const state = reactive({
 .semi-circle-progress {
   clip-path: polygon(0% 0%, 100% 0%, 100% 50%, 0% 50%);
   margin-bottom: -50px; /* 调整位置 */
+}
+
+.boxItem:hover {
+  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.05), 0px 6px 12px rgba(0, 0, 0, 0.05);
+  background-color: rgba(27, 27, 27, .8);
+  translate: 0px -1px;
 }
 </style>

@@ -1,30 +1,26 @@
-import { computed } from 'vue'
-import { api } from '@/apis'
+import { computed, reactive } from 'vue'
+// import { api } from '@/apis'
 import * as utilEthereum from '@/utils/kiwi/util_ethereum'
 import * as util_base from '@/utils/kiwi/util_base'
 import { ethers } from 'ethers'
 import { constant } from '@/utils/constant.js'
 import * as uniapp from '@/utils/uni-app'
-import { t } from '@/utils/lang/index.js'
 import { blackList } from '../utils/blackList'
+import { defineStore } from 'pinia'
 
 export const store = {
   useAppStore: defineStore('appStore', () => {
     const tomeState = reactive({
-      token: sessionStorage.getItem(constant.tokenKey),
-      username: uni.getStorageSync(constant.usernameKey),
-      userInfo: sessionStorage.getItem(constant.userInfoKey) || null,
+      token: localStorage.getItem(constant.tokenKey),
+      username: localStorage.getItem(constant.usernameKey),
+      userInfo: localStorage.getItem(constant.userInfoKey) || null,
 
-      appConfig: uni.getStorageSync(constant.appConfigKey) || {},
-
-      appSystemInfo: uni.getSystemInfoSync(),
-      appWindowInfo: uni.getWindowInfo(),
-      initData: uni.getStorageSync('initData') || {},
+      appConfig: localStorage.getItem(constant.appConfigKey) || {},
       walletAccountList: [],
-      curWalletAddress: '',
+      curWalletAddress: localStorage.getItem(constant.curWalletAddress) || '',
       hasProvider: false,
       isLoading: false,
-      signMessage: sessionStorage.getItem(constant.signMessage) || '',
+      signMessage: localStorage.getItem(constant.signMessage) || '',
     })
     const tomeStateC = {
       isLogin: computed(() => !!tomeState.token),
@@ -34,6 +30,8 @@ export const store = {
       providers: new Map(),
       // 浏览器提供的小狐狸 provider
       metamaskProvider: null,
+      // 用户上次登录的钱包类型
+      lastWalletRdns:localStorage.getItem(constant.lastWalletRdnsKey) || '',
       /**
        * Ethers 的 provider
        * @type {ethers.BrowserProvider}
@@ -41,44 +39,41 @@ export const store = {
       ethersBrowserProvider: null,
       signer: null,
     })
-    const pageHeightGetter = computed(() => {
-      return (
-        tomeState.appSystemInfo.screenHeight -
-        tomeState.appSystemInfo.statusBarHeight -
-        tomeState.appSystemInfo.safeAreaInsets.bottom
-      )
-    })
     const actions = {
       onUpdateToken(val) {
         tomeState.token = val
-        sessionStorage.setItem(constant.tokenKey, val)
-        // uni.setStorageSync(constant.tokenKey, val)
+        localStorage.setItem(constant.tokenKey, val)
+        // localStorage.setItem(constant.tokenKey, val)
       },
       onUpdateSignMessage(val) {
         tomeState.signMessage = val
-        sessionStorage.setItem(constant.signMessage, val)
-        // uni.setStorageSync(constant.tokenKey, val)
-      },
-      onUpdateInitData(val) {
-        tomeState.initData = val
-        uni.setStorageSync('initData', val)
+        localStorage.setItem(constant.signMessage, val)
+        // localStorage.setItem(constant.tokenKey, val)
       },
       onUpdateUsername(val) {
         tomeState.username = val
-        uni.setStorageSync(constant.usernameKey, val)
+        localStorage.setItem(constant.usernameKey, val)
       },
       onUpdateUserInfo(val) {
         tomeState.userInfo = val
-        sessionStorage.setItem(constant.userInfoKey, JSON.stringify(val))
-        // uni.setStorageSync(constant.userInfoKey, val)
+        localStorage.setItem(constant.userInfoKey, JSON.stringify(val))
+        // localStorage.setItem(constant.userInfoKey, val)
       },
       onUpdateCurPagePath(val) {
         tomeState.curPagePath = val
-        uni.setStorageSync(constant.tabBarPagePathKey, val)
+        localStorage.setItem(constant.tabBarPagePathKey, val)
+      },
+      onUpdateCurWalletAddress(val) {
+        tomeState.curWalletAddress = val
+        localStorage.setItem(constant.curWalletAddress, val)
+      },
+      onUpdateLastWalletRdns(val) {
+        tomeState.lastWalletRdns = val
+        localStorage.setItem(constant.lastWalletRdnsKey, val)
       },
       onUpdateWalletAccountList(val) {
         tomeState.walletAccountList = val
-        // uni.setStorageSync(constant.tabBarPagePathKey, val)
+        // localStorage.setItem(constant.tabBarPagePathKey, val)
       },
       getCurrentRoute() {
         const pages = getCurrentPages()
@@ -96,9 +91,11 @@ export const store = {
         tomeState.token = ''
         tomeState.username = ''
         tomeState.userInfo = {}
-        uni.removeStorageSync(constant.tokenKey)
-        uni.removeStorageSync(constant.usernameKey)
-        uni.removeStorageSync(constant.userInfoKey)
+        localStorage.removeItem(constant.tokenKey)
+        localStorage.removeItem(constant.usernameKey)
+        localStorage.removeItem(constant.userInfoKey)
+        localStorage.removeItem(constant.curWalletAddress)
+        localStorage.removeItem(constant.lastWalletRdnsKey)
       },
       // 链接钱包
       async evmConnectWallet(recovery = false, walletRdns = 'io.metamask') {
@@ -110,8 +107,17 @@ export const store = {
            */
           code: 1,
         }
-        const metamaskProvider = this.getMetamaskProvider(walletRdns)
 
+        let metamaskProvider = null
+
+        console.log('evmConnectWallet',walletRdns);
+        
+
+        if(!recovery){
+          metamaskProvider = this.getMetamaskProvider(walletRdns)
+        }else if(recovery&&mStateSimple.lastWalletRdns){
+          metamaskProvider = this.getMetamaskProvider(mStateSimple.lastWalletRdns)
+        }
         if (!metamaskProvider) {
           ret.code === 40001
           return ret
@@ -130,32 +136,12 @@ export const store = {
         }
         tomeState.walletAccountList = onConnectMetaMaskRet.data.accounts
 
-        tomeState.curWalletAddress = tomeState.walletAccountList[0]
-        const flag = blackList.some(
-          (item) => item.toLowerCase() == tomeState.curWalletAddress.toLowerCase(),
-        )
-        if (flag) {
-          uniapp.toast(t('thirdIssue.title62'))
-          return
-        }
+        this.onUpdateCurWalletAddress(tomeState.walletAccountList[0])
+        this.onUpdateLastWalletRdns(walletRdns)
         mStateSimple.metamaskProvider = metamaskProvider
         console.log('metamaskProvider>>>>>>>', metamaskProvider)
         tomeState.hasProvider = true
         console.log('getSign', tomeState.token, tomeState.signMessage, tomeState.userInfo)
-        if (!tomeState.token || !tomeState.signMessage || !tomeState.userInfo) {
-          if (tomeState.isLoading) return
-          tomeState.isLoading = true
-          // const flag = tomeState.curWalletAddress.toLowerCase() == '0xe1D20DdEF52ae459DCb464E818B1F8AC49a94466'.toLowerCase()
-          const flag = blackList.some(
-            (item) => item.toLowerCase() == tomeState.curWalletAddress.toLowerCase(),
-          )
-          // console.log('flag>>>>>>>>',flag);
-          if (!flag) {
-            await this.getSign()
-          } else {
-            uniapp.toast(t('thirdIssue.title62'))
-          }
-        }
         const provider = new ethers.BrowserProvider(metamaskProvider)
         // 等待 provider 初始化完成
         // await provider.ready
@@ -179,7 +165,7 @@ export const store = {
         return ret
       },
       getMetamaskProvider(walletRdns) {
-        walletRdns = 'io.metamask'
+        // walletRdns = 'io.metamask'
         /**
          * rdns
          * io.metamask
@@ -189,18 +175,18 @@ export const store = {
           if (providerObj.info.rdns.toLowerCase().includes(walletRdns)) {
             console.log(
               `++++++[${new Date().toISOString()}] 从 eip 6963 集合中找到了 metamask 提供者，当前 rdns： ${walletRdns}`,
-              providerObj,
+              providerObj.provider
             )
             return providerObj.provider
           }
         }
         // @ts-ignore
-        if (window?.ethereum?.isTronLink === true) {
-          return null
-        }
-        if (window?.ethereum?.isMetaMask) {
-          return window.ethereum
-        }
+        // if (window?.ethereum?.isTronLink === true) {
+        //   return null
+        // }
+        // if (window?.ethereum?.isMetaMask) {
+        //   return window.ethereum
+        // }
         return null
       },
       async getSign() {
@@ -241,10 +227,10 @@ export const store = {
           const path = this.getCurrentRoute()
           // console.log('getUserInfo',path);
           if (res.result.topAddress && path !== 'pages/home/index') {
-            uniapp.route({
-              url: `/pages/home/index`,
-              type: 'redirectTo',
-            })
+            // uniapp.route({
+            //   url: `/pages/home/index`,
+            //   type: 'redirectTo',
+            // })
           }
         }
       },
@@ -348,14 +334,17 @@ export const store = {
       },
       // 断开钱包链接
       async onDisConnectClick() {
+          console.log('onDisConnectClick',mStateSimple.metamaskProvider);
         try {
           if (mStateSimple.metamaskProvider) {
             this.removeMetaMaskListeners(mStateSimple.metamaskProvider)
             await utilEthereum.onDisConnect(mStateSimple.metamaskProvider)
             mStateSimple.metamaskProvider = null
             mStateSimple.ethersBrowserProvider = null
+            mStateSimple.lastWalletRdns = ''
             tomeState.walletAccountList = []
             tomeState.curWalletAddress = ''
+            this.onLoginOut()
             console.log(`++++++[${new Date().toISOString()}] 断开链接成功`)
           }
         } catch (error) {
@@ -368,7 +357,6 @@ export const store = {
       tomeState,
       tomeStateC,
       mStateSimple,
-      pageHeightGetter,
       ...actions,
     }
   }),

@@ -1,3 +1,6 @@
+import { useToast } from "vue-toastification";
+
+
 export class HttpRequest {
   constructor(baseConfig = {}, customConfig = {}) {
     this.baseConfig = {
@@ -237,7 +240,7 @@ export const sliceNumber = (value,decimals = 2)=>{
 export const formatAddress = (addrsss) =>{
   return (
     addrsss.slice(0, 4) +
-    "***" +
+    "..." +
     addrsss.slice(-4)
   );
 }
@@ -245,6 +248,16 @@ export const formatAddress = (addrsss) =>{
 export const setClipboardData = async (options = {}) => {
   const { showToast = false, ...restOptions } = options
   return await uni.setClipboardData({ showToast, ...restOptions })
+}
+
+export const copyToClipboard = async (text) => {
+  try {
+    const toast = useToast();
+    await navigator.clipboard.writeText(text);
+    toast.success('Copy Success!');
+  } catch (err) {
+    toast.error('Copy Fail!');
+  }
 }
 
 export const openUrl = (url, { openInCurrentTab = false, openInAppBrowser = true } = {}) => {

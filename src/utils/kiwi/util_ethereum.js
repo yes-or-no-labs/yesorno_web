@@ -302,7 +302,7 @@ export const onConnectMetaMask = async (provider, chainIdNum, recovery = false) 
   }
 
   if (recovery) {
-    const onEthAccountsRet = await onEthAccounts()
+    const onEthAccountsRet = await onEthAccounts(provider)
     if (!onEthAccountsRet?.success) {
       return onEthAccountsRet
     }

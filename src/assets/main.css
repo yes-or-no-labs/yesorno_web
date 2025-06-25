@@ -24,9 +24,14 @@ body {
   src: url('@/assets/font/Inter-Italic.ttf');
 }
 
-@font-face {
+/* @font-face {
   font-family: 'din';
   src: url('@/assets/font/din-black.ttf');
+} */
+
+@font-face {
+  font-family: 'din';
+  src: url('@/assets/font/din.ttf');
 }
 
 @font-face {
@@ -47,4 +52,14 @@ body {
 @font-face {
   font-family: 'bebas';
   src: url('@/assets/font/bebas.otf');
+}
+
+@font-face {
+  font-family: 'inter-bold';
+  src: url('@/assets/font/inter-bold.ttf');
+}
+
+
+div,span,p{
+  font-family: 'Inter', sans-serif;
 }
