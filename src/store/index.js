@@ -119,7 +119,7 @@ export const store = {
           metamaskProvider = this.getMetamaskProvider(mStateSimple.lastWalletRdns)
         }
         if (!metamaskProvider) {
-          ret.code === 40001
+          ret.code = 40001
           return ret
         }
 

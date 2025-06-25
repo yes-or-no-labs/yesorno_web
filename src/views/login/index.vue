@@ -57,8 +57,9 @@ async function connectWallet(item) {
     if (res.success) {
       router.push('/')
     }else{
-        console.log(res);
-        toast.error(`${item.title} is not installed. Please install ${item.title} or try another wallet.`);
+        if(res.code === 40001){
+         toast.error(`${item.title} is not installed. Please install ${item.title} or try another wallet.`);
+        }
     }
   } catch (error) {
     console.error(error)
