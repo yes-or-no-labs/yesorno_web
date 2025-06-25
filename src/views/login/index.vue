@@ -53,6 +53,7 @@ const toast = useToast();
 
 async function connectWallet(item) {
   try {
+    if(!state.checkTerms) return toast.error(`Please check the Terms of Use to proceed.`);
     const res = await appStore.evmConnectWallet(false, item.walletRdns)
     console.log('connectWallet res', res)
     if (res.success) {
