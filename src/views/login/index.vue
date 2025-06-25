@@ -43,6 +43,7 @@ const state = reactive({
       walletRdns: 'app.phantom',
     },
   ],
+  checkTerms:false
 })
 
 const appStore = store.useAppStore()
@@ -119,6 +120,20 @@ function isDetected(walletRdns) {
           </div>
         </div>
       </div>
+      <div>
+        <v-checkbox v-model="state.checkTerms" color="#3182ce" :hide-details="true">
+            <template v-slot:label>
+                <div class="text-[16px] text-[#fff]" style="font-family: din;">
+                    I agree to the <span class="cursor-pointer underline" style="font-family: din;">Terms of Use.</span>
+                </div>
+            </template>
+            </v-checkbox>
+      </div>
+      <div class="cursor-pointer underline text-[16px] text-[#94969C] text-center" @click="$router.back()">Back</div>
     </div>
   </div>
 </template>
+
+
+<style scoped>
+</style>
