@@ -36,4 +36,7 @@ export default createVuetify({
       },
     },
   },
+  scss: {
+    additionalData: `@use "@/assets/variables.scss";`,
+  },
 })
