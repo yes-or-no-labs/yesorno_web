@@ -86,10 +86,10 @@ function isDetected(walletRdns) {
     <div class="flex flex-col items-center gap-[16px] w-[360px] mx-auto !px-[16px]">
       <div class="flex flex-col items-center gap-[24px]">
         <div class="flex items-center gap-[10px]">
-          <img src="@/assets/img/logo.png" class="w-[56px] h-[56px]" />
-          <div class="text-[32px] fon-[500] text-[#fff] leading-[32px]" style="font-family: din">
+          <img src="@/assets/img/logo.png" class="w-[160px] h-[40px]" />
+          <!-- <div class="text-[32px] fon-[500] text-[#fff] leading-[32px]" style="font-family: din">
             Yesorno
-          </div>
+          </div> -->
         </div>
         <div class="text-[24px] fon-[500] text-[#fff] leading-[24px]" style="font-family: din">
           Sign into Your Account

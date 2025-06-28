@@ -60,17 +60,17 @@ async function handleClickItem(index){
 </script>
 
 <template>
-  <div class="w-full h-[80px] bg-[#002548] fixed top-0 left-0 z-[999]">
+  <div class="w-full h-[80px] fixed top-0 left-0 z-[999]" style="backdrop-filter: blur(15px);">
     <div
-      class="max-w-[1440px] mx-auto flex items-center justify-between px-[58px] h-full gap-[70px]"
+      class="max-w-[1440px] mx-auto flex items-center justify-between !px-[32px] h-full gap-[70px]"
     >
       <div class="flex items-center gap-[25px] h-full">
         <div class="flex items-center gap-[40px] cursor-pointer" @click="$router.push('/')">
-          <img src="@/assets/img/logo.png" mode="scaleToFill" class="w-[90px] h-[90px]" />
-          <div class="flex flex-col gap-[5px]">
+          <img src="@/assets/img/logo.png" mode="scaleToFill" class="w-[160px] h-[40px]" />
+          <!-- <div class="flex flex-col gap-[5px]">
             <div class="text-[#fff] text-[24px] leading-[24px]">Yesorno.Fun</div>
             <div class="text-[#81F963] text-[15px] leading-[15px]">Beta V1</div>
-          </div>
+          </div> -->
         </div>
         <div
           class="text-[#fff] text-[15px] leading-[15px] cursor-pointer"

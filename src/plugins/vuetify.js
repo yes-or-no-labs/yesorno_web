@@ -33,6 +33,7 @@ export default createVuetify({
       class: 'text-none',
       style: {
         'border-radius': '106px',
+        'background': 'linear-gradient(90deg, #6DDD25 0%, #0AB45A 100%)'
       },
     },
   },
