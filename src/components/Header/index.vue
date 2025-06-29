@@ -74,21 +74,21 @@ async function handleClickItem(index){
         </div>
         <div
           class="text-[#fff] text-[15px] leading-[15px] cursor-pointer"
-          style="font-family: Inter-Italic"
+          style="font-family: Geist"
           @click="$router.push('/market')"
         >
           Market
         </div>
         <div
           class="text-[#fff] text-[15px] leading-[15px] cursor-pointer"
-          style="font-family: Inter-Italic"
+          style="font-family: Geist"
           @click="$router.push('/task')"
         >
           Tasks
         </div>
         <div
           class="text-[#fff] text-[15px] leading-[15px] cursor-pointer"
-          style="font-family: Inter-Italic"
+          style="font-family: Geist"
           @click="$router.push('/leaderboard')"
         >
           Leaderboard
@@ -98,7 +98,7 @@ async function handleClickItem(index){
             <div
               class="text-[#fff] text-[15px] leading-[15px] cursor-pointer"
               v-bind="props"
-              style="font-family: Inter-Italic"
+              style="font-family: Geist"
             >
               Social Media
               <v-icon icon="mdi-menu-down" />
@@ -113,7 +113,7 @@ async function handleClickItem(index){
 
         <div
           class="text-[#fff] text-[15px] leading-[15px] cursor-pointer"
-          style="font-family: Inter-Italic"
+          style="font-family: Geist"
         >
           Discord
         </div>
@@ -151,7 +151,7 @@ async function handleClickItem(index){
             <div
               class="text-[#fff] text-[15px] leading-[15px] cursor-pointer"
               v-bind="props"
-              style="font-family: Inter-Italic"
+              style="font-family: Geist"
             >
               <img src="@/assets/img/person.png" class="w-[50px] h-[50px] rounded-full cursor-pointer" />
             </div>

@@ -63,6 +63,16 @@ body {
   src: url('@/assets/font/inter-bold.ttf');
 }
 
+@font-face {
+  font-family: 'Geist-Bold';
+  src: url('@/assets/font/Geist-Bold.ttf');
+}
+
+@font-face {
+  font-family: 'Geist';
+  src: url('@/assets/font/Geist-Regular.ttf');
+}
+
 
 div,span,p{
   font-family: 'Inter', sans-serif;
