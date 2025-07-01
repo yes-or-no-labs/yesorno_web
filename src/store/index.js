@@ -320,7 +320,7 @@ export const store = {
       setupMetaMaskListeners(provider) {
         if (provider) {
           utilEthereum.onAddChainChangedListener(provider, this.handleChainChanged)
-          utilEthereum.onAddWalletListener(provider, this.handleAccountsChanged)
+          utilEthereum.onAddWalletListener(provider, this.onDisConnectClick)
           console.log(`++++++[${new Date().toISOString()}] 添加监听 evm 的链和账号改变监听`)
         }
       },
@@ -328,7 +328,7 @@ export const store = {
       removeMetaMaskListeners(provider) {
         if (provider) {
           utilEthereum.onRemoveChainChangedListener(provider, this.handleChainChanged)
-          utilEthereum.onRemoveWalletListener(provider, this.handleAccountsChanged)
+          utilEthereum.onRemoveWalletListener(provider, this.onDisConnectClick)
           console.log(`++++++[${new Date().toISOString()}] 移除监听 evm 的链和账号改变监听`)
         }
       },

@@ -19,7 +19,7 @@ const state = reactive({
 </script>
 
 <template>
-  <div class="w-full min-h-screen !pb-[40px]">
+  <div class="w-full min-h-screen !pb-[100px]">
     <div class="w-full h-[58px] flex items-center justify-between !px-[35px]">
       <div class="flex items-center gap-[35px]">
         <div
@@ -156,9 +156,6 @@ const state = reactive({
           <img src="@/assets/img/star.png" class="w-[20px] h-[20px] cursor-pointer">
         </div>
       </div>
-    </div>
-    <div class="!px-[38px]">
-      <Footer/>
     </div>
   </div>
 </template>

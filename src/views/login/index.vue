@@ -9,6 +9,7 @@ import phantomImg from '@/assets/img/phantom.png'
 import { store } from '@/store'
 import { useRouter } from 'vue-router'
 import { useToast } from "vue-toastification";
+import { ethers } from 'ethers'
 
 const state = reactive({
   walletList: [
@@ -57,6 +58,7 @@ async function connectWallet(item) {
     const res = await appStore.evmConnectWallet(false, item.walletRdns)
     console.log('connectWallet res', res)
     if (res.success) {
+      await getSignatrue()
       router.push('/')
     }else{
         if(res.code === 40001){
@@ -79,6 +81,27 @@ const rdnsArr = computed(() => {
 function isDetected(walletRdns) {
   return rdnsArr.value.some((item) => item.toLowerCase().includes(walletRdns))
 }
+
+
+async function getSignatrue() {
+          // await appStore.mStateSimple.ethersBrowserProvider.ready();
+    try {
+      const provider = new ethers.BrowserProvider(
+        appStore.mStateSimple.metamaskProvider
+      );
+    
+      const signer = await provider.getSigner();
+      const signMessage = {nonce:'24844408781633',timestamp:1751282884}
+      
+      const signatrue = await signer.signMessage(JSON.stringify(signMessage));
+      console.log("signatrue", signatrue);
+      // this.onUpdateSignMessage(signatrue)
+      // await this.getUserInfo()
+    } catch (error) {
+      console.error(error);
+    }
+    
+  }
 </script>
 
 <template>

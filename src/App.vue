@@ -3,6 +3,7 @@ import { RouterLink, RouterView, useRouter } from 'vue-router'
 import Header from '@/components/Header/index.vue'
 import { computed, onMounted } from 'vue'
 import { store } from "@/store";
+import FooterSecond from '@/components/FooterSecond/index.vue'
 
 const router = useRouter()
 
@@ -27,9 +28,10 @@ onMounted(() => {
 <template>
   <div :class="includePaths.includes(currenRoutePath) ? 'bg-[#103582]' : 'bg-[#000]'">
     <Header v-if="currenRoutePath!=='/login'" />
-    <div class="max-w-[1440px] mx-auto !pb-[40px]">
+    <div class="max-w-[1440px] mx-auto">
       <RouterView />
     </div>
+    <FooterSecond/>
   </div>
 </template>
 

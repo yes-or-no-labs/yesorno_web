@@ -38,7 +38,7 @@ function filterStyle(index) {
 
 
 <template>
-  <div class="w-full bg-[#103582] relative">
+  <div class="w-full bg-[#103582] relative !pb-[100px]">
     <img src="@/assets/img/leaderboard_bg1.png" class="w-full h-[448px] absolute top-0 left-0 object-cover" />
     <div class=" relative !py-[100px] !px-[50px]">
         <div class="gradient-text font-[900] text-[55px]" style="font-family: Inter;">Yesorno Trading Leaderboard</div>

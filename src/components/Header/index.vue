@@ -60,34 +60,34 @@ async function handleClickItem(index){
 </script>
 
 <template>
-  <div class="w-full h-[80px] fixed top-0 left-0 z-[999]" style="backdrop-filter: blur(15px);">
+  <div class="w-full h-[60px] sticky lg:h-[80px] top-0 left-0 z-[999]" style="backdrop-filter: blur(15px);">
     <div
-      class="max-w-[1440px] mx-auto flex items-center justify-between !px-[32px] h-full gap-[70px]"
+      class="hidden lg:flex max-w-[1440px] mx-auto items-center justify-between !px-[32px] h-full gap-[70px]"
     >
-      <div class="flex items-center gap-[25px] h-full">
-        <div class="flex items-center gap-[40px] cursor-pointer" @click="$router.push('/')">
-          <img src="@/assets/img/logo.png" mode="scaleToFill" class="w-[160px] h-[40px]" />
+      <div class="flex items-center lg:gap-[20px] gap-[25px] h-full">
+        <div class="flex items-center lg:gap-[20px] gap-[40px] cursor-pointer" @click="$router.push('/')">
+          <img src="@/assets/img/logo.png" mode="scaleToFill" class="lg:w-[120px] lg:h-[30px] w-[160px] h-[40px]" />
           <!-- <div class="flex flex-col gap-[5px]">
             <div class="text-[#fff] text-[24px] leading-[24px]">Yesorno.Fun</div>
             <div class="text-[#81F963] text-[15px] leading-[15px]">Beta V1</div>
           </div> -->
         </div>
         <div
-          class="text-[#fff] text-[15px] leading-[15px] cursor-pointer"
+          class="text-[#fff] lg:text-[14px] text-[15px] leading-[15px] cursor-pointer"
           style="font-family: Geist"
           @click="$router.push('/market')"
         >
           Market
         </div>
         <div
-          class="text-[#fff] text-[15px] leading-[15px] cursor-pointer"
+          class="text-[#fff] lg:text-[14px] text-[15px] leading-[15px] cursor-pointer"
           style="font-family: Geist"
           @click="$router.push('/task')"
         >
           Tasks
         </div>
         <div
-          class="text-[#fff] text-[15px] leading-[15px] cursor-pointer"
+          class="text-[#fff] lg:text-[14px] text-[15px] leading-[15px] cursor-pointer"
           style="font-family: Geist"
           @click="$router.push('/leaderboard')"
         >
@@ -96,7 +96,7 @@ async function handleClickItem(index){
         <v-menu transition="scale-transition" :offset="[10, 0]">
           <template v-slot:activator="{ props }">
             <div
-              class="text-[#fff] text-[15px] leading-[15px] cursor-pointer"
+              class="text-[#fff] lg:text-[14px] text-[15px] leading-[15px] cursor-pointer whitespace-nowrap"
               v-bind="props"
               style="font-family: Geist"
             >
@@ -112,40 +112,40 @@ async function handleClickItem(index){
         </v-menu>
 
         <div
-          class="text-[#fff] text-[15px] leading-[15px] cursor-pointer"
+          class="text-[#fff] lg:text-[14px] text-[15px] leading-[15px] cursor-pointer"
           style="font-family: Geist"
         >
           Discord
         </div>
       </div>
       <div class="flex items-center gap-[45px] h-full">
-        <div class="flex items-center gap-[45px] h-full" v-show="appStore.tomeState.curWalletAddress">
+        <div class="flex items-center gap-[45px] h-full flex-1" v-show="appStore.tomeState.curWalletAddress">
           <div class="flex flex-col items-center gap-[5px]">
-            <div class="text-[#fff] text-[13px] leading-[13px]" style="font-family: Inter">
+            <div class="text-[#fff] lg:text-[12px] text-[13px] leading-[13px] whitespace-nowrap" style="font-family: Inter">
               My ponts
             </div>
-            <div class="text-[#81F963] text-[20px] leading-[20px]" style="font-family: din">
+            <div class="text-[#81F963] lg:text-[16px] text-[20px] leading-[20px]" style="font-family: din">
               0.00
             </div>
           </div>
           <div class="flex flex-col items-center gap-[5px]">
-            <div class="text-[#fff] text-[13px] leading-[13px]" style="font-family: Inter">
+            <div class="text-[#fff] lg:text-[12px] text-[13px] leading-[13px] whitespace-nowrap" style="font-family: Inter">
               My Porttollo
             </div>
-            <div class="text-[#81F963] text-[20px] leading-[20px]" style="font-family: din">
+            <div class="text-[#81F963] lg:text-[16px] text-[20px] leading-[20px]" style="font-family: din">
               $0.00
             </div>
           </div>
           <div class="flex flex-col items-center gap-[5px]">
-            <div class="text-[#fff] text-[13px] leading-[13px]" style="font-family: Inter">
+            <div class="text-[#fff] lg:text-[12px] text-[13px] leading-[13px] whitespace-nowrap" style="font-family: Inter">
               Balance
             </div>
-            <div class="text-[#81F963] text-[20px] leading-[20px]" style="font-family: din">
+            <div class="text-[#81F963] lg:text-[16px] text-[20px] leading-[20px]" style="font-family: din">
               $0.00
             </div>
           </div>
         </div>
-        <div v-show="appStore.tomeState.curWalletAddress">
+        <div class="flex-1" v-show="appStore.tomeState.curWalletAddress">
           <v-menu transition="scale-transition" :offset="[10, 0]" >
           <template v-slot:activator="{ props }">
             <div
@@ -189,6 +189,13 @@ async function handleClickItem(index){
         </VBtnConnect>
       </div>
     </div>
+    <div class="flex items-center !px-[32px] h-full justify-between lg:hidden">
+      <div class="flex items-center gap-[40px] cursor-pointer" @click="$router.push('/')">
+          <img src="@/assets/img/logo.png" mode="scaleToFill" class="w-[120px] h-[30px]" />
+        </div>
+      <VBtnConnect class="rounded-[106px] !h-[34px] !px-[10px] !py-[6px]" v-show="!appStore.tomeState.curWalletAddress" @click="$router.push('/login')">
+          Connect Wallet
+      </VBtnConnect>
+    </div>
   </div>
-  <div class="w-full h-[80px]"></div>
 </template>
