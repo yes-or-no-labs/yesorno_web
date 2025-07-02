@@ -105,25 +105,25 @@ async function getSignatrue() {
 </script>
 
 <template>
-  <div class="w-full relative !pt-[100px]">
+  <div class="w-full relative sm:!pt-[100px] !pt-[50px] min-h-screen">
     <div class="flex flex-col items-center gap-[16px] w-[360px] mx-auto !px-[16px]">
-      <div class="flex flex-col items-center gap-[24px]">
+      <div class="flex flex-col items-center sm:gap-[24px] gap-[18px]">
         <div class="flex items-center gap-[10px]">
-          <img src="@/assets/img/logo.png" class="w-[160px] h-[40px]" />
+          <img src="@/assets/img/logo.png" class="w-[160px] h-[40px] sm:w-[240px] sm:h-[60px]" />
           <!-- <div class="text-[32px] fon-[500] text-[#fff] leading-[32px]" style="font-family: din">
             Yesorno
           </div> -->
         </div>
-        <div class="text-[24px] fon-[500] text-[#fff] leading-[24px]" style="font-family: din">
+        <div class="sm:text-[24px] text-[18px] fon-[600] text-[#fff] sm:leading-[24px] leading-[18px]" style="font-family: din">
           Sign into Your Account
         </div>
-        <div class="text-[16px] fon-[500] text-[#9DC425] leading-[16px]" style="font-family: din">
+        <div class="sm:text-[16px] text-[14px] fon-[600] text-[#9DC425] leading-[16px]" style="font-family: din">
           Get100 $USD0as aNewUser
         </div>
       </div>
-      <div class="flex flex-col items-center gap-[16px]">
+      <div class="flex flex-col items-center gap-[16px] w-full !px-[20px]">
         <div
-          class="w-[360px] rounded-[4px] border border-solid border-[#333741] !px-[10px] h-[44px] flex items-center justify-between bg-[#131316] hover:bg-[#333741] cursor-pointer"
+          class="sm:w-[360px] w-full rounded-[4px] border border-solid border-[#333741] !px-[10px] h-[44px] flex items-center justify-between bg-[#131316] hover:bg-[#333741] cursor-pointer"
           v-ripple
           v-for="item in state.walletList"
           :key="item.title"

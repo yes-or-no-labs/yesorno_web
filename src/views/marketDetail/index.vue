@@ -18,6 +18,10 @@ const state = reactive({
   selectTimeLine: 1,
 })
 
+onMounted(()=>{
+  // optAnimation()
+})
+
 
 const optAnimation = () => {
   lottie.destroy('lottieLoading')
@@ -81,7 +85,7 @@ const optAnimation = () => {
               </div>
             </div>
           </div>
-          <div class="!mt-[30px] flex items-center gap-[30px]">
+          <div class="!mt-[30px] flex items-center gap-[30px] lottieLoading">
             <div class="flex flex-col gap-[8px]">
               <div
                 class="text-[#787878] text-[14px] leading-[14px]"
@@ -181,7 +185,7 @@ const optAnimation = () => {
               </div>
             </div>
           </div>
-          <div class="!mt-[28px] !pt-[23px]" style="border-top: 1px solid rgba(255, 255, 255, 0.1)">
+          <div class="!mt-[28px] !pt-[23px] " style="border-top: 1px solid rgba(255, 255, 255, 0.1)">
             <div class="flex items-center gap-[16px]">
               <img src="@/assets/img/conChart.png" class="w-[24px] h-[24px]" />
               <div class="flex items-center gap-[4px]">
@@ -214,7 +218,6 @@ const optAnimation = () => {
         </div>
       </div>
       <comment/>
-      <Footer />
     </div>
   </div>
 </template>

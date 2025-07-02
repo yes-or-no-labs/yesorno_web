@@ -26,12 +26,12 @@ onMounted(() => {
 </script>
 
 <template>
-  <div :class="includePaths.includes(currenRoutePath) ? 'bg-[#103582]' : 'bg-[#000]'">
+  <div class="bg-[#000]">
     <Header v-if="currenRoutePath!=='/login'" />
     <div class="max-w-[1440px] mx-auto">
       <RouterView />
     </div>
-    <FooterSecond/>
+    <FooterSecond v-if="currenRoutePath!=='/login'"/>
   </div>
 </template>
 

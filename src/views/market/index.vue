@@ -1,27 +1,28 @@
 <script setup>
 import { reactive } from 'vue'
-import Footer from '@/components/Footer/index.vue'
+import Segmented from '@/components/Segmented/index.vue'
+
 
 const state = reactive({
   menuList: [
-    { title: 'Trending', id: 1 },
-    { title: 'New', id: 2 },
-    { title: 'Crypto', id: 3 },
-    { title: 'Business', id: 4 },
-    { title: 'Politics', id: 5 },
-    { title: 'Sports', id: 6 },
-    { title: 'Culture', id: 7 },
+    { label: 'Trending', value: 1 },
+    { label: 'New', value: 2 },
+    { label: 'Crypto', value: 3 },
+    { label: 'Business', value: 4 },
+    { label: 'Politics', value: 5 },
+    { label: 'Sports', value: 6 },
+    { label: 'Culture', value: 7 },
   ],
   searchInputLoading: false,
-  progress: 50 / 2,
+  progress: 50,
   progressValue: 50,
 })
 </script>
 
 <template>
   <div class="w-full min-h-screen !pb-[100px]">
-    <div class="w-full h-[58px] flex items-center justify-between !px-[35px]">
-      <div class="flex items-center gap-[35px]">
+    <div class="w-full h-[58px] flex items-center justify-between !px-[35px] !mt-[40px]">
+      <!-- <div class="flex items-center gap-[35px]">
         <div
           class="text-[15px] text-[#fff] cursor-pointer"
           style="font-family: Inter"
@@ -30,9 +31,10 @@ const state = reactive({
         >
           {{ item.title }}
         </div>
-      </div>
-      <div class="flex items-center gap-[8px]">
-        <div class="flex items-center bg-[#708D11] !rounded-[5px] overflow-hidden">
+      </div> -->
+        <Segmented :options="state.menuList" />
+      <div class="flex items-center gap-[16px]">
+        <div class="flex items-center border border-solid border-[#22242D] !rounded-[40px] overflow-hidden">
           <v-text-field
             :loading="state.searchInputLoading"
             prepend-inner-icon="mdi-magnify"
@@ -40,18 +42,19 @@ const state = reactive({
             variant="solo"
             hide-details
             single-line
-            class="w-[150px] h-[40px]"
-            bg-color="rgba(255, 255, 255, 0.16)"
+            class="w-[200px] h-[40px] "
+            bg-color="transparent"
+            placeholder="Search"
           >
           </v-text-field>
-          <VBtn
+          <!-- <VBtn
             class="!rounded-r-[5px] !rounded-l-[0px] !h-[40px] !bg-[#708D11] !text-[14px] !leading-[14px]"
             variant="flat"
           >
             Search
-          </VBtn>
+          </VBtn> -->
         </div>
-        <VBtn
+        <!-- <VBtn
           class="!h-[40px] !bg-[#1A1A1A] !text-[14px] !leading-[14px]"
           variant="flat"
           style="color: rgba(255, 255, 255, 0.49)"
@@ -64,28 +67,29 @@ const state = reactive({
               </div>
             </div>
           </template>
-        </VBtn>
+        </VBtn> -->
+        <VBtnConnect class="rounded-[106px] !px-[20px] !py-[12px]">
+          Create New Market
+      </VBtnConnect>
       </div>
     </div>
-    <div>
-      <img src="@/assets/img/market_bg1.png" class="w-full h-[448px] object-cover" />
-    </div>
+    
     <div class="w-full grid grid-cols-3 gap-[20px] !mt-[20px] !px-[38px]">
       <div
-        class="h-[270px] rounded-[20px] bg-[#1B1B1B] !px-[25px] !py-[15px] cursor-pointer boxItem"
+        class="h-[270px] rounded-[20px] border border-solid border-[#fff] !p-[15px] cursor-pointer boxItem"
         v-for="item in 10"
         :key="item"
         @click="$router.push('/marketDetail')"
       >
         <div class="flex justify-between items-center">
           <div
-            class="!py-[5px] !px-[8px] border border-solid border-[#2B7B84] rounded-[4px] text-[#2B7B84] text-[12px] leading-[12px]"
+            class="!py-[5px] !px-[8px] border border-solid !border-[#6DDD25] rounded-[4px] text-[#6DDD25] text-[12px] leading-[12px]"
           >
             Trending
           </div>
-          <div>
+          <!-- <div>
             <v-btn icon="mdi-dots-horizontal" variant="text"></v-btn>
-          </div>
+          </div> -->
         </div>
         <div class="flex justify-between items-center !mt-[15px]">
           <div class="flex items-center gap-[20px]">
@@ -108,16 +112,15 @@ const state = reactive({
           <div class="relative">
             <v-progress-circular
               :model-value="state.progress"
-              :rotate="-90"
-              :size="100"
-              :width="10"
-              color="#A2D00C"
-              class="semi-circle-progress"
+              :size="70"
+              :width="5"
+              bg-color="#fff"
+              color="#6DDD25"
             >
               <div
-                class="text-[#fff] text-[20px] font-bold absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-90%]"
+                class="text-[#6DDD25] text-[16px] font-bold absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]"
               >
-                {{ state.progressValue }}%
+                {{ state.progress }}%
               </div>
             </v-progress-circular>
           </div>
@@ -129,10 +132,10 @@ const state = reactive({
             v-ripple
             @click.stop="()=> console.log('Yes clicked')"
           >
-            <div class="text-[#A2D00C] text-[20px] leading-[20px]" style="font-family: Inter">
+            <div class="text-[#6DDD25] text-[20px] leading-[20px] select-none" style="font-family: Inter">
               Yes
             </div>
-            <div class="text-[#787878] text-[14px] leading-[14px]" style="font-family: Inter">
+            <div class="text-[#787878] text-[14px] leading-[14px] select-none" style="font-family: Inter">
               8492.00
             </div>
           </div>
@@ -142,15 +145,15 @@ const state = reactive({
             v-ripple
              @click.stop="()=> console.log('No clicked')"
           >
-            <div class="text-[#5D2FE7] text-[20px] leading-[20px]" style="font-family: Inter">
+            <div class="text-[#E72F2F] text-[20px] leading-[20px] select-none" style="font-family: Inter">
               No
             </div>
-            <div class="text-[#787878] text-[14px] leading-[14px]" style="font-family: Inter">
+            <div class="text-[#787878] text-[14px] leading-[14px] select-none" style="font-family: Inter">
               8492.00
             </div>
           </div>
         </div>
-        <div class="!px-[20px] !mt-[10px] flex items-center justify-between">
+        <div class="!px-[20px] !mt-[20px] flex items-center justify-between">
           <div class="text-[16px] text-[#787878]">RTG:85127848.00</div>
           <!-- <v-icon icon="mdi-star-outline" size="20" class="cursor-pointer" /> -->
           <img src="@/assets/img/star.png" class="w-[20px] h-[20px] cursor-pointer">
@@ -167,8 +170,10 @@ const state = reactive({
 }
 
 .boxItem:hover {
-  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.05), 0px 6px 12px rgba(0, 0, 0, 0.05);
-  background-color: rgba(27, 27, 27, .8);
+  /* box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.05), 0px 6px 12px rgba(0, 0, 0, 0.05);
+  background-color: rgba(27, 27, 27, .8); */
   translate: 0px -1px;
+  box-shadow: 0px 0px 6px 4px #69DB2740;
+
 }
 </style>
