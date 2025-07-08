@@ -14,6 +14,7 @@ import Toast from "vue-toastification";
 import "vue-toastification/dist/index.css";
 import InfiniteLoading from "v3-infinite-loading";
 import "v3-infinite-loading/lib/style.css";
+import { setupGlobalFilters  } from '@/utils/filters'
 
 import App from './App.vue'
 import router from './router'
@@ -33,6 +34,7 @@ const vuetify = createVuetify({
   directives,
 })
 
+setupGlobalFilters(app)
 app.use(createPinia())
 app.use(router)
 app.use(vuetify)

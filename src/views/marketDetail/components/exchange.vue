@@ -22,6 +22,8 @@ const state = reactive({
     checkSlip: false, //是否使用滑点
     slippage: 0,
     loading: false,
+    totalPrice: 0, // 总共需要支付的价格
+    curAvgPrice: 0, // 当前每份价格
   },
   eventId: '',
   conditionId: '',
@@ -52,10 +54,12 @@ onMounted(async () => {
 
 const appStore = store.useAppStore()
 
-
-watch(()=>state.buyOrder.amount,()=>{
-  getEstimatedPrice()
-})
+watch(
+  () => state.buyOrder.amount,
+  () => {
+    getEstimatedPrice()
+  },
+)
 
 function initErc20Contract() {
   state.tokenContract = appStore.initErc20Contract(
@@ -74,6 +78,7 @@ async function initControlContract() {
 }
 
 async function getTokenBalance() {
+  if (!state.tokenContract) return
   const balance = await state.tokenContract.balanceOf(appStore.tomeState.curWalletAddress)
   state.balanceOfUsdo = appStore.formatUnits(balance)
   console.log('balanceOfUsdo', state.balanceOfUsdo)
@@ -104,17 +109,18 @@ async function approveUsdo(value) {
 }
 
 // 通过份数算出价格
-async function getEstimatedPrice(val) {
+async function getEstimatedPrice() {
   try {
-    console.log('getEstimatedPrice',state.marketContract.getEstimatedPrice);
-    
+    // console.log('getEstimatedPrice',state.eventId,state.conditionId,state.amount,state.buyOrder.outcome);
     const res = await state.marketContract.getEstimatedPrice(
       state.eventId,
       state.conditionId,
-      state.amount,
+      state.buyOrder.amount,
       state.buyOrder.outcome,
     )
-    console.log('getEstimatedPrice', res)
+    // console.log('getEstimatedPrice', appStore.formatUnits(res[0]),appStore.formatUnits(res[1]))
+    state.buyOrder.curAvgPrice = Number(appStore.formatUnits(res[0]))
+    state.buyOrder.totalPrice = Number(appStore.formatUnits(res[1]))
   } catch (error) {
     console.error(error)
   }
@@ -332,10 +338,9 @@ async function handleClickBuy() {
             <div
               class="w-full flex items-center justify-end gap-[5px] text-[16px] leading-[16px] text-[#cecfd2]"
             >
-              <div style="font-family: din">{{ state.balanceOfUsdo }} USDO</div>
+              <div>{{ state.balanceOfUsdo }} USDO</div>
               <div
                 class="text-[#708D11] underline text-[14px] leading-[14px] cursor-pointer font-bold"
-                style="font-family: din"
                 @click="state.buyOrder.amount = Number(state.balanceOfUsdo)"
               >
                 Max
@@ -343,6 +348,25 @@ async function handleClickBuy() {
             </div>
             <div
               class="!mt-[16px] border border-solid border-[#DBDBDB] rounded-[10px] overflow-hidden"
+              v-show="state.buyOrder.buyType == 1"
+            >
+              <v-number-input
+                control-variant="split"
+                density="compact"
+                variant="plain"
+                v-model:model-value="state.buyOrder.totalPrice"
+                :hide-details="true"
+                base-color="#1b1b1b"
+                bgColor="#1b1b1b"
+                style="height: 38px"
+                height="60"
+                :min="0"
+              >
+              </v-number-input>
+            </div>
+            <div
+              class="!mt-[16px] border border-solid border-[#DBDBDB] rounded-[10px] overflow-hidden"
+              v-show="state.buyOrder.buyType == 2"
             >
               <v-number-input
                 control-variant="split"
@@ -370,13 +394,12 @@ async function handleClickBuy() {
                   <div
                     v-bind="props"
                     class="text-[#96949c] border-b border-dotted border-[#333741]"
-                    style="font-family: din"
                   >
                     Est Avg Price
                   </div>
                 </template>
               </v-tooltip>
-              <div class="text-[#cecfd2]" style="font-family: din">0.00 USDO</div>
+              <div class="text-[#cecfd2]">{{ $formatAmount(state.buyOrder.curAvgPrice) }}</div>
             </div>
             <div class="flex items-center justify-between">
               <v-tooltip
@@ -388,13 +411,12 @@ async function handleClickBuy() {
                   <div
                     v-bind="props"
                     class="text-[#96949c] border-b border-dotted border-[#333741]"
-                    style="font-family: din"
                   >
                     Shares
                   </div>
                 </template>
               </v-tooltip>
-              <div class="text-[#cecfd2]" style="font-family: din">0.00 USDO</div>
+              <div class="text-[#cecfd2]">{{ $formatAmount(state.buyOrder.amount) }}</div>
             </div>
             <div class="flex items-center justify-between">
               <v-tooltip
@@ -406,13 +428,12 @@ async function handleClickBuy() {
                   <div
                     v-bind="props"
                     class="text-[#96949c] border-b border-dotted border-[#333741]"
-                    style="font-family: din"
                   >
                     Potential Profit
                   </div>
                 </template>
               </v-tooltip>
-              <div class="text-[#cecfd2]" style="font-family: din">--</div>
+              <div class="text-[#cecfd2]">--</div>
             </div>
             <div class="flex items-center justify-between">
               <v-tooltip
@@ -424,13 +445,12 @@ async function handleClickBuy() {
                   <div
                     v-bind="props"
                     class="text-[#96949c] border-b border-dotted border-[#333741]"
-                    style="font-family: din"
                   >
                     Est. Fee
                   </div>
                 </template>
               </v-tooltip>
-              <div class="text-[#cecfd2]" style="font-family: din">--</div>
+              <div class="text-[#cecfd2]">--</div>
             </div>
           </div>
           <div>
@@ -441,7 +461,7 @@ async function handleClickBuy() {
               :disabled="btnForBuyDisabled"
               @click="handleClickBuy"
             >
-              <div class="text-[#fff] text-[18px]" style="font-family: din">Confirm Buy</div>
+              <div class="text-[#fff] text-[18px]">Confirm Buy</div>
             </v-btn>
           </div>
           <div class="flex items-center gap-[5px]">
@@ -459,13 +479,12 @@ async function handleClickBuy() {
                 <div
                   v-bind="props"
                   class="text-[#cecfd2] border-b border-dotted border-[#333741] text-[14px]"
-                  style="font-family: din"
                 >
                   Slippage Tolerance
                 </div>
               </template>
             </v-tooltip>
-            <div class="text-[#cecfd2] text-[14px]" style="font-family: din">2.0%</div>
+            <div class="text-[#cecfd2] text-[14px]">2.0%</div>
             <v-menu location="bottom" :close-on-content-click="false">
               <template v-slot:activator="{ props }">
                 <div v-bind="props" class="cursor-pointer">
@@ -491,7 +510,6 @@ async function handleClickBuy() {
                       <div>
                         <span
                           class="text-[#cecfd2] border-b border-dotted border-[#333741] text-[14px] inline-block"
-                          style="font-family: din"
                         >
                           Slippage Tolerance
                         </span>
@@ -708,10 +726,9 @@ async function handleClickBuy() {
             <div
               class="w-full flex items-center justify-end gap-[5px] text-[16px] leading-[16px] text-[#cecfd2]"
             >
-              <div style="font-family: din">1000 USDO</div>
+              <div>1000 USDO</div>
               <div
                 class="text-[#708D11] underline text-[14px] leading-[14px] cursor-pointer font-bold"
-                style="font-family: din"
               >
                 Max
               </div>
@@ -745,13 +762,12 @@ async function handleClickBuy() {
                   <div
                     v-bind="props"
                     class="text-[#96949c] border-b border-dotted border-[#333741]"
-                    style="font-family: din"
                   >
                     Est Avg Price
                   </div>
                 </template>
               </v-tooltip>
-              <div class="text-[#cecfd2]" style="font-family: din">0.00 USDO</div>
+              <div class="text-[#cecfd2]">{{ state.curAvgPrice }} USDO</div>
             </div>
             <div class="flex items-center justify-between">
               <v-tooltip
@@ -763,13 +779,12 @@ async function handleClickBuy() {
                   <div
                     v-bind="props"
                     class="text-[#96949c] border-b border-dotted border-[#333741]"
-                    style="font-family: din"
                   >
                     Shares
                   </div>
                 </template>
               </v-tooltip>
-              <div class="text-[#cecfd2]" style="font-family: din">0.00 USDO</div>
+              <div class="text-[#cecfd2]">0.00</div>
             </div>
             <div class="flex items-center justify-between">
               <v-tooltip
@@ -781,13 +796,12 @@ async function handleClickBuy() {
                   <div
                     v-bind="props"
                     class="text-[#96949c] border-b border-dotted border-[#333741]"
-                    style="font-family: din"
                   >
                     Potential Profit
                   </div>
                 </template>
               </v-tooltip>
-              <div class="text-[#cecfd2]" style="font-family: din">--</div>
+              <div class="text-[#cecfd2]">--</div>
             </div>
             <div class="flex items-center justify-between">
               <v-tooltip
@@ -799,13 +813,12 @@ async function handleClickBuy() {
                   <div
                     v-bind="props"
                     class="text-[#96949c] border-b border-dotted border-[#333741]"
-                    style="font-family: din"
                   >
                     Est. Fee
                   </div>
                 </template>
               </v-tooltip>
-              <div class="text-[#cecfd2]" style="font-family: din">--</div>
+              <div class="text-[#cecfd2]">--</div>
             </div>
           </div>
           <div>
@@ -814,7 +827,7 @@ async function handleClickBuy() {
               class="!rounded-full !h-[44px] !w-full !bg-[#708D11]"
               :disabled="false"
             >
-              <div class="text-[#fff] text-[18px]" style="font-family: din">Confirm Sell</div>
+              <div class="text-[#fff] text-[18px]">Confirm Sell</div>
             </v-btn>
           </div>
         </div>

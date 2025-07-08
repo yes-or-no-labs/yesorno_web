@@ -278,6 +278,8 @@ export const store = {
         return ethers.formatUnits(value, decimal)
       },
       parseUnits(value, decimal = 18) {
+        console.log('parseUnits',value);
+        
         if (!value) return '0'
 
         // 处理科学计数法
