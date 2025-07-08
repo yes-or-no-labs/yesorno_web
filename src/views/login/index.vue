@@ -10,41 +10,43 @@ import { store } from '@/store'
 import { useRouter } from 'vue-router'
 import { useToast } from "vue-toastification";
 import { ethers } from 'ethers'
+import { api } from '@/apis'
 
 const state = reactive({
   walletList: [
-    {
-      title: 'Backpack',
-      icon: backpackImg,
-      walletRdns: 'app.backpack',
-    },
-    {
-      title: 'HaHa Wallet',
-      icon: hahaImg,
-      walletRdns: 'haha.me',
-    },
+    // {
+    //   title: 'Backpack',
+    //   icon: backpackImg,
+    //   walletRdns: 'app.backpack',
+    // },
+    // {
+    //   title: 'HaHa Wallet',
+    //   icon: hahaImg,
+    //   walletRdns: 'haha.me',
+    // },
     {
       title: 'MetaMask',
       icon: metamaskImg,
       walletRdns: 'io.metamask',
     },
-    {
-      title: 'Coinbase Wallet',
-      icon: coinbaseImg,
-      walletRdns: 'com.coinbase.wallet',
-    },
-    {
-      title: 'OKX Wallet',
-      icon: okxImg,
-      walletRdns: 'com.okex.wallet',
-    },
-    {
-      title: 'Phantom',
-      icon: phantomImg,
-      walletRdns: 'app.phantom',
-    },
+    // {
+    //   title: 'Coinbase Wallet',
+    //   icon: coinbaseImg,
+    //   walletRdns: 'com.coinbase.wallet',
+    // },
+    // {
+    //   title: 'OKX Wallet',
+    //   icon: okxImg,
+    //   walletRdns: 'com.okex.wallet',
+    // },
+    // {
+    //   title: 'Phantom',
+    //   icon: phantomImg,
+    //   walletRdns: 'app.phantom',
+    // },
   ],
-  checkTerms:false
+  checkTerms:false,
+  curRdns:''
 })
 
 const appStore = store.useAppStore()
@@ -55,6 +57,7 @@ const toast = useToast();
 async function connectWallet(item) {
   try {
     if(!state.checkTerms) return toast.error(`Please check the Terms of Use to proceed.`);
+    state.curRdns = item.walletRdns
     const res = await appStore.evmConnectWallet(false, item.walletRdns)
     console.log('connectWallet res', res)
     if (res.success) {
@@ -82,6 +85,16 @@ function isDetected(walletRdns) {
   return rdnsArr.value.some((item) => item.toLowerCase().includes(walletRdns))
 }
 
+function generateSecure14DigitRandom() {
+    const array = new Uint32Array(4);
+    window.crypto.getRandomValues(array);
+    let result = '';
+    array.forEach(value => {
+        result += value.toString().padStart(10, '0').slice(-10);
+    });
+    return result.slice(0, 14);
+}
+
 
 async function getSignatrue() {
           // await appStore.mStateSimple.ethersBrowserProvider.ready();
@@ -89,14 +102,29 @@ async function getSignatrue() {
       const provider = new ethers.BrowserProvider(
         appStore.mStateSimple.metamaskProvider
       );
+
+      const nonce = generateSecure14DigitRandom()
+      const timestamp = Math.floor(new Date().getTime() / 1000);
     
       const signer = await provider.getSigner();
-      const signMessage = {nonce:'24844408781633',timestamp:1751282884}
+      const signMessage = {nonce,timestamp}
       
       const signatrue = await signer.signMessage(JSON.stringify(signMessage));
       console.log("signatrue", signatrue);
-      // this.onUpdateSignMessage(signatrue)
-      // await this.getUserInfo()
+      const res = await api.login({
+        nonce,
+        timestamp,
+        sign:signatrue,
+        invite_code:'',
+        sources:'web',
+        sign_in_wallet_plugin:state.curRdns
+      })
+      // console.log('login',res);
+      if(res.success){
+        appStore.onUpdateToken('bearer '+res.obj.accessToken)
+        appStore.onUpdateRefreshToken('bearer '+res.obj.refreshToken)
+        await appStore.getUserInfo()
+      }
     } catch (error) {
       console.error(error);
     }

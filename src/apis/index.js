@@ -1,4 +1,4 @@
-import { createRequest } from "@/utils/request/request"
+import createRequest from "@/utils/request/request"
 
 export const baseHttp = createRequest({
     baseURL: import.meta.env.VITE_APP_BASE_URL,
@@ -27,6 +27,9 @@ export const formDataHttp = createRequest({
   })
 
 export const api = {
-  getSign: (data) => formDataHttp.req({url:"/user/getSign",method: 'POST', data}),
-  
+  login: (data) => baseHttp({url:"/v1/login/login",method: 'POST', data}),
+  logout: () => baseHttp({url:"/v1/login/logout",method: 'POST'}),
+  refreshToken: () => baseHttp({url:"/v1/login/refresh_token",method: 'POST'}),
+  getUserInfo: () => baseHttp({url:"/v1/users/info",method: 'GET',}),
+  getMarketData: (params) => baseHttp({url:"/v1/guess/list",method: 'GET',params}),
 }

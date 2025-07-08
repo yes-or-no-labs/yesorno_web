@@ -90,9 +90,18 @@ export const onEthAccounts = async (provider) => {
     const addressArray = await provider.request({
       method: 'eth_accounts',
     })
-    result['data'] = addressArray
-    result['message'] = 'Success'
-    result['success'] = true
+    console.log('onEthAccounts',addressArray);
+    if(addressArray.length>0){
+      result['data'] = addressArray
+      result['message'] = 'Success'
+      result['success'] = true
+    }else{
+      result['data'] = addressArray
+      result['message'] = 'faild'
+      result['success'] = false
+    }
+    
+    
   } catch (error) {
     console.error(error)
     result['message'] = error.message
@@ -303,6 +312,8 @@ export const onConnectMetaMask = async (provider, chainIdNum, recovery = false) 
 
   if (recovery) {
     const onEthAccountsRet = await onEthAccounts(provider)
+    console.log('onConnectMetaMask',onEthAccountsRet);
+    
     if (!onEthAccountsRet?.success) {
       return onEthAccountsRet
     }

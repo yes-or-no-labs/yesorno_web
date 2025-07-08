@@ -12,7 +12,7 @@ const router = useRouter()
 const includePaths = ['/market', '/marketDetail','/leaderboard','/task','/profile']
 
 const currenRoutePath = computed(() => {
-  console.log('currenRoutePath', router.currentRoute.value)
+  // console.log('currenRoutePath', router.currentRoute.value)
 
   return router.currentRoute.value.fullPath
 })

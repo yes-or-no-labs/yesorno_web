@@ -7,6 +7,7 @@ import { constant } from '@/utils/constant.js'
 import * as uniapp from '@/utils/uni-app'
 import { blackList } from '../utils/blackList'
 import { defineStore } from 'pinia'
+import { api } from '@/apis'
 
 export const store = {
   useAppStore: defineStore('appStore', () => {
@@ -14,7 +15,7 @@ export const store = {
       token: localStorage.getItem(constant.tokenKey),
       username: localStorage.getItem(constant.usernameKey),
       userInfo: localStorage.getItem(constant.userInfoKey) || null,
-
+      refreshToken: localStorage.getItem(constant.refreshTokenKey) || '',
       appConfig: localStorage.getItem(constant.appConfigKey) || {},
       walletAccountList: [],
       curWalletAddress: localStorage.getItem(constant.curWalletAddress) || '',
@@ -43,6 +44,11 @@ export const store = {
       onUpdateToken(val) {
         tomeState.token = val
         localStorage.setItem(constant.tokenKey, val)
+        // localStorage.setItem(constant.tokenKey, val)
+      },
+      onUpdateRefreshToken(val) {
+        tomeState.refreshToken = val
+        localStorage.setItem(constant.refreshTokenKey, val)
         // localStorage.setItem(constant.tokenKey, val)
       },
       onUpdateSignMessage(val) {
@@ -110,7 +116,7 @@ export const store = {
 
         let metamaskProvider = null
 
-        console.log('evmConnectWallet',walletRdns);
+        // console.log('evmConnectWallet',walletRdns);
         
 
         if(!recovery){
@@ -132,6 +138,7 @@ export const store = {
         )
         console.log(`++++++[${new Date().toISOString()}] 链接钱包结果: `, onConnectMetaMaskRet)
         if (!onConnectMetaMaskRet.success) {
+          this.onDisConnectClick()
           return onConnectMetaMaskRet
         }
         tomeState.walletAccountList = onConnectMetaMaskRet.data.accounts
@@ -220,18 +227,10 @@ export const store = {
         }
       },
       async getUserInfo() {
-        const res = await api.getUser()
-        // console.log('getUserInfo',res);
-        if (res.code == 0) {
-          this.onUpdateUserInfo(res.result)
-          const path = this.getCurrentRoute()
-          // console.log('getUserInfo',path);
-          if (res.result.topAddress && path !== 'pages/home/index') {
-            // uniapp.route({
-            //   url: `/pages/home/index`,
-            //   type: 'redirectTo',
-            // })
-          }
+        const res = await api.getUserInfo()
+        console.log('getUserInfo',res);
+        if (res.success) {
+          this.onUpdateUserInfo(res.obj.userInfo)
         }
       },
 
@@ -257,11 +256,13 @@ export const store = {
         )
       },
       initErc20Contract(tokenAddress, abi) {
+        if(!mStateSimple.metamaskProvider) return
         const provider = new ethers.BrowserProvider(mStateSimple.metamaskProvider)
         // 创建代币合约实例
         return new ethers.Contract(tokenAddress, abi, provider)
       },
       async initErc20ContractSign(tokenAddress, abi) {
+        if(!mStateSimple.metamaskProvider) return
         const provider = new ethers.BrowserProvider(mStateSimple.metamaskProvider)
         const signer = await provider.getSigner()
         // console.log('initErc20ContractSign',provider.getSigner());
@@ -339,6 +340,8 @@ export const store = {
           if (mStateSimple.metamaskProvider) {
             this.removeMetaMaskListeners(mStateSimple.metamaskProvider)
             await utilEthereum.onDisConnect(mStateSimple.metamaskProvider)
+          }
+            await api.logout()
             mStateSimple.metamaskProvider = null
             mStateSimple.ethersBrowserProvider = null
             mStateSimple.lastWalletRdns = ''
@@ -346,7 +349,6 @@ export const store = {
             tomeState.curWalletAddress = ''
             this.onLoginOut()
             console.log(`++++++[${new Date().toISOString()}] 断开链接成功`)
-          }
         } catch (error) {
           console.error(`++++++[${new Date().toISOString()}] 断开链接错误`, error)
         }

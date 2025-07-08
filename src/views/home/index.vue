@@ -1,29 +1,58 @@
 <script setup>
-import { reactive } from 'vue';
+import { onMounted, reactive } from 'vue';
 import home_bg4 from '@/assets/img/home_bg4.png'
 import home_bg5 from '@/assets/img/home_bg5.png'
 import home_bg6 from '@/assets/img/home_bg6.png'
+import lottie from 'lottie-web' // 引入插件
+import animationData1 from '@/assets/animate/data1.json'
+import animationData2 from '@/assets/animate/data2.json' // 引入
+import animationData3 from '@/assets/animate/data3.json'
 
 const state = reactive({
   reasoningList:[{
     icon:home_bg4,
-    title:'Stay updated on breaking news, viral trends, and global conversations without ever leaving your chat.'
+    json:animationData1,
+    title:'Predict instantly without leaving the chat. Breaking news, viral trends, or global events — just tap, think, and vote right inside Telegram. No app switching, no feed refreshing.'
   },{
     icon:home_bg5,
-    title:'Whether it’s a crypto price surge, a political shakeup, a game-winning shot, or the next AI breakthrough — YesorNo lets you instantly respond with your'
+    json:animationData3,
+    title:'Where collective intelligence meets real-time insight. Our AI surfaces patterns, curates questions, and helps communities uncover what’s really happening — together.'
   },{
     icon:home_bg6,
-    title:'Prediction, right from where you’re already talking. No need to open another app or refresh a feed. Just tap, think, and vote.'
+    json:animationData2,
+    title:'Every prediction is a chance to win. Turn your foresight into rewards as you bet on crypto, culture, politics, and more — driven by what the world believes, or is afraid to say.'
   }]
 })
+
+onMounted(()=>{
+      // optAnimation()
+})
+
+
+const optAnimation = (json,index) => {
+  lottie.destroy('lottieLoading'+index)
+  const elem = document.querySelector('.lottieLoading'+index)
+  console.log('elem', elem)
+
+  const params = {
+    container: elem,
+    renderer: 'svg',
+    loop: true,
+    autoplay: true,
+    animationData:json,
+    name: 'lottieLoading'+index,
+  }
+  lottie.loadAnimation(params)
+}
 </script>
 
 <template>
   <div>
-    <img
+    <!-- <img
       src="@/assets/img/home_bg.png"
       class="absolute lg:top-0 top-[40xp] left-[50%] translate-x-[-50%] w-full object-cover max-w-[1920px]"
-    />
+    /> -->
+    <video src="@/assets/mp4/home_main.mp4" autoplay poster="@/assets/img/home_bg.png" muted loop class="absolute lg:top-0 top-[40xp] left-[50%] translate-x-[-50%] w-full object-cover max-w-[1920px]" oncontextmenu="return false;"></video>
     <div
       class="relative 2xl:h-[1067px] xl:h-[836px] lg:h-[654px] md:h-[525px] sm:h-[388px] h-[238px] flex items-center justify-center"
     >
@@ -72,11 +101,12 @@ const state = reactive({
         />
         committed to truth, and designed to reward those who dare to predict.
       </div>
-      <img
+      <!-- <img
         src="@/assets/img/home_bg2.png"
         class="w-full object-cover 2xl:h-[200px] xl:h-[180px] lg:h-[160px] sm:h-[140px] h-[80px] 2xl:!mt-[40px] xl:!mt-[30px] lg:!mt-[20px] !mt-[10px]"
         draggable="false"
-      />
+      /> -->
+      <video src="@/assets/mp4/home_bg.mp4" autoplay poster="@/assets/img/home_bg2.png" muted loop class="w-full object-cover 2xl:h-[200px] xl:h-[180px] lg:h-[160px] sm:h-[140px] h-[80px] 2xl:!mt-[40px] xl:!mt-[30px] lg:!mt-[20px] !mt-[10px]" oncontextmenu="return false;"></video>
     </div>
     <div class="2xl:!mt-[200px] xl:!mt-[180px] lg:!mt-[160px] sm:!mt-[140px] !mt-[120px] w-[80%] mx-auto">
       <div
@@ -86,7 +116,7 @@ const state = reactive({
           class="2xl:text-[34px] xl:text-[28px] sm:text-[25px] text-[20px] text-center text-[#fff] font-bold relative z-10"
           style="font-family: Geist"
         >
-          Reasoning Enlighten You
+          Unique Value Proposition
         </div>
         <img
           src="@/assets/img/home_bg3.png"
@@ -104,13 +134,14 @@ const state = reactive({
             :key="index"
           >
             <div class="!pt-[10px]">
-              <img
+              <!-- <img
                 :src="item.icon"
                 draggable="false"
                 class="2xl:w-[46px] xl:w-[40px] lg:w-[35px] md:w-[30px] w-[25px] mx-auto"
-              />
+              /> -->
+              <div class="2xl:w-[66px] 2xl:h-[66px] xl:w-[60px] xl:h-[60px] lg:w-[55px] lg:h-[55px] md:w-[50px] md:h-[50px] w-[45px] h-[45px] mx-auto" :class="`lottieLoading${index+1}`" >{{ optAnimation(item.json,index+1) }}</div>
               <div
-                class="xl:text-[14px] text-[12px] text-[#fff] 2xl:!mt-[20px] xl:!mt-[15px] lg:!mt-[10px] text-center"
+                class="xl:text-[14px] text-[12px] text-[#fff] 2xl:!mt-[10px] xl:!mt-[15px] lg:!mt-[10px] text-center"
                 style="font-family: Geist"
               >
                {{ item.title }}

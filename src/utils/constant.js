@@ -10,5 +10,6 @@ export const constant = {
     hasJumpToAddWallet: 'hn5cnyz11j3yol6svjer',
     signMessage: 'mdpdsrgy7apqhaky6dwt',
     curWalletAddress:'KDLTYBi7f43HhGrrpM4U',
-    lastWalletRdnsKey:'UNQfPc8LKJ0g3Az4z4RH'
+    lastWalletRdnsKey:'UNQfPc8LKJ0g3Az4z4RH',
+    refreshTokenKey:'1870CdXLdqc2ei8B6cfJ'
 }

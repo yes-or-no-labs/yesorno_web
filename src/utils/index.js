@@ -1,10 +1,4 @@
 
-import * as uniapp from './uni-app'
-import {store} from '../store/index'
-import {api} from '@/apis'
-import {constant} from './constant'
-import {t} from './lang/index'
-import { blackList } from "@/utils/blackList";
 // const appStore = store.useAppStore();
 const isNil = (value) => value === null || value === undefined
 const isObjectLike = (value) => value && typeof value === 'object' && !Array.isArray(value)

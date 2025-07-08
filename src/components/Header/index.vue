@@ -6,6 +6,7 @@ import profile_icon1 from '@/assets/img/profile_icon1.png'
 import profile_icon2 from '@/assets/img/profile_icon2.png'
 import profile_icon3 from '@/assets/img/profile_icon3.png'
 import profile_icon4 from '@/assets/img/profile_icon4.png'
+import personImg from '@/assets/img/person.png'
 import {copyToClipboard} from '@/utils/uni-app'
 import { useRouter } from 'vue-router'
 
@@ -38,10 +39,12 @@ const router = useRouter()
 
 
 onMounted(()=>{
-  console.log(appStore.tomeState.curWalletAddress);
+  // console.log('userInfo',appStore.tomeState);
 })
 
 const curWalletAddress = computed(() => appStore.tomeState.curWalletAddress)
+
+const userInfo = computed(() => appStore.tomeState.userInfo)
 
 
 function handleClickCopy() {
@@ -57,6 +60,13 @@ async function handleClickItem(index){
   }
   router.push(porfileList[index].path)
 }
+
+const currenRoutePath = computed(() => {
+  // console.log('currenRoutePath', router.currentRoute.value)
+
+  return router.currentRoute.value.fullPath
+})
+
 </script>
 
 <template>
@@ -64,7 +74,7 @@ async function handleClickItem(index){
     <div
       class="hidden lg:flex max-w-[1440px] mx-auto items-center justify-between !px-[32px] h-full gap-[70px]"
     >
-      <div class="flex items-center lg:gap-[20px] gap-[25px] h-full">
+      <div class="flex items-center lg:gap-[40px] gap-[25px] h-full">
         <div class="flex items-center lg:gap-[20px] gap-[40px] cursor-pointer" @click="$router.push('/')">
           <img src="@/assets/img/logo.png" mode="scaleToFill" class="w-[120px] h-[30px] lg:w-[160px] lg:h-[40px]" />
           <!-- <div class="flex flex-col gap-[5px]">
@@ -72,28 +82,39 @@ async function handleClickItem(index){
             <div class="text-[#81F963] text-[15px] leading-[15px]">Beta V1</div>
           </div> -->
         </div>
+         <div
+          class="text-[#fff] lg:text-[14px] text-[16px] leading-[16px] font-[600] cursor-pointer"
+          style="font-family: Geist"
+          @click="$router.push('/')"
+          :class="currenRoutePath=== '/'?'!text-[#6DDD25]':''"
+        >
+          Home
+        </div>
         <div
-          class="text-[#fff] lg:text-[14px] text-[15px] leading-[15px] cursor-pointer"
+          class="text-[#fff] lg:text-[14px] text-[16px] leading-[16px] font-[600] cursor-pointer"
           style="font-family: Geist"
           @click="$router.push('/market')"
+          :class="currenRoutePath=== '/market'?'!text-[#6DDD25]':''"
         >
           Market
         </div>
         <div
-          class="text-[#fff] lg:text-[14px] text-[15px] leading-[15px] cursor-pointer"
+          class="text-[#fff] lg:text-[14px] text-[16px] leading-[16px] font-[600] cursor-pointer"
           style="font-family: Geist"
           @click="$router.push('/task')"
+          :class="currenRoutePath=== '/task'?'!text-[#6DDD25]':''"
         >
           Tasks
         </div>
         <div
-          class="text-[#fff] lg:text-[14px] text-[15px] leading-[15px] cursor-pointer"
+          class="text-[#fff] lg:text-[14px] text-[16px] leading-[16px] font-[600] cursor-pointer"
           style="font-family: Geist"
           @click="$router.push('/leaderboard')"
+          :class="currenRoutePath=== '/leaderboard'?'!text-[#6DDD25]':''"
         >
-          Leaderboard
+          Ranking
         </div>
-        <v-menu transition="scale-transition" :offset="[10, 0]">
+        <!-- <v-menu transition="scale-transition" :offset="[10, 0]">
           <template v-slot:activator="{ props }">
             <div
               class="text-[#fff] lg:text-[14px] text-[15px] leading-[15px] cursor-pointer whitespace-nowrap"
@@ -109,14 +130,14 @@ async function handleClickItem(index){
               <v-list-item-title>{{ item.title }}</v-list-item-title>
             </v-list-item>
           </v-list>
-        </v-menu>
+        </v-menu> -->
 
-        <div
+        <!-- <div
           class="text-[#fff] lg:text-[14px] text-[15px] leading-[15px] cursor-pointer"
           style="font-family: Geist"
         >
           Discord
-        </div>
+        </div> -->
       </div>
       <div class="flex items-center gap-[45px] h-full">
         <div class="flex items-center gap-[45px] h-full flex-1" v-show="appStore.tomeState.curWalletAddress">
@@ -153,16 +174,16 @@ async function handleClickItem(index){
               v-bind="props"
               style="font-family: Geist"
             >
-              <img src="@/assets/img/person.png" class="w-[50px] h-[50px] rounded-full cursor-pointer" />
+              <img :src="userInfo.avatarUrl||personImg" class="w-[50px] h-[50px] rounded-full cursor-pointer" />
             </div>
           </template>
           <v-list>
              <v-list-item>
                 <v-list-item-title>
                   <div class="!pb-[16px] border-b border-solid border-[#333741]  flex gap-[8px] items-center">
-                    <img src="@/assets/img/person.png" class="w-[40px] h-[40px] rounded-full cursor-pointer" />
+                    <img :src="userInfo.avatarUrl||personImg" class="w-[40px] h-[40px] rounded-full cursor-pointer" />
                     <div class="flex flex-col">
-                      <div class="text-[#fff] text-[14px]" style="font-family: din;">User_238192</div>
+                      <div class="text-[#fff] text-[14px]" style="font-family: din;">{{ userInfo.nickname?userInfo.nickname:`User_${curWalletAddress.slice(-6)}` }}</div>
                       <div class="flex items-center gap-[5px]">
                         <div class="text-[#fff] text-[14px]" style="font-family: din;">{{ formatAddress(curWalletAddress) }}</div>
                         <img src="@/assets/img/copy.png" class="w-[16px] h-[16px] cursor-pointer" @click="handleClickCopy"/>

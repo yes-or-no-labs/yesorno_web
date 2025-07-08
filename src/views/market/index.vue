@@ -1,6 +1,7 @@
 <script setup>
-import { reactive } from 'vue'
+import { onMounted, reactive } from 'vue'
 import Segmented from '@/components/Segmented/index.vue'
+import { api } from '@/apis';
 
 
 const state = reactive({
@@ -16,11 +17,43 @@ const state = reactive({
   searchInputLoading: false,
   progress: 50,
   progressValue: 50,
+  pageNum:1,
+  pageSize:10,
+  dataList:[]
 })
+
+onMounted(()=>{
+  loadMore()
+})
+
+async function loadMore($state) {
+  console.log('onScroll',$state);
+  try {
+    const res = await api.getMarketData({
+      pageSize:state.pageSize,
+      pageNum:state.pageNum,
+      topic:'',
+      eventType:''
+    })
+    console.log('getMarketData',res);
+    if(res.success){
+      state.dataList = state.dataList.concat(res.obj.result)
+      if(Array.isArray(res.obj.result)&& res.obj?.result.length<state.pageSize){
+        $state?.complete()
+      }else{
+        $state?.loaded();
+        state.pageNum++
+      }
+    }
+  } catch (error) {
+    console.error(error);
+    $state?.error()
+  }
+}
 </script>
 
 <template>
-  <div class="w-full min-h-screen !pb-[100px]">
+  <div class="w-full min-h-screen !pb-[100px] max-w-[1300px] mx-auto">
     <div class="w-full h-[58px] flex items-center justify-between !px-[35px] !mt-[40px]">
       <!-- <div class="flex items-center gap-[35px]">
         <div
@@ -74,12 +107,13 @@ const state = reactive({
       </div>
     </div>
     
-    <div class="w-full grid grid-cols-3 gap-[20px] !mt-[20px] !px-[38px]">
+    <div class="w-full grid grid-cols-3 gap-[16px] !mt-[20px] !px-[38px]">
       <div
-        class="h-[270px] rounded-[20px] border border-solid border-[#fff] !p-[15px] cursor-pointer boxItem"
-        v-for="item in 10"
-        :key="item"
-        @click="$router.push('/marketDetail')"
+        class="rounded-[20px] border border-solid border-[#fff] !p-[15px] cursor-pointer boxItem"
+        v-for="item in state.dataList"
+        :key="item.guid"
+        @click="$router.push(`/marketDetail?eventId=${item.eventId}&conditionId=${item.conditionList
+[0].conditionId}`)"
       >
         <div class="flex justify-between items-center">
           <div
@@ -94,7 +128,7 @@ const state = reactive({
         <div class="flex justify-between items-center !mt-[15px]">
           <div class="flex items-center gap-[20px]">
             <img
-              src="https://pub-e95d6af5130d4cb8a791802809e31727.r2.dev/0x18f63f20eead237c83ff75bb7bd2028006fef79d/0xa7e5f55d2381a2cc7c4e709d01603d0c79706746a54d7452006285d9a692eba3"
+              :src="item.imgUrl"
               class="w-[58px] h-[58px] rounded-[8px]"
             />
             <div class="flex flex-col gap-[5px]">
@@ -102,7 +136,7 @@ const state = reactive({
                 class="text-[#fff] text-[16px] font-bold leading-[20px]"
                 style="font-family: 'Inter'"
               >
-                GTA VI released before June 2026?
+                {{ item.topic }}
               </div>
               <div class="text-[#787878] text-[14px] leading-[14px]" style="font-family: 'Inter'">
                 Trending
@@ -125,7 +159,7 @@ const state = reactive({
             </v-progress-circular>
           </div>
         </div>
-        <div class="!mt-[25px] flex items-center gap-[10px]">
+        <div class="!mt-[25px] !mb-[20px] flex items-center gap-[10px]" v-if="item.conditionList.length==1">
           <div
             class="flex-1 rounded-l-[10px] !py-[12px] !pl-[23px] flex flex-col gap-[5px] cursor-pointer"
             style="background: rgba(255, 255, 255, 0.05)"
@@ -153,13 +187,43 @@ const state = reactive({
             </div>
           </div>
         </div>
-        <div class="!px-[20px] !mt-[20px] flex items-center justify-between">
+        <div class="h-[98px] w-full overflow-y-auto !mt-[12px] flex flex-col gap-[12px]" v-else>
+          <div class="w-full flex items-center gap-[8px]" v-for="item1 in item.conditionList" :key="item1.conditionId">
+            <div class="flex-1 relative">
+              <div class="flex-1 flex items-center gap-[12px] !px-[4px]">
+                <div class="text-[14px] text-[#F5F5F6] flex-1 truncate w-[40px]">{{ item1.conditionDesc }}</div>
+                <div class="text-[14px] text-[#F5F5F6]">12%</div>
+              </div>
+              <div class="w-[50%] h-full absolute left-0 top-0 bg-[#ffffff33] rounded-l-[8px]"></div>
+            </div>
+            <div class="flex-[0.8] flex items-center gap-[5px]">
+              <div class="h-[24px] rounded-[8px] text-[14px] bg-[#1A1A1E] text-[#6DDD25] flex-1 flex justify-center items-center hover:bg-[rgb(109,221,37,.5)]" v-ripple>Yes</div>
+              <div class="h-[24px] rounded-[8px] text-[14px] bg-[#1A1A1E] text-[#E72F2F] flex-1 flex justify-center items-center hover:bg-[rgb(231,47,47,.5)]" v-ripple>No</div>
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center justify-between">
           <div class="text-[16px] text-[#787878]">RTG:85127848.00</div>
           <!-- <v-icon icon="mdi-star-outline" size="20" class="cursor-pointer" /> -->
           <img src="@/assets/img/star.png" class="w-[20px] h-[20px] cursor-pointer">
         </div>
       </div>
+      <v-skeleton-loader
+        class="mx-auto w-full !rounded-[20px] border border-solid border-[#fff]"
+        v-show="state.dataList == 0"
+        type="card-avatar, actions"
+        v-for="item in 5"
+      >
+      </v-skeleton-loader>
     </div>
+      <infinite-loading @infinite="loadMore" :firstload="false">
+        <template #spinner>
+          <div class=" text-center">Loading...</div>
+        </template>
+        <template #complete>
+            <div class=" text-center">No more</div>
+          </template>
+      </infinite-loading>
   </div>
 </template>
 

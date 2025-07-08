@@ -1,6 +1,11 @@
 <script setup>
-import { reactive } from 'vue'
+import { computed, onMounted, reactive, watch } from 'vue'
 import settingSvg from '@/assets/img/setting.svg'
+import { useRoute } from 'vue-router'
+import GuessMarketAbi from '@/abi/GuessMarket.json'
+import network from '@/utils/network'
+import Erc20ABi from '@/abi/erc_20.json'
+import { store } from '@/store'
 
 const state = reactive({
   tabList: [
@@ -8,16 +13,141 @@ const state = reactive({
     { title: 'SELL', value: '2' },
   ],
   buyOrder: {
-    outcome: 'yes',
+    outcome: '0', //0-yes，1-no
     orderType: '1', //1 Market,2 limit
     buyType: '1', //1 amount,2shares
     limitPrice: 0,
     slider: 0,
     amount: 0,
     checkSlip: false, //是否使用滑点
-    slippage:0
+    slippage: 0,
+    loading: false,
   },
+  eventId: '',
+  conditionId: '',
+  tokenContract: null,
+  marketContract: null,
+  usdoAllowancebalance: 0,
+  balanceOfUsdo: 0,
 })
+
+const route = useRoute()
+
+const btnForBuyDisabled = computed(() => {
+  return (
+    !Number(state.balanceOfUsdo) ||
+    !Number(state.buyOrder.amount) ||
+    Number(state.buyOrder.amount) > Number(state.balanceOfUsdo)
+  )
+})
+
+onMounted(async () => {
+  state.eventId = route.query.eventId
+  state.conditionId = route.query.conditionId
+  console.log('onMounted', state.eventId)
+  initErc20Contract()
+  await initControlContract()
+  getTokenBalance()
+})
+
+const appStore = store.useAppStore()
+
+
+watch(()=>state.buyOrder.amount,()=>{
+  getEstimatedPrice()
+})
+
+function initErc20Contract() {
+  state.tokenContract = appStore.initErc20Contract(
+    network[import.meta.env.VITE_APP_CHAIN].USDO,
+    Erc20ABi,
+  )
+}
+
+async function initControlContract() {
+  // console.log("controlContract", Control.abi);
+  // await kiwi.util_base.sleep(1000);
+  state.marketContract = await appStore.initErc20ContractSign(
+    network[import.meta.env.VITE_APP_CHAIN].marketContract,
+    GuessMarketAbi.abi,
+  )
+}
+
+async function getTokenBalance() {
+  const balance = await state.tokenContract.balanceOf(appStore.tomeState.curWalletAddress)
+  state.balanceOfUsdo = appStore.formatUnits(balance)
+  console.log('balanceOfUsdo', state.balanceOfUsdo)
+}
+
+async function allowanceForUsdo() {
+  const allowance = await state.tokenContract.allowance(
+    appStore.tomeState.curWalletAddress,
+    network[import.meta.env.VITE_APP_CHAIN].marketContract,
+  )
+  state.usdoAllowancebalance = appStore.formatUnits(allowance)
+  console.log('allowance11111', state.usdoAllowancebalance)
+}
+
+async function approveUsdo(value) {
+  const tokenContractForUsdo = await appStore.initErc20ContractSign(
+    network[import.meta.env.VITE_APP_CHAIN].USDO,
+    Erc20ABi,
+  )
+  console.log('tokenContractForUsdo', tokenContractForUsdo)
+
+  const approvalTx = await tokenContractForUsdo.approve(
+    network[import.meta.env.VITE_APP_CHAIN].marketContract,
+    appStore.parseUnits(Math.ceil(value)), // 授权最大额度，也可以只授权所需数量
+  )
+  await approvalTx.wait()
+  await allowanceForUsdo()
+}
+
+// 通过份数算出价格
+async function getEstimatedPrice(val) {
+  try {
+    console.log('getEstimatedPrice',state.marketContract.getEstimatedPrice);
+    
+    const res = await state.marketContract.getEstimatedPrice(
+      state.eventId,
+      state.conditionId,
+      state.amount,
+      state.buyOrder.outcome,
+    )
+    console.log('getEstimatedPrice', res)
+  } catch (error) {
+    console.error(error)
+  }
+}
+
+async function handleClickBuy() {
+  try {
+    state.buyOrder.loading = true
+    await allowanceForUsdo()
+    if (Number(state.usdoAllowancebalance) < Number(state.buyOrder.amount)) {
+      await approveUsdo(state.buyOrder.amount)
+    }
+    console.log(
+      'eventId:' + state.eventId,
+      'conditionId:' + state.conditionId,
+      'outcome:' + state.buyOrder.outcome,
+      'amount:' + state.buyOrder.amount,
+    )
+
+    const res = await state.marketContract.bet(
+      state.eventId,
+      state.conditionId,
+      state.buyOrder.outcome,
+      state.buyOrder.amount,
+    )
+    console.log('handleClickBuy', res)
+    await res.wait()
+  } catch (error) {
+    console.error(error)
+  } finally {
+    state.buyOrder.loading = false
+  }
+}
 </script>
 
 <template>
@@ -37,15 +167,15 @@ const state = reactive({
                 class="flex-1 h-full flex items-center justify-center rounded-l-[10px] cursor-pointer select-none"
                 v-ripple
                 :style="
-                  state.buyOrder.outcome == 'yes'
+                  state.buyOrder.outcome == '0'
                     ? 'background-color:#9DC425'
                     : 'border-top:1px solid #DBDBDB;border-left:1px solid #DBDBDB;border-bottom:1px solid #DBDBDB;'
                 "
-                @click="state.buyOrder.outcome = 'yes'"
+                @click="state.buyOrder.outcome = '0'"
               >
                 <div
                   class="flex flex-col gap-[10px]"
-                  :style="state.buyOrder.outcome == 'yes' ? 'color:#000' : 'color:#9D9D9D'"
+                  :style="state.buyOrder.outcome == '0' ? 'color:#000' : 'color:#9D9D9D'"
                 >
                   <div class="text-[16px] leading-[16px]">Yes 0.442948294</div>
                   <!-- <div class="text-[16px] leading-[16px] font-bold text-center">SOL</div> -->
@@ -55,15 +185,15 @@ const state = reactive({
                 class="flex-1 h-full flex items-center justify-center rounded-r-[10px] cursor-pointer select-none"
                 v-ripple
                 :style="
-                  state.buyOrder.outcome == 'no'
+                  state.buyOrder.outcome == '1'
                     ? 'background-color:#9DC425'
                     : 'border-top:1px solid #DBDBDB;border-right:1px solid #DBDBDB;border-bottom:1px solid #DBDBDB;'
                 "
-                @click="state.buyOrder.outcome = 'no'"
+                @click="state.buyOrder.outcome = '1'"
               >
                 <div
                   class="flex flex-col gap-[10px]"
-                  :style="state.buyOrder.outcome == 'no' ? 'color:#000' : 'color:#9D9D9D'"
+                  :style="state.buyOrder.outcome == '1' ? 'color:#000' : 'color:#9D9D9D'"
                 >
                   <div class="text-[16px] leading-[16px]">No 0.442948294</div>
                   <!-- <div class="text-[16px] leading-[16px] font-bold text-center">SOL</div> -->
@@ -202,10 +332,11 @@ const state = reactive({
             <div
               class="w-full flex items-center justify-end gap-[5px] text-[16px] leading-[16px] text-[#cecfd2]"
             >
-              <div style="font-family: din">1000 USDO</div>
+              <div style="font-family: din">{{ state.balanceOfUsdo }} USDO</div>
               <div
                 class="text-[#708D11] underline text-[14px] leading-[14px] cursor-pointer font-bold"
                 style="font-family: din"
+                @click="state.buyOrder.amount = Number(state.balanceOfUsdo)"
               >
                 Max
               </div>
@@ -306,7 +437,9 @@ const state = reactive({
             <v-btn
               variant="text"
               class="!rounded-full !h-[44px] !w-full !bg-[#708D11]"
-              :disabled="false"
+              :loading="state.buyOrder.loading"
+              :disabled="btnForBuyDisabled"
+              @click="handleClickBuy"
             >
               <div class="text-[#fff] text-[18px]" style="font-family: din">Confirm Buy</div>
             </v-btn>
@@ -367,28 +500,30 @@ const state = reactive({
                       <div class="flex items-center gap-[5px]">
                         <div class="flex-[0.6]">
                           <v-btn-group variant="outlined" divided class="!rounded-[10px]">
-                            <v-btn @click="state.buyOrder.slippage=1">1%</v-btn>
-                            <v-btn @click="state.buyOrder.slippage=2">2%</v-btn>
-                            <v-btn @click="state.buyOrder.slippage=5">5%</v-btn>
+                            <v-btn @click="state.buyOrder.slippage = 1">1%</v-btn>
+                            <v-btn @click="state.buyOrder.slippage = 2">2%</v-btn>
+                            <v-btn @click="state.buyOrder.slippage = 5">5%</v-btn>
                           </v-btn-group>
                         </div>
-                        <div class="flex-[0.4] flex items-center border border-solid border-[rgba(255,255,255,.12)] h-[48px] rounded-[10px] !px-[10px]">
-                            <v-text-field
-                                density="compact"
-                                variant="plain"
-                                type="number"
-                                v-model:model-value="state.buyOrder.slippage"
-                                :hide-details="true"
-                                bgColor=""
-                                hide-spin-buttons
-                                :reverse="true"
-                                :min="0"
-                                prefix="%"
-                                :tile="true"
-                                single-line
-                                width="100"
-                            >
-                            </v-text-field>
+                        <div
+                          class="flex-[0.4] flex items-center border border-solid border-[rgba(255,255,255,.12)] h-[48px] rounded-[10px] !px-[10px]"
+                        >
+                          <v-text-field
+                            density="compact"
+                            variant="plain"
+                            type="number"
+                            v-model:model-value="state.buyOrder.slippage"
+                            :hide-details="true"
+                            bgColor=""
+                            hide-spin-buttons
+                            :reverse="true"
+                            :min="0"
+                            prefix="%"
+                            :tile="true"
+                            single-line
+                            width="100"
+                          >
+                          </v-text-field>
                         </div>
                       </div>
                     </div>
@@ -679,7 +814,7 @@ const state = reactive({
               class="!rounded-full !h-[44px] !w-full !bg-[#708D11]"
               :disabled="false"
             >
-              <div class="text-[#fff] text-[18px]" style="font-family: din">Confirm Buy</div>
+              <div class="text-[#fff] text-[18px]" style="font-family: din">Confirm Sell</div>
             </v-btn>
           </div>
         </div>
@@ -701,15 +836,15 @@ const state = reactive({
   margin: 0 !important;
 }
 
-:deep(.v-field__input){
-    padding-top: 0;
+:deep(.v-field__input) {
+  padding-top: 0;
 }
 
-:deep(.v-field__field){
-    align-items: center;
+:deep(.v-field__field) {
+  align-items: center;
 }
 
-:deep(.v-text-field__prefix){
-    padding-top: 0;
+:deep(.v-text-field__prefix) {
+  padding-top: 0;
 }
 </style>

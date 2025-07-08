@@ -1,7 +1,7 @@
 <script setup>
 import { onMounted, reactive, ref } from 'vue'
-import lottie from 'lottie-web' // 引入插件
-import animationData from '@/assets/animate/data.json' // 引入
+
+
 import Footer from '@/components/Footer/index.vue'
 import exchange from './components/exchange.vue'
 import handicap from './components/handicap.vue'
@@ -18,33 +18,14 @@ const state = reactive({
   selectTimeLine: 1,
 })
 
-onMounted(()=>{
-  // optAnimation()
-})
 
-
-const optAnimation = () => {
-  lottie.destroy('lottieLoading')
-  const elem = document.querySelector('.lottieLoading')
-  console.log('elem', elem)
-
-  const params = {
-    container: elem,
-    renderer: 'svg',
-    loop: true,
-    autoplay: true,
-    animationData,
-    name: 'lottieLoading',
-  }
-  lottie.loadAnimation(params)
-}
 </script>
 
 <template>
   <div class="w-full !pb-[40px]">
-    <div>
+    <!-- <div>
       <img src="@/assets/img/market_bg1.png" class="w-full !h-[127px] object-cover" />
-    </div>
+    </div> -->
     <div class="!mt-[16px]">
       <div class="flex gap-[13px]">
         <div class="flex-[0.7] rounded-[25px] bg-[#1B1B1B] !px-[30px] !py-[36px]">
@@ -85,7 +66,7 @@ const optAnimation = () => {
               </div>
             </div>
           </div>
-          <div class="!mt-[30px] flex items-center gap-[30px] lottieLoading">
+          <div class="!mt-[30px] flex items-center gap-[30px]">
             <div class="flex flex-col gap-[8px]">
               <div
                 class="text-[#787878] text-[14px] leading-[14px]"

@@ -1,9 +1,8 @@
 import axios from 'axios'
 import { removeEmptyKey } from '../index'
 import { store } from '@/store/index'
-import { updateUserInfo, logout, updateSignModel } from '@/store/reducers/user-reducer'
-import i18n from '@/utils/i18n'
-import {constant} from './constant'
+import {constant} from '../constant'
+import { useToast } from "vue-toastification";
 
 export default function createRequest(options) {
   const instance = axios.create(
@@ -19,6 +18,8 @@ export default function createRequest(options) {
   )
   // Request interceptor
   instance.interceptors.request.use((config) => {
+    // console.log('request',config);
+    
     if (['get', 'GET'].includes(config.method)) {
       config.params = {
         _t: Date.parse(new Date()) / 1000,
@@ -32,9 +33,11 @@ export default function createRequest(options) {
       // 处理参数为undefined情况
       removeEmptyKey(config.data)
       // 序列化参数
-      config.data = JSON.stringify(config.data)
+      // config.data = JSON.stringify(config.data)
     }
-     reqInfo['header']['sign'] = sessionStorage.getItem(constant.tokenKey) || ''
+    // console.log('request',localStorage.getItem(constant.tokenKey));
+    
+     config.headers['Authorization'] = localStorage.getItem(constant.tokenKey) || ''
     return config
   })
 
@@ -61,38 +64,36 @@ export default function createRequest(options) {
       // const { user } = store.getState()
       const appStore = store.useAppStore();
       const res = await instance.request(config)
+      const toast = useToast();
+
+      
       // Api code 401 and have token
-      if (res && res.code && res.code === '401' && appStore.userInfo?.refreshToken) {
+      if (res && res.code && res.code === '401') {
         // Get new token
-        const newRes = await getNewToken({
-          token: user.userInfo[user.walletAddress]?.token,
-          refreshToken: user.userInfo[user.walletAddress]?.refreshToken,
-        })
-        if (newRes.success) {
-          // store.dispatch(
-          //   updateUserInfo({
-          //     token: newRes.obj,
-          //     walletAddress: user.walletAddress,
-          //   }),
-          // )
-          // Re request
-          return await instance.request(config)
-        } else {
+        // const newRes = await getNewToken({
+        //   token: user.userInfo[user.walletAddress]?.token,
+        //   refreshToken: user.userInfo[user.walletAddress]?.refreshToken,
+        // })
+        // if (newRes.success) {
+        //   // store.dispatch(
+        //   //   updateUserInfo({
+        //   //     token: newRes.obj,
+        //   //     walletAddress: user.walletAddress,
+        //   //   }),
+        //   // )
+        //   // Re request
+        //   return await instance.request(config)
+        // } else {
           
-          return Promise.reject(401)
-        }
+        //   return Promise.reject(401)
+        // }
+        // toast.error('')
+        appStore.onDisConnectClick()
       } else {
-        if (!res.success) {
-          // 0022 单独处理
-          // if (res.code != '0022' && res.code != '-1') toast.error(i18n.t(res.code))
-        }
         return res || {}
       }
     } catch (error) {
-      if (error.response) {
-       
-      }
-      return {}
+      console.log('request error',error);
     }
   }
   // return instance

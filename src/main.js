@@ -12,6 +12,8 @@ import * as directives from 'vuetify/directives'
 import vuetifyConfig from './plugins/vuetify'
 import Toast from "vue-toastification";
 import "vue-toastification/dist/index.css";
+import InfiniteLoading from "v3-infinite-loading";
+import "v3-infinite-loading/lib/style.css";
 
 import App from './App.vue'
 import router from './router'
@@ -44,5 +46,7 @@ app.use(Toast, {
   draggablePercent: 0.6,  // 拖动多少百分比才关闭
   closeButton: false,
 });
+
+app.component("infinite-loading", InfiniteLoading);
 
 app.mount('#app')

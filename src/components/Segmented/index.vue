@@ -1,5 +1,5 @@
 <template>
-  <div class="segmented-container" :style="`padding-left: ${offset}px;`">
+  <div class="segmented-container w-full overflow-x-auto" :style="`padding-left: ${offset}px;padding-right: ${offset}px;`">
     <div class="segmented-wrap">
       <div
         class="segmented-thumb"
@@ -17,7 +17,7 @@
         @click.self="changeHandler(item, $event)"
       >
         <input type="radio" name="segmented" />
-        <div class="select-none">{{ item.label }}</div>
+        <div class="select-none sm:text-[16px] sm:!leading-[16px] text-[14px] sm:!py-[10px]">{{ item.label }}</div>
       </label>
     </div>
   </div>
@@ -33,6 +33,7 @@ export default {
       isInit: false,
     }
   },
+  emits: ['change'],
   props: {
     options: {
       required: true,
@@ -40,7 +41,7 @@ export default {
     },
     offset: {
       type: Number,
-      default: 25,
+      default: 20,
     },
   },
   mounted() {
@@ -58,8 +59,8 @@ export default {
 
     changeHandler(item, ev) {
       if (item.disabled) return
-      this.w = ev.target.clientWidth + 50
-      this.x = ev.target.offsetLeft - 25
+      this.w = ev.target.clientWidth + this.offset * 2
+      this.x = ev.target.offsetLeft - this.offset
       this.$emit('change', item.value)
     },
   },
@@ -82,7 +83,7 @@ export default {
   display: flex;
   align-items: center;
   justify-items: flex-start;
-  gap: 60px;
+  gap: 40px;
   width: 100%;
   .segmented-item {
     position: relative;
@@ -93,7 +94,7 @@ export default {
       cursor: not-allowed;
     }
     & > div {
-      min-height: 35px;
+      //min-height: 35px;
       line-height: 28px;
       display: flex;
       justify-content: center;
