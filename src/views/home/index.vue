@@ -32,7 +32,7 @@ onMounted(()=>{
 const optAnimation = (json,index) => {
   lottie.destroy('lottieLoading'+index)
   const elem = document.querySelector('.lottieLoading'+index)
-  console.log('elem', elem)
+  // console.log('elem', elem)
 
   const params = {
     container: elem,

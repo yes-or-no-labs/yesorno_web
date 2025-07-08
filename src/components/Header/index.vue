@@ -174,16 +174,16 @@ const currenRoutePath = computed(() => {
               v-bind="props"
               style="font-family: Geist"
             >
-              <img :src="userInfo.avatarUrl||personImg" class="w-[50px] h-[50px] rounded-full cursor-pointer" />
+              <img :src="userInfo?.avatarUrl||personImg" class="w-[50px] h-[50px] rounded-full cursor-pointer" />
             </div>
           </template>
           <v-list>
              <v-list-item>
                 <v-list-item-title>
                   <div class="!pb-[16px] border-b border-solid border-[#333741]  flex gap-[8px] items-center">
-                    <img :src="userInfo.avatarUrl||personImg" class="w-[40px] h-[40px] rounded-full cursor-pointer" />
+                    <img :src="userInfo?.avatarUrl||personImg" class="w-[40px] h-[40px] rounded-full cursor-pointer" />
                     <div class="flex flex-col">
-                      <div class="text-[#fff] text-[14px]" style="font-family: din;">{{ userInfo.nickname?userInfo.nickname:`User_${curWalletAddress.slice(-6)}` }}</div>
+                      <div class="text-[#fff] text-[14px]" style="font-family: din;">{{ userInfo?.nickname?userInfo?.nickname:`User_${curWalletAddress?.slice(-6)}` }}</div>
                       <div class="flex items-center gap-[5px]">
                         <div class="text-[#fff] text-[14px]" style="font-family: din;">{{ formatAddress(curWalletAddress) }}</div>
                         <img src="@/assets/img/copy.png" class="w-[16px] h-[16px] cursor-pointer" @click="handleClickCopy"/>
