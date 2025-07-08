@@ -86,7 +86,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: dev.predictx.fun
+    - host: dev.yesornolabs.xyz
       http:
         paths:
           - backend:
@@ -98,6 +98,6 @@ spec:
             pathType: Prefix
   tls:
     - hosts:
-        - dev.predictx.fun
-      secretName: predictx.fun
+        - dev.yesornolabs.xyz
+      secretName: yesornolabs.xyz
 
