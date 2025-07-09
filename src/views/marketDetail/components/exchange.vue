@@ -6,11 +6,14 @@ import GuessMarketAbi from '@/abi/GuessMarket.json'
 import network from '@/utils/network'
 import Erc20ABi from '@/abi/erc_20.json'
 import { store } from '@/store'
+import { api } from '@/apis'
+import { debounce } from '@/utils/debounce'
+import { useToast } from 'vue-toastification'
 
 const state = reactive({
   tabList: [
     { title: 'BUY', value: '1' },
-    { title: 'SELL', value: '2' },
+    { title: 'SELL', value: '2',disabled:true },
   ],
   buyOrder: {
     outcome: '0', //0-yes，1-no
@@ -26,14 +29,25 @@ const state = reactive({
     curAvgPrice: 0, // 当前每份价格
   },
   eventId: '',
-  conditionId: '',
   tokenContract: null,
   marketContract: null,
   usdoAllowancebalance: 0,
   balanceOfUsdo: 0,
 })
 
+const props = defineProps({
+  curSelectEvent:{
+    type:Object,
+  }
+})
+
+const toast = useToast();
+
+const conditionId = computed(()=>props.curSelectEvent.conditionId)
+
 const route = useRoute()
+
+const env = computed(()=> import.meta.env)
 
 const btnForBuyDisabled = computed(() => {
   return (
@@ -45,7 +59,7 @@ const btnForBuyDisabled = computed(() => {
 
 onMounted(async () => {
   state.eventId = route.query.eventId
-  state.conditionId = route.query.conditionId
+  // state.conditionId = route.query.conditionId
   console.log('onMounted', state.eventId)
   initErc20Contract()
   await initControlContract()
@@ -55,15 +69,42 @@ onMounted(async () => {
 const appStore = store.useAppStore()
 
 watch(
-  () => state.buyOrder.amount,
-  () => {
-    getEstimatedPrice()
+  ()=>[state.buyOrder.amount,state.buyOrder.outcome],
+  newVal => {
+    if(state.buyOrder.buyType == '1') return
+    if(Number(newVal) === 0) {
+      state.buyOrder.curAvgPrice = 0
+      return
+    }
+    debounce(()=>getPriceByAmount())
   },
 )
 
+watch(
+  ()=>[state.buyOrder.totalPrice,state.buyOrder.outcome],
+  newVal => {
+    if(state.buyOrder.buyType == '2') return
+    if(Number(newVal) === 0) {
+      state.buyOrder.curAvgPrice = 0
+      return
+    }
+    debounce(()=>getAmountByCost())
+  },
+)
+
+function calcPercent(type) {
+  const totalAmount = props.curSelectEvent.yesAmount + props.curSelectEvent.noAmount
+  if(Number(totalAmount) === 0) return 0
+  if(type === 'yes'){
+    return ( props.curSelectEvent.yesAmount/totalAmount * 100).toFixed(1)
+  }else if(type === 'no'){
+    return (props.curSelectEvent.noAmount/totalAmount * 100).toFixed(1)
+  }
+}
+
 function initErc20Contract() {
   state.tokenContract = appStore.initErc20Contract(
-    network[import.meta.env.VITE_APP_CHAIN].USDO,
+    network[import.meta.env.VITE_APP_CHAIN][network[import.meta.env.VITE_APP_CHAIN].Denomination],
     Erc20ABi,
   )
 }
@@ -95,7 +136,7 @@ async function allowanceForUsdo() {
 
 async function approveUsdo(value) {
   const tokenContractForUsdo = await appStore.initErc20ContractSign(
-    network[import.meta.env.VITE_APP_CHAIN].USDO,
+    network[import.meta.env.VITE_APP_CHAIN][network[import.meta.env.VITE_APP_CHAIN].Denomination],
     Erc20ABi,
   )
   console.log('tokenContractForUsdo', tokenContractForUsdo)
@@ -114,7 +155,7 @@ async function getEstimatedPrice() {
     // console.log('getEstimatedPrice',state.eventId,state.conditionId,state.amount,state.buyOrder.outcome);
     const res = await state.marketContract.getEstimatedPrice(
       state.eventId,
-      state.conditionId,
+      conditionId.value,
       state.buyOrder.amount,
       state.buyOrder.outcome,
     )
@@ -123,6 +164,40 @@ async function getEstimatedPrice() {
     state.buyOrder.totalPrice = Number(appStore.formatUnits(res[1]))
   } catch (error) {
     console.error(error)
+  }
+}
+
+async function getPriceByAmount() {
+  try {
+    const res = await api.getPriceByAmount({
+      amount:state.buyOrder.amount,
+      eventId:state.eventId,
+      conditionId:conditionId.value,
+      option:state.buyOrder.outcome
+   })
+   if(res.success){
+    state.buyOrder.curAvgPrice = Number(appStore.formatUnits(res.obj.price))
+    state.buyOrder.totalPrice = Number(appStore.formatUnits(res.obj.cost))
+   }
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+async function getAmountByCost() {
+  try {
+    const res = await api.getAmountByCost({
+      cost:appStore.parseUnits(state.buyOrder.totalPrice),
+      eventId:state.eventId,
+      conditionId:conditionId.value,
+      option:state.buyOrder.outcome
+   })
+   if(res.success){
+    state.buyOrder.curAvgPrice = Number(appStore.formatUnits(res.obj.price))
+    state.buyOrder.amount = Number(res.obj?.amount)
+   }
+  } catch (error) {
+    console.error(error);
   }
 }
 
@@ -135,14 +210,14 @@ async function handleClickBuy() {
     }
     console.log(
       'eventId:' + state.eventId,
-      'conditionId:' + state.conditionId,
+      'conditionId:' + conditionId.value,
       'outcome:' + state.buyOrder.outcome,
       'amount:' + state.buyOrder.amount,
     )
 
     const res = await state.marketContract.bet(
       state.eventId,
-      state.conditionId,
+      conditionId.value,
       state.buyOrder.outcome,
       state.buyOrder.amount,
     )
@@ -158,8 +233,8 @@ async function handleClickBuy() {
 
 <template>
   <div>
-    <v-tabs v-model="state.currentTab" fixed-tabs align-tabs="center" color="#CCFA15" height="60">
-      <v-tab :value="item.value" v-for="item in state.tabList" style="font-size: 20px">{{
+    <v-tabs v-model="state.currentTab" fixed-tabs align-tabs="center" color="#0AB45A" height="60">
+      <v-tab :value="item.value" v-for="item in state.tabList" style="font-size: 20px" :disabled="item.disabled">{{
         item.title
       }}</v-tab>
     </v-tabs>
@@ -167,14 +242,14 @@ async function handleClickBuy() {
       <v-tabs-window-item value="1">
         <div class="flex flex-col gap-[30px] !mt-[20px]">
           <div>
-            <div class="text-[#708D11] text-[16px] leading-[16px] font-bold">Outcome</div>
+            <div class="text-[#0AB45A] text-[16px] leading-[16px] font-bold">Outcome</div>
             <div class="!mt-[16px] flex items-center h-[38px]">
               <div
                 class="flex-1 h-full flex items-center justify-center rounded-l-[10px] cursor-pointer select-none"
                 v-ripple
                 :style="
                   state.buyOrder.outcome == '0'
-                    ? 'background-color:#9DC425'
+                    ? 'background-color:#0AB45A'
                     : 'border-top:1px solid #DBDBDB;border-left:1px solid #DBDBDB;border-bottom:1px solid #DBDBDB;'
                 "
                 @click="state.buyOrder.outcome = '0'"
@@ -183,7 +258,7 @@ async function handleClickBuy() {
                   class="flex flex-col gap-[10px]"
                   :style="state.buyOrder.outcome == '0' ? 'color:#000' : 'color:#9D9D9D'"
                 >
-                  <div class="text-[16px] leading-[16px]">Yes 0.442948294</div>
+                  <div class="text-[16px] leading-[16px]">Yes {{ calcPercent('yes') }}</div>
                   <!-- <div class="text-[16px] leading-[16px] font-bold text-center">SOL</div> -->
                 </div>
               </div>
@@ -192,7 +267,7 @@ async function handleClickBuy() {
                 v-ripple
                 :style="
                   state.buyOrder.outcome == '1'
-                    ? 'background-color:#9DC425'
+                    ? 'background-color:#0AB45A'
                     : 'border-top:1px solid #DBDBDB;border-right:1px solid #DBDBDB;border-bottom:1px solid #DBDBDB;'
                 "
                 @click="state.buyOrder.outcome = '1'"
@@ -201,21 +276,21 @@ async function handleClickBuy() {
                   class="flex flex-col gap-[10px]"
                   :style="state.buyOrder.outcome == '1' ? 'color:#000' : 'color:#9D9D9D'"
                 >
-                  <div class="text-[16px] leading-[16px]">No 0.442948294</div>
+                  <div class="text-[16px] leading-[16px]">No {{ calcPercent('no') }}</div>
                   <!-- <div class="text-[16px] leading-[16px] font-bold text-center">SOL</div> -->
                 </div>
               </div>
             </div>
           </div>
           <div>
-            <div class="text-[#708D11] text-[16px] leading-[16px] font-bold">Order Type</div>
+            <div class="text-[#0AB45A] text-[16px] leading-[16px] font-bold">Order Type</div>
             <div class="!mt-[16px] flex items-center h-[38px]">
               <div
                 class="flex-1 h-full flex items-center justify-center rounded-l-[10px] cursor-pointer select-none"
                 v-ripple
                 :style="
                   state.buyOrder.orderType == '1'
-                    ? 'background-color:#9DC425'
+                    ? 'background-color:#0AB45A'
                     : 'border-top:1px solid #DBDBDB;border-left:1px solid #DBDBDB;border-bottom:1px solid #DBDBDB;'
                 "
                 @click="state.buyOrder.orderType = '1'"
@@ -232,10 +307,10 @@ async function handleClickBuy() {
                 v-ripple
                 :style="
                   state.buyOrder.orderType == '2'
-                    ? 'background-color:#9DC425'
+                    ? 'background-color:#0AB45A'
                     : 'border-top:1px solid #DBDBDB;border-right:1px solid #DBDBDB;border-bottom:1px solid #DBDBDB;'
                 "
-                @click="state.buyOrder.orderType = '2'"
+                @click="debounce(()=>{toast.info('coming soon')})"
               >
                 <div
                   class="flex flex-col gap-[10px]"
@@ -247,7 +322,7 @@ async function handleClickBuy() {
             </div>
           </div>
           <div v-show="state.buyOrder.orderType == '2'">
-            <div class="text-[#708D11] text-[16px] leading-[16px] font-bold">Limit Price</div>
+            <div class="text-[#0AB45A] text-[16px] leading-[16px] font-bold">Limit Price</div>
             <div
               class="!mt-[16px] border border-solid border-[#DBDBDB] rounded-[10px] overflow-hidden flex items-center"
             >
@@ -267,14 +342,14 @@ async function handleClickBuy() {
             </div>
           </div>
           <div>
-            <div class="text-[#708D11] text-[16px] leading-[16px] font-bold">Buy In</div>
+            <div class="text-[#0AB45A] text-[16px] leading-[16px] font-bold">Buy In</div>
             <div class="!mt-[16px] flex items-center h-[38px]">
               <div
                 class="flex-1 h-full flex items-center justify-center rounded-l-[10px] cursor-pointer select-none"
                 v-ripple
                 :style="
                   state.buyOrder.buyType == '1'
-                    ? 'background-color:#9DC425'
+                    ? 'background-color:#0AB45A'
                     : 'border-top:1px solid #DBDBDB;border-left:1px solid #DBDBDB;border-bottom:1px solid #DBDBDB;'
                 "
                 @click="state.buyOrder.buyType = '1'"
@@ -291,7 +366,7 @@ async function handleClickBuy() {
                 v-ripple
                 :style="
                   state.buyOrder.buyType == '2'
-                    ? 'background-color:#9DC425'
+                    ? 'background-color:#0AB45A'
                     : 'border-top:1px solid #DBDBDB;border-right:1px solid #DBDBDB;border-bottom:1px solid #DBDBDB;'
                 "
                 @click="state.buyOrder.buyType = '2'"
@@ -308,26 +383,26 @@ async function handleClickBuy() {
             <div class="!mt-[10px] relative !px-[10px]">
               <div
                 class="absolute pointer-none left-[10px] top-[50%] translate-y-[-50%] w-[2px] h-[10px] bg-[#333741]"
-                :style="state.buyOrder.slider > 0 ? 'background-color:#708D11' : ''"
+                :style="state.buyOrder.slider > 0 ? 'background-color:#0AB45A' : ''"
               ></div>
               <div
                 class="absolute pointer-none left-[25%] top-[50%] translate-y-[-50%] w-[2px] h-[10px] bg-[#333741]"
-                :style="state.buyOrder.slider >= 25 ? 'background-color:#708D11' : ''"
+                :style="state.buyOrder.slider >= 25 ? 'background-color:#0AB45A' : ''"
               ></div>
               <div
                 class="absolute pointer-none left-[50%] top-[50%] translate-y-[-50%] w-[2px] h-[10px] bg-[#333741]"
-                :style="state.buyOrder.slider >= 50 ? 'background-color:#708D11' : ''"
+                :style="state.buyOrder.slider >= 50 ? 'background-color:#0AB45A' : ''"
               ></div>
               <div
                 class="absolute pointer-none left-[75%] top-[50%] translate-y-[-50%] w-[2px] h-[10px] bg-[#333741]"
-                :style="state.buyOrder.slider >= 75 ? 'background-color:#708D11' : ''"
+                :style="state.buyOrder.slider >= 75 ? 'background-color:#0AB45A' : ''"
               ></div>
               <div
                 class="absolute pointer-none left-[100%] top-[50%] translate-y-[-50%] w-[2px] h-[10px] bg-[#333741]"
-                :style="state.buyOrder.slider == 100 ? 'background-color:#708D11' : ''"
+                :style="state.buyOrder.slider == 100 ? 'background-color:#0AB45A' : ''"
               ></div>
               <v-slider
-                color="#708D11"
+                color="#0AB45A"
                 v-model="state.buyOrder.slider"
                 :hide-details="true"
                 track-color="#333741"
@@ -338,9 +413,9 @@ async function handleClickBuy() {
             <div
               class="w-full flex items-center justify-end gap-[5px] text-[16px] leading-[16px] text-[#cecfd2]"
             >
-              <div>{{ state.balanceOfUsdo }} USDO</div>
+              <div>{{ state.balanceOfUsdo }} {{ network[env.VITE_APP_CHAIN].Denomination }}</div>
               <div
-                class="text-[#708D11] underline text-[14px] leading-[14px] cursor-pointer font-bold"
+                class="text-[#0AB45A] underline text-[14px] leading-[14px] cursor-pointer font-bold"
                 @click="state.buyOrder.amount = Number(state.balanceOfUsdo)"
               >
                 Max
@@ -456,18 +531,18 @@ async function handleClickBuy() {
           <div>
             <v-btn
               variant="text"
-              class="!rounded-full !h-[44px] !w-full !bg-[#708D11]"
+              class="!rounded-full !h-[44px] !w-full !bg-[#0AB45A]"
               :loading="state.buyOrder.loading"
               :disabled="btnForBuyDisabled"
               @click="handleClickBuy"
             >
-              <div class="text-[#fff] text-[18px]">Confirm Buy</div>
+              <div class="text-[#fff] text-[18px]">Confirm Buy <span v-show="state.buyOrder.totalPrice>0">${{ $formatAmount(state.buyOrder.totalPrice) }}</span></div>
             </v-btn>
           </div>
-          <div class="flex items-center gap-[5px]">
+          <!-- <div class="flex items-center gap-[5px]">
             <v-checkbox
               :model-value="state.buyOrder.checkSlip"
-              color="#708D11"
+              color="#0AB45A"
               :hide-details="true"
             ></v-checkbox>
             <v-tooltip
@@ -549,20 +624,20 @@ async function handleClickBuy() {
                 </v-list>
               </v-card>
             </v-menu>
-          </div>
+          </div> -->
         </div>
       </v-tabs-window-item>
       <v-tabs-window-item value="2">
         <div class="flex flex-col gap-[30px] !mt-[20px]">
           <div>
-            <div class="text-[#708D11] text-[16px] leading-[16px] font-bold">Outcome</div>
+            <div class="text-[#0AB45A] text-[16px] leading-[16px] font-bold">Outcome</div>
             <div class="!mt-[16px] flex items-center h-[38px]">
               <div
                 class="flex-1 h-full flex items-center justify-center rounded-l-[10px] cursor-pointer select-none"
                 v-ripple
                 :style="
                   state.buyOrder.outcome == 'yes'
-                    ? 'background-color:#9DC425'
+                    ? 'background-color:#0AB45A'
                     : 'border-top:1px solid #DBDBDB;border-left:1px solid #DBDBDB;border-bottom:1px solid #DBDBDB;'
                 "
                 @click="state.buyOrder.outcome = 'yes'"
@@ -580,7 +655,7 @@ async function handleClickBuy() {
                 v-ripple
                 :style="
                   state.buyOrder.outcome == 'no'
-                    ? 'background-color:#9DC425'
+                    ? 'background-color:#0AB45A'
                     : 'border-top:1px solid #DBDBDB;border-right:1px solid #DBDBDB;border-bottom:1px solid #DBDBDB;'
                 "
                 @click="state.buyOrder.outcome = 'no'"
@@ -596,14 +671,14 @@ async function handleClickBuy() {
             </div>
           </div>
           <div>
-            <div class="text-[#708D11] text-[16px] leading-[16px] font-bold">Order Type</div>
+            <div class="text-[#0AB45A] text-[16px] leading-[16px] font-bold">Order Type</div>
             <div class="!mt-[16px] flex items-center h-[38px]">
               <div
                 class="flex-1 h-full flex items-center justify-center rounded-l-[10px] cursor-pointer select-none"
                 v-ripple
                 :style="
                   state.buyOrder.orderType == '1'
-                    ? 'background-color:#9DC425'
+                    ? 'background-color:#0AB45A'
                     : 'border-top:1px solid #DBDBDB;border-left:1px solid #DBDBDB;border-bottom:1px solid #DBDBDB;'
                 "
                 @click="state.buyOrder.orderType = '1'"
@@ -620,7 +695,7 @@ async function handleClickBuy() {
                 v-ripple
                 :style="
                   state.buyOrder.orderType == '2'
-                    ? 'background-color:#9DC425'
+                    ? 'background-color:#0AB45A'
                     : 'border-top:1px solid #DBDBDB;border-right:1px solid #DBDBDB;border-bottom:1px solid #DBDBDB;'
                 "
                 @click="state.buyOrder.orderType = '2'"
@@ -635,7 +710,7 @@ async function handleClickBuy() {
             </div>
           </div>
           <div v-show="state.buyOrder.orderType == '2'">
-            <div class="text-[#708D11] text-[16px] leading-[16px] font-bold">Limit Price</div>
+            <div class="text-[#0AB45A] text-[16px] leading-[16px] font-bold">Limit Price</div>
             <div
               class="!mt-[16px] border border-solid border-[#DBDBDB] rounded-[10px] overflow-hidden"
             >
@@ -655,14 +730,14 @@ async function handleClickBuy() {
             </div>
           </div>
           <div>
-            <div class="text-[#708D11] text-[16px] leading-[16px] font-bold">Buy In</div>
+            <div class="text-[#0AB45A] text-[16px] leading-[16px] font-bold">Buy In</div>
             <div class="!mt-[16px] flex items-center h-[38px]">
               <div
                 class="flex-1 h-full flex items-center justify-center rounded-l-[10px] cursor-pointer select-none"
                 v-ripple
                 :style="
                   state.buyOrder.buyType == '1'
-                    ? 'background-color:#9DC425'
+                    ? 'background-color:#0AB45A'
                     : 'border-top:1px solid #DBDBDB;border-left:1px solid #DBDBDB;border-bottom:1px solid #DBDBDB;'
                 "
                 @click="state.buyOrder.buyType = '1'"
@@ -679,7 +754,7 @@ async function handleClickBuy() {
                 v-ripple
                 :style="
                   state.buyOrder.buyType == '2'
-                    ? 'background-color:#9DC425'
+                    ? 'background-color:#0AB45A'
                     : 'border-top:1px solid #DBDBDB;border-right:1px solid #DBDBDB;border-bottom:1px solid #DBDBDB;'
                 "
                 @click="state.buyOrder.buyType = '2'"
@@ -696,26 +771,26 @@ async function handleClickBuy() {
             <div class="!mt-[10px] relative">
               <div
                 class="absolute pointer-none left-0 top-[50%] translate-y-[-50%] w-[2px] h-[10px] bg-[#333741]"
-                :style="state.buyOrder.slider > 0 ? 'background-color:#708D11' : ''"
+                :style="state.buyOrder.slider > 0 ? 'background-color:#0AB45A' : ''"
               ></div>
               <div
                 class="absolute pointer-none left-[25%] top-[50%] translate-y-[-50%] w-[2px] h-[10px] bg-[#333741]"
-                :style="state.buyOrder.slider >= 25 ? 'background-color:#708D11' : ''"
+                :style="state.buyOrder.slider >= 25 ? 'background-color:#0AB45A' : ''"
               ></div>
               <div
                 class="absolute pointer-none left-[50%] top-[50%] translate-y-[-50%] w-[2px] h-[10px] bg-[#333741]"
-                :style="state.buyOrder.slider >= 50 ? 'background-color:#708D11' : ''"
+                :style="state.buyOrder.slider >= 50 ? 'background-color:#0AB45A' : ''"
               ></div>
               <div
                 class="absolute pointer-none left-[75%] top-[50%] translate-y-[-50%] w-[2px] h-[10px] bg-[#333741]"
-                :style="state.buyOrder.slider >= 75 ? 'background-color:#708D11' : ''"
+                :style="state.buyOrder.slider >= 75 ? 'background-color:#0AB45A' : ''"
               ></div>
               <div
                 class="absolute pointer-none left-[100%] top-[50%] translate-y-[-50%] w-[2px] h-[10px] bg-[#333741]"
-                :style="state.buyOrder.slider == 100 ? 'background-color:#708D11' : ''"
+                :style="state.buyOrder.slider == 100 ? 'background-color:#0AB45A' : ''"
               ></div>
               <v-slider
-                color="#708D11"
+                color="#0AB45A"
                 v-model="state.buyOrder.slider"
                 :hide-details="true"
                 track-color="#333741"
@@ -726,9 +801,9 @@ async function handleClickBuy() {
             <div
               class="w-full flex items-center justify-end gap-[5px] text-[16px] leading-[16px] text-[#cecfd2]"
             >
-              <div>1000 USDO</div>
+              <div>1000 {{ network[env.VITE_APP_CHAIN].Denomination }}</div>
               <div
-                class="text-[#708D11] underline text-[14px] leading-[14px] cursor-pointer font-bold"
+                class="text-[#0AB45A] underline text-[14px] leading-[14px] cursor-pointer font-bold"
               >
                 Max
               </div>
@@ -767,7 +842,7 @@ async function handleClickBuy() {
                   </div>
                 </template>
               </v-tooltip>
-              <div class="text-[#cecfd2]">{{ state.curAvgPrice }} USDO</div>
+              <div class="text-[#cecfd2]">{{ state.curAvgPrice }} {{ network[env.VITE_APP_CHAIN].Denomination }}</div>
             </div>
             <div class="flex items-center justify-between">
               <v-tooltip
@@ -824,7 +899,7 @@ async function handleClickBuy() {
           <div>
             <v-btn
               variant="text"
-              class="!rounded-full !h-[44px] !w-full !bg-[#708D11]"
+              class="!rounded-full !h-[44px] !w-full !bg-[#0AB45A]"
               :disabled="false"
             >
               <div class="text-[#fff] text-[18px]">Confirm Sell</div>

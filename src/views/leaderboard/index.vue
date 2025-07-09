@@ -74,7 +74,7 @@ function tabChange(val) {
             >
                 <v-tab :value="item.value" v-for="item in state.tabList" style="font-size: 20px">{{ item.title }}</v-tab>
             </v-tabs> -->
-            <Segmented :options="state.menuList" @change="e=>state.currentTab = e" />
+            <Segmented :options="state.menuList" @change="e=>state.currentTab = e" :value="state.currentTab" />
             <v-window v-model="state.currentTab">
                 <v-window-item value="1">
                     <div class="w-full !pb-[30px] border border-solid !border-[rgba(255,255,255,.5)] rounded-[20px] !mt-[20px] sm:h-[800px] h-[500px] overflow-y-auto">

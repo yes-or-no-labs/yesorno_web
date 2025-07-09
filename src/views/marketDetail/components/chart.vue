@@ -1,6 +1,6 @@
 <script setup>
 import * as echarts from 'echarts'
-import { onMounted, reactive, ref } from 'vue';
+import { nextTick, onMounted, reactive, ref } from 'vue';
 const state = reactive({
   timeLine: [
     { title: '1D', id: 1 },
@@ -116,10 +116,18 @@ const chartRef = ref(null)
 
 onMounted(() => {
   // optAnimation();
-  // console.log('chartRef',chartRef.value);
+  console.log('chartRef onMounted');
+  nextTick(()=>{
+    initChart()
+  })
+})
+
+function initChart() {
   const myChart = echarts.init(chartRef.value)
   myChart.setOption(state.chartOption)
-})
+}
+
+defineExpose([initChart])
 </script>
 
 <template>

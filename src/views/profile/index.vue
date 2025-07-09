@@ -1,6 +1,10 @@
 <script setup>
 import { reactive } from 'vue'
 import personImg from '@/assets/img/person.png'
+import network from '@/utils/network'
+import { computed } from 'vue';
+
+const env = computed(()=> import.meta.env)
 
 const state = reactive({
   tabList: [
@@ -185,7 +189,7 @@ const state = reactive({
                    <div class="w-[180px] min-w-[180px] text-[14px] text-[#94969C] whitespace-nowrap border-b border-solid border-[#87878733] !py-[10px] !px-[16px]">1.2</div>
                    <div class="w-[180px] min-w-[180px] text-[14px] text-[#94969C] whitespace-nowrap border-b border-solid border-[#87878733] !py-[10px] !px-[16px]">1.2</div>
                    <div class="w-[180px] min-w-[180px] text-[14px] text-[#94969C] whitespace-nowrap border-b border-solid border-[#87878733] !py-[10px] !px-[16px]">1.2</div>
-                   <div class="w-[180px] min-w-[180px] text-[14px] text-[#94969C] whitespace-nowrap border-b border-solid border-[#87878733] !py-[10px] !px-[16px]">USDO</div>
+                   <div class="w-[180px] min-w-[180px] text-[14px] text-[#94969C] whitespace-nowrap border-b border-solid border-[#87878733] !py-[10px] !px-[16px]">{{ network[env.VITE_APP_CHAIN].Denomination }}</div>
                   </div>
                    
                 </div>

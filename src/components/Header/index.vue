@@ -11,9 +11,9 @@ import {copyToClipboard} from '@/utils/uni-app'
 import { useRouter } from 'vue-router'
 
 const menuList = [
-  { title: 'Twitter', link: 'https://twitter.com/YesornoFun' },
-  { title: 'Telegram', link: 'https://t.me/yesorno_fun' },
-  { title: 'Discord', link: 'https://discord.gg/yesorno' },
+  { title: 'White paper', link: 'https://yesorno-labs.gitbook.io/yesornolabs/' },
+  { title: 'Medium', link: 'https://medium.com/@yesorno_labs' },
+  { title: 'Audit report', link: '' },
 ]
 
 const porfileList=[{
@@ -67,6 +67,10 @@ const currenRoutePath = computed(() => {
   return router.currentRoute.value.fullPath
 })
 
+function handleClickMenu(url) {
+  window.open(url)
+}
+
 </script>
 
 <template>
@@ -83,7 +87,7 @@ const currenRoutePath = computed(() => {
           </div> -->
         </div>
          <div
-          class="text-[#fff] lg:text-[14px] text-[16px] leading-[16px] font-[600] cursor-pointer"
+          class="text-[#fff] lg:text-[14px] text-[16px] font-[600] cursor-pointer"
           style="font-family: Geist"
           @click="$router.push('/')"
           :class="currenRoutePath=== '/'?'!text-[#6DDD25]':''"
@@ -91,7 +95,7 @@ const currenRoutePath = computed(() => {
           Home
         </div>
         <div
-          class="text-[#fff] lg:text-[14px] text-[16px] leading-[16px] font-[600] cursor-pointer"
+          class="text-[#fff] lg:text-[14px] text-[16px] font-[600] cursor-pointer"
           style="font-family: Geist"
           @click="$router.push('/market')"
           :class="currenRoutePath=== '/market'?'!text-[#6DDD25]':''"
@@ -99,7 +103,7 @@ const currenRoutePath = computed(() => {
           Market
         </div>
         <div
-          class="text-[#fff] lg:text-[14px] text-[16px] leading-[16px] font-[600] cursor-pointer"
+          class="text-[#fff] lg:text-[14px] text-[16px] font-[600] cursor-pointer"
           style="font-family: Geist"
           @click="$router.push('/task')"
           :class="currenRoutePath=== '/task'?'!text-[#6DDD25]':''"
@@ -107,30 +111,29 @@ const currenRoutePath = computed(() => {
           Tasks
         </div>
         <div
-          class="text-[#fff] lg:text-[14px] text-[16px] leading-[16px] font-[600] cursor-pointer"
+          class="text-[#fff] lg:text-[14px] text-[16px] font-[600] cursor-pointer"
           style="font-family: Geist"
           @click="$router.push('/leaderboard')"
           :class="currenRoutePath=== '/leaderboard'?'!text-[#6DDD25]':''"
         >
           Ranking
         </div>
-        <!-- <v-menu transition="scale-transition" :offset="[10, 0]">
+        <v-menu transition="scale-transition" :offset="[10, 0]">
           <template v-slot:activator="{ props }">
             <div
-              class="text-[#fff] lg:text-[14px] text-[15px] leading-[15px] cursor-pointer whitespace-nowrap"
+              class="text-[#fff] lg:text-[14px] text-[16px] font-[600] cursor-pointer whitespace-nowrap flex items-center"
               v-bind="props"
-              style="font-family: Geist"
             >
-              Social Media
+            <div>Doc</div>
               <v-icon icon="mdi-menu-down" />
             </div>
           </template>
           <v-list>
-            <v-list-item v-for="(item, index) in menuList" :key="index" :value="index">
+            <v-list-item v-for="(item, index) in menuList" :key="index" :value="index" @click="handleClickMenu(item.link)">
               <v-list-item-title>{{ item.title }}</v-list-item-title>
             </v-list-item>
           </v-list>
-        </v-menu> -->
+        </v-menu>
 
         <!-- <div
           class="text-[#fff] lg:text-[14px] text-[15px] leading-[15px] cursor-pointer"

@@ -14,7 +14,7 @@
         :class="['segmented-item', { 'segmented-item-disabled': item.disabled }]"
         v-for="(item, index) in options"
         :key="index"
-        @click.self="changeHandler(item, $event)"
+        @click.self="$emit('change', item.value)"
       >
         <input type="radio" name="segmented" />
         <div class="select-none sm:text-[16px] sm:!leading-[16px] text-[14px] sm:!py-[10px]">{{ item.label }}</div>
@@ -43,9 +43,19 @@ export default {
       type: Number,
       default: 20,
     },
+    value:{
+      type: String||Number,
+    }
   },
   mounted() {
     this.init()
+  },
+  watch:{
+    value(newVal){
+      const index = this.options.findIndex(item=>item.value === this.value)
+      this.changeHandler(this.options[index],this.$refs.labelRef[index])
+      // console.log('props.value',this.$refs.labelRef[index]);
+    }
   },
   methods: {
     init() {
@@ -59,9 +69,10 @@ export default {
 
     changeHandler(item, ev) {
       if (item.disabled) return
-      this.w = ev.target.clientWidth + this.offset * 2
-      this.x = ev.target.offsetLeft - this.offset
-      this.$emit('change', item.value)
+      // this.w = ev.target.clientWidth + this.offset * 2
+      // this.x = ev.target.offsetLeft - this.offset
+      this.w = ev.clientWidth + this.offset * 2
+      this.x = ev.offsetLeft - this.offset
     },
   },
 }

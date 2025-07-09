@@ -1,3 +1,12 @@
+<script setup>
+import network from '@/utils/network'
+import { computed } from 'vue';
+
+const env = computed(()=> import.meta.env)
+
+</script>
+
+
 <template>
   <div class="flex-[0.3] !py-[8px] rounded-[8px] border border-solid border-[#333741]">
     <div class="flex items-center justify-between !px-[8px]">
@@ -21,9 +30,9 @@
       </svg>
     </div>
     <div class="flex items-center !px-[8px]">
-      <div class="flex-1 text-[12px] leading-[18px] text-[#85888E]">Price (USDO)</div>
+      <div class="flex-1 text-[12px] leading-[18px] text-[#85888E]">Price ({{ network[env.VITE_APP_CHAIN].Denomination }})</div>
       <div class="flex-1 text-[12px] leading-[18px] text-[#85888E] text-center">Shares</div>
-      <div class="flex-1 text-[12px] leading-[18px] text-[#85888E] text-right">Total (USDO)</div>
+      <div class="flex-1 text-[12px] leading-[18px] text-[#85888E] text-right">Total ({{ network[env.VITE_APP_CHAIN].Denomination }})</div>
     </div>
     <div class="max-h-[404px] h-[404px] flex flex-col">
       <div

@@ -13,7 +13,7 @@ const state = reactive({
   <div class="!mt-[40px] bg-[#000] !p-[16px] rounded-[20px]">
     <div class="flex items-center justify-between">
       <div
-        class="py-[6px] !px-[16px] border-b-[2px] border-solid border-[#CCFA15] text-[14px] text-[#CCFA15]"
+        class="py-[6px] !px-[16px] border-b-[2px] border-solid border-[#0AB45A] text-[14px] text-[#0AB45A]"
         style="font-family: din"
       >
         Comments(1)
@@ -21,8 +21,7 @@ const state = reactive({
       <v-menu location="bottom" offset="10">
         <template v-slot:activator="{ props }">
           <div
-            class="py-[6px] px-[16px] text-[14px] flex items-center gap-[5px] cursor-pointer text-[#CCFA15] font-bold"
-            style="font-family: din"
+            class="py-[6px] px-[16px] text-[14px] flex items-center gap-[5px] cursor-pointer text-[#0AB45A] font-bold"
             v-bind="props"
           >
             <img src="@/assets/img/switch.png" class="w-[16px] h-[16px]" />
@@ -34,13 +33,13 @@ const state = reactive({
           <v-list-item style="padding: 6px;width: 150px;">
               <div class="text-[#fff] text-[14px] flex items-center justify-between cursor-pointer hover:bg-[#26272B] !p-[10px]" @click="state.sortType = 1">
                 New to Old
-                <v-icon icon="mdi-check" color="#CCFA15" size="20" v-show="state.sortType == 1"></v-icon>
+                <v-icon icon="mdi-check" color="#0AB45A" size="20" v-show="state.sortType == 1"></v-icon>
               </div>
           </v-list-item>
           <v-list-item style="padding: 6px;">
             <div class="text-[#fff] text-[14px] flex items-center justify-between cursor-pointer hover:bg-[#26272B] !p-[10px]" @click="state.sortType = 2">
                 Most Liked
-                <v-icon icon="mdi-check" color="#CCFA15" size="20" v-show="state.sortType == 2"></v-icon>
+                <v-icon icon="mdi-check" color="#0AB45A" size="20" v-show="state.sortType == 2"></v-icon>
               </div>
           </v-list-item>
         </v-list>
@@ -112,7 +111,7 @@ const state = reactive({
           >
             <template #prepend-inner>
               <div
-                class="!px-[10px] text-[#CCFA15] font-bold"
+                class="!px-[10px] text-[#0AB45A] font-bold"
                 style="font-family: din"
                 v-show="state.replyInfo"
               >
@@ -125,7 +124,7 @@ const state = reactive({
                 v-show="state.replyInfo"
                 @click="state.replyInfo = null"
               >
-                <v-icon icon="mdi-close" size="25" color="#CCFA15"></v-icon>
+                <v-icon icon="mdi-close" size="25" color="#0AB45A"></v-icon>
               </div>
             </template>
           </v-text-field>
@@ -133,7 +132,7 @@ const state = reactive({
         <v-btn
           density="comfortable"
           icon="mdi-send"
-          color="#CCFA15"
+          color="#0AB45A"
           class="!rounded-[10px]"
           :loading="state.sending"
         ></v-btn>

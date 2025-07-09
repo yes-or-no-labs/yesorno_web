@@ -47,19 +47,19 @@ function filterStyle(index) {
 
 <template>
   <div class="w-full relative">
-    <div class="relative !py-[100px] mx-auto w-[600px]">
+    <div class="relative !py-[20px] md:!py-[50px] lg:!py-[100px] mx-auto md:w-[600px] !px-[16px] md:!px-0">
       <!-- <div class="text-[24px] font-[500] leading-[24px] text-[#fff]">Task center</div> -->
       <div
-        class="!mt-[20px] w-full rounded-[6px] bg-[#000] !p-[25px] border border-solid  flex items-center justify-between"
+        class="w-full rounded-[6px] bg-[#000] !p-[10px] md:!p-[16px] lg:!p-[25px] border border-solid  flex items-center justify-between"
         style="border-color: rgba(255, 255, 255, 0.5) !important"
       >
-        <div class="flex flex-col gap-[20px]">
-          <div class="text-[#fff] text-[14px] leading-[14px] font-[500]">My Points</div>
-          <div class="text-[#fff] text-[36px] leading-[24px] font-[600]">0.00</div>
+        <div class="flex flex-col gap-[10px] lg:gap-[20px]">
+          <div class="text-[#fff] text-[12px] lg:text-[14px] font-[500]">My Points</div>
+          <div class="text-[#fff] text-[18px] lg:text-[22px] xl:text-[30px] 2xl:text-[36px] font-[600]">0.00</div>
         </div>
-        <div class="flex flex-col gap-[20px]">
-          <div class="text-[#fff] text-[14px] leading-[14px] font-[500]">Points Earned Today</div>
-          <div class="text-[#0AB45A] text-[36px] leading-[24px] font-[600] text-right">0.00</div>
+        <div class="flex flex-col gap-[10px] lg:gap-[20px]">
+          <div class="text-[#fff] text-[12px] lg:text-[14px] font-[500]">Points Earned Today</div>
+          <div class="text-[#0AB45A] text-[18px] lg:text-[22px] xl:text-[30px] 2xl:text-[36px] font-[600] text-right">0.00</div>
         </div>
       </div>
       <!-- <div
@@ -102,7 +102,7 @@ function filterStyle(index) {
                     </div>
                   </div>
                   <VBtn
-                    class="!rounded-full !h-[40px] !bg-[#0AB45A] !text-[16px] !leading-[14px] !text-[#fff] !w-[85px] !font-[600]"
+                    class="!rounded-full !h-[40px] !bg-[#0AB45A] !text-[12px] md:!text-[14px] lg:!text-[16px] !leading-[14px] !text-[#fff] !w-[85px] !font-[600]"
                     variant="flat"
                   >
                     Claim
@@ -130,7 +130,7 @@ function filterStyle(index) {
                       </div>
                     </div>
                     <VBtn
-                      class="!rounded-full !h-[40px] !bg-[#0AB45A] !text-[16px] !leading-[14px] !text-[#fff] !w-[85px] !font-[600]"
+                      class="!rounded-full !h-[40px] !bg-[#0AB45A] !text-[12px] md:!text-[14px] lg:!text-[16px] !leading-[14px] !text-[#fff] !w-[85px] !font-[600]"
                       variant="flat"
                     >
                       Go
