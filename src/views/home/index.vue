@@ -90,7 +90,7 @@ const optAnimation = (json, index) => {
           class="text-center 2xl:text-[24px] xl:text-[20px] lg:text-[18px] md:text-[16px] sm:text-[14px] text-[12px]"
           style="font-family: Geist"
         >
-          Where opinions meet incentives. Bet on the future, shaped by you and Al.<br />Explore what
+          Where opinions meet incentives. Bet on the future, shaped by you and Ai.<br />Explore what
           the world believesnat they're too afraid to say.
         </div>
         <div class="flex justify-center">
