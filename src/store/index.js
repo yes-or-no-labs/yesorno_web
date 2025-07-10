@@ -273,7 +273,11 @@ export const store = {
         if (!value) return '0'
         // 处理科学计数法
         if (typeof value === 'number') {
-          value = BigInt(value).toString()
+          try {
+            value = BigInt(value).toString()
+          } catch (error) {
+            value = value.toString()
+          }
         }
         return ethers.formatUnits(value, decimal)
       },
@@ -284,7 +288,11 @@ export const store = {
 
         // 处理科学计数法
         if (typeof value === 'number') {
-          value = BigInt(value).toString()
+          try {
+            value = BigInt(value).toString()
+          } catch (error) {
+            value = value.toString()
+          }
         }
         return ethers.parseUnits(value, decimal)
       },

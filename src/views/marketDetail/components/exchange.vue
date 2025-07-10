@@ -54,7 +54,7 @@ const btnForBuyDisabled = computed(() => {
   return (
     !Number(state.balanceOfUsdo) ||
     !Number(state.buyOrder.amount) ||
-    Number(state.buyOrder.amount) > Number(state.balanceOfUsdo)
+    Number(state.buyOrder.totalPrice) > Number(state.balanceOfUsdo)
   )
 })
 
@@ -69,26 +69,38 @@ onMounted(async () => {
 
 const appStore = store.useAppStore()
 
+watch(()=>state.buyOrder.slider,(newVal)=>{
+  console.log('buyOrder',newVal);
+  if(state.buyOrder.buyType == '1'){
+    state.buyOrder.totalPrice = newVal
+  }else if(state.buyOrder.buyType == '2'){
+    state.buyOrder.totalPrice = newVal
+    debounce(()=>getAmountByCost())
+  }
+  
+})
+
 watch(
   ()=>[state.buyOrder.amount,outcome.value,state.buyOrder.buyType],
-  newVal => {
+  () => {
     if(state.buyOrder.buyType == '1') return
-    if(Number(newVal) === 0) {
-      state.buyOrder.curAvgPrice = 0
-      return
-    }
+    // if(Number(newVal) === 0) {
+    //   state.buyOrder.curAvgPrice = 0
+    //   return
+    // }
     debounce(()=>getPriceByAmount())
   },
 )
 
 watch(
   ()=>[state.buyOrder.totalPrice,outcome.value,state.buyOrder.buyType],
-  newVal => {
+  () => {
+    state.buyOrder.slider = state.buyOrder.totalPrice
     if(state.buyOrder.buyType == '2') return
-    if(Number(newVal) === 0) {
-      state.buyOrder.curAvgPrice = 0
-      return
-    }
+    // if(Number(newVal) === 0) {
+    //   state.buyOrder.curAvgPrice = 0
+    //   return
+    // }
     debounce(()=>getAmountByCost())
   },
 )
@@ -204,6 +216,16 @@ async function getAmountByCost() {
   }
 }
 
+function handleClickMax() {
+  state.buyOrder.slider = Number(state.balanceOfUsdo)
+  if(state.buyOrder.buyType == '1'){
+    state.buyOrder.totalPrice = Number(state.balanceOfUsdo)
+  }else if(state.buyOrder.buyType == '2'){
+    state.buyOrder.totalPrice = Number(state.balanceOfUsdo)
+    getAmountByCost()
+  }
+}
+
 async function handleClickBuy() {
   try {
     state.buyOrder.loading = true
@@ -255,14 +277,14 @@ async function handleClickBuy() {
                 v-ripple
                 :style="
                   outcome == '0'
-                    ? 'background-color:#0AB45A'
+                    ? 'background-color:#0AB45A;border-top:1px solid #0AB45A;border-left:1px solid #0AB45A;border-bottom:1px solid #0AB45A;'
                     : 'border-top:1px solid #DBDBDB;border-left:1px solid #DBDBDB;border-bottom:1px solid #DBDBDB;'
                 "
                 @click="emit('selectOutcome','0')"
               >
                 <div
                   class="flex flex-col gap-[10px]"
-                  :style="outcome == '0' ? 'color:#000' : 'color:#9D9D9D'"
+                  :style="outcome == '0' ? 'color:#fff' : 'color:#9D9D9D'"
                 >
                   <div class="text-[16px] leading-[16px]">Yes {{ calcPercent('yes') }}</div>
                   <!-- <div class="text-[16px] leading-[16px] font-bold text-center">SOL</div> -->
@@ -273,14 +295,14 @@ async function handleClickBuy() {
                 v-ripple
                 :style="
                   outcome == '1'
-                    ? 'background-color:#0AB45A'
+                    ? 'background-color:#E72F2F;border-top:1px solid #E72F2F;border-right:1px solid #E72F2F;border-bottom:1px solid #E72F2F;'
                     : 'border-top:1px solid #DBDBDB;border-right:1px solid #DBDBDB;border-bottom:1px solid #DBDBDB;'
                 "
                 @click="emit('selectOutcome','1')"
               >
                 <div
                   class="flex flex-col gap-[10px]"
-                  :style="outcome == '1' ? 'color:#000' : 'color:#9D9D9D'"
+                  :style="outcome == '1' ? 'color:#fff' : 'color:#9D9D9D'"
                 >
                   <div class="text-[16px] leading-[16px]">No {{ calcPercent('no') }}</div>
                   <!-- <div class="text-[16px] leading-[16px] font-bold text-center">SOL</div> -->
@@ -393,19 +415,19 @@ async function handleClickBuy() {
               ></div>
               <div
                 class="absolute pointer-none left-[25%] top-[50%] translate-y-[-50%] w-[2px] h-[10px] bg-[#333741]"
-                :style="state.buyOrder.slider >= 25 ? 'background-color:#0AB45A' : ''"
+                :style="Math.floor(state.buyOrder.slider / Number(state.balanceOfUsdo) *100 )>= 25 ? 'background-color:#0AB45A' : ''"
               ></div>
               <div
                 class="absolute pointer-none left-[50%] top-[50%] translate-y-[-50%] w-[2px] h-[10px] bg-[#333741]"
-                :style="state.buyOrder.slider >= 50 ? 'background-color:#0AB45A' : ''"
+                :style="Math.floor(state.buyOrder.slider / Number(state.balanceOfUsdo) *100) >= 50 ? 'background-color:#0AB45A' : ''"
               ></div>
               <div
                 class="absolute pointer-none left-[75%] top-[50%] translate-y-[-50%] w-[2px] h-[10px] bg-[#333741]"
-                :style="state.buyOrder.slider >= 75 ? 'background-color:#0AB45A' : ''"
+                :style="Math.floor(state.buyOrder.slider / Number(state.balanceOfUsdo) *100) >= 75 ? 'background-color:#0AB45A' : ''"
               ></div>
               <div
                 class="absolute pointer-none left-[100%] top-[50%] translate-y-[-50%] w-[2px] h-[10px] bg-[#333741]"
-                :style="state.buyOrder.slider == 100 ? 'background-color:#0AB45A' : ''"
+                :style="Math.floor(state.buyOrder.slider / Number(state.balanceOfUsdo) *100) == 100 ? 'background-color:#0AB45A' : ''"
               ></div>
               <v-slider
                 color="#0AB45A"
@@ -414,6 +436,7 @@ async function handleClickBuy() {
                 track-color="#333741"
                 thumb-size="13"
                 :readonly="false"
+                :max="Number(state.balanceOfUsdo)"
               ></v-slider>
             </div>
             <div
@@ -422,7 +445,7 @@ async function handleClickBuy() {
               <div>{{ state.balanceOfUsdo }} {{ network[env.VITE_APP_CHAIN].Denomination }}</div>
               <div
                 class="text-[#0AB45A] underline text-[14px] leading-[14px] cursor-pointer font-bold"
-                @click="state.buyOrder.amount = Number(state.balanceOfUsdo)"
+                @click="handleClickMax"
               >
                 Max
               </div>
@@ -442,6 +465,7 @@ async function handleClickBuy() {
                 style="height: 38px"
                 height="60"
                 :min="0"
+                :precision="2"
               >
               </v-number-input>
             </div>
@@ -460,6 +484,7 @@ async function handleClickBuy() {
                 style="height: 38px"
                 height="60"
                 :min="0"
+                :precision="2"
               >
               </v-number-input>
             </div>

@@ -83,7 +83,7 @@ const optAnimation = (json, index) => {
           class="2xl:text-[68px] xl:text-[48px] lg:text-[38px] md:text-[28px] sm:text-[20px] text-[18px] text-[#fff] text-center font-bold"
           style="font-family: Geist"
         >
-          The AL-Native Prediction Market <br />
+          The AI-Native Prediction Market <br />
           for Real-Time With Discovery
         </div>
         <div

@@ -120,7 +120,7 @@ function handleClickMenu(url) {
               class="text-[#fff] lg:text-[14px] text-[16px] font-[600] cursor-pointer whitespace-nowrap flex items-center"
               v-bind="props"
             >
-            <div>Doc</div>
+            <div>Docs</div>
               <v-icon icon="mdi-menu-down" />
             </div>
           </template>
