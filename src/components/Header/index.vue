@@ -21,10 +21,6 @@ const porfileList=[{
   icon: profile_icon1,
   path:'/profile'
 }, {
-  title: 'My Portfolio',
-  icon: profile_icon2,
-  path:''
-}, {
   title: 'Terms of Use',
   icon: profile_icon3,
   path:''

@@ -5,7 +5,7 @@ import { formatAddress } from '@/utils/uni-app.js'
 const state = reactive({
   tabList: [
     { title: 'Tasks', value: '1' },
-    { title: 'Points History', value: '2' },
+    { title: 'Points History', value: '2',disabled:true },
   ],
   currentTab: '1',
   dataList: [
@@ -79,6 +79,7 @@ function filterStyle(index) {
             :value="item.value"
             v-for="item in state.tabList"
             style="font-size: 16px; font-weight: bold"
+            :disabled="item.disabled"
             >{{ item.title }}</v-tab
           >
         </v-tabs>

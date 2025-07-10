@@ -89,6 +89,7 @@ export default function createRequest(options) {
         // }
         // toast.error('')
         appStore.onDisConnectClick()
+        return res || {}
       } else {
         return res || {}
       }

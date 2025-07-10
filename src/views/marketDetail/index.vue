@@ -22,9 +22,8 @@ const state = reactive({
   ],
   selectTimeLine: 1,
   eventId: '',
-  conditionId: '',
   dataObj: {},
-  curSelectEvent: {}, //当前选择的事件
+  curSelectEvent: null, //当前选择的事件
   selectPanel: '',
 })
 
@@ -36,7 +35,6 @@ const env = computed(() => import.meta.env)
 
 onMounted(async () => {
   state.eventId = route.query.eventId
-  state.conditionId = route.query.conditionId
   getMarketInfo()
 })
 
@@ -47,15 +45,28 @@ async function getMarketInfo() {
     })
     console.log('getMarketInfo', res)
     if (res.success) {
-      state.dataObj = res.obj
-      state.curSelectEvent = res.obj?.conditionList[0]
-      if (res.obj.conditionList.length > 1) {
+      if(!state.curSelectEvent){
+        state.curSelectEvent = res.obj?.conditionList[0]
+      }
+      for (const item of res.obj?.conditionList) {
+          item.outcome = '0'
+          if(item.guid === state.curSelectEvent.guid){
+            state.curSelectEvent = item
+            state.selectPanel = item.guid
+          }
+        }
+      if (res.obj.conditionList.length > 1&&!state.curSelectEvent) {
         state.selectPanel = res.obj.conditionList[0].guid
       }
+      state.dataObj = res.obj
     }
   } catch (error) {
     console.error(error)
   }
+}
+
+function selectOutcome(e) {
+  state.curSelectEvent.outcome = e
 }
 
 function calcTotalPrice(list) {
@@ -79,9 +90,14 @@ function calcPercent(item, type) {
   }
 }
 
-function handleClickPanel(item) {
+function handleClickPanel(item,outcome) {
   console.log('handleClickPanel', state.selectPanel)
+  if(outcome){
+    item.outcome = outcome
+    state.selectPanel = item.guid
+  }
   state.curSelectEvent = item
+
 }
 
 function handleClickRule() {
@@ -331,16 +347,32 @@ function handleClickRule() {
                     </div>
                     <div class="flex-1 flex items-center gap-[8px]">
                       <div
-                        class="flex-1 cursor-pointer border border-solid !border-[#0AB45A] h-[36px] rounded-[12px] flex items-center gap-[5px] text-[#fff] justify-center"
+                        class="flex-1 relative cursor-pointer h-[36px] rounded-[12px] flex items-center gap-[5px] text-[#fff] justify-center"
                       >
                         <div class="text-[14px]">Yes</div>
                         <div class="text-[14px]">{{ calcPercent(item, 'yes') }}</div>
+                        <div
+                          class="w-full cursor-pointer border border-solid !border-[#0AB45A] h-[36px] rounded-[12px] flex items-center gap-[5px] text-[#fff] justify-center absolute top-0 left-0 z-10"
+                          :style="item.outcome==0?'background:#0AB45A':''"
+                          @click.stop="handleClickPanel(item,'0')"
+                        >
+                          <div class="text-[14px]">Yes</div>
+                          <div class="text-[14px]">{{ calcPercent(item, 'yes') }}</div>
+                        </div>
                       </div>
                       <div
-                        class="flex-1 cursor-pointer border border-solid !border-[#E72F2F] h-[36px] rounded-[12px] flex items-center gap-[5px] text-[#fff] justify-center"
+                        class="flex-1 relative cursor-pointer h-[36px] rounded-[12px] flex items-center gap-[5px] text-[#fff] justify-center"
                       >
                         <div class="text-[14px]">No</div>
                         <div class="text-[14px]">{{ calcPercent(item, 'no') }}</div>
+                        <div
+                          class="w-full cursor-pointer border border-solid !border-[#E72F2F] h-[36px] rounded-[12px] flex items-center gap-[5px] text-[#fff] justify-center absolute top-0 left-0 z-10"
+                          :style="item.outcome==1?'background:#E72F2F':''"
+                          @click.stop="handleClickPanel(item,'1')"
+                        >
+                          <div class="text-[14px]">No</div>
+                          <div class="text-[14px]">{{ calcPercent(item, 'no') }}</div>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -379,7 +411,7 @@ function handleClickRule() {
           class="flex-[0.3] rounded-[25px] bg-[#1B1B1B] !p-[16px] overflow-hidden"
           style="border: 1px solid rgba(135, 135, 135, 0.2)"
         >
-          <exchange :curSelectEvent="state.curSelectEvent" />
+          <exchange :curSelectEvent="state.curSelectEvent" @success="getMarketInfo" @selectOutcome="selectOutcome" />
         </div>
       </div>
       <comment />

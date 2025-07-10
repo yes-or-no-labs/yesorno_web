@@ -5,12 +5,13 @@ const state = reactive({
   commentVal: '',
   sending: false,
   replyInfo: null,
-  sortType:1 //1为最新，2为最受欢迎
+  sortType:1, //1为最新，2为最受欢迎
+  commentList:[]
 })
 </script>
 
 <template>
-  <div class="!mt-[40px] bg-[#000] !p-[16px] rounded-[20px]">
+  <div class="!mt-[40px] bg-[#1B1B1B] !p-[16px] rounded-[20px]">
     <div class="flex items-center justify-between">
       <div
         class="py-[6px] !px-[16px] border-b-[2px] border-solid border-[#0AB45A] text-[14px] text-[#0AB45A]"
@@ -48,7 +49,7 @@ const state = reactive({
     <div class="flex flex-col gap-[16px] !pt-[12px]">
       <div class="flex overflow-y-auto max-h-[550px] w-full">
         <div class="flex flex-col gap-[16px] w-full">
-          <div class="flex gap-[12px]">
+          <div class="flex gap-[12px]" v-for="item in state.commentList">
             <img src="@/assets/img/person.png" class="w-[32px] h-[32px] rounded-full" />
             <div class="flex flex-col gap-[3px] text-[14px] leading-[20px] flex-1">
               <div class="flex items-center justify-between text-[#94969C] flex-1">

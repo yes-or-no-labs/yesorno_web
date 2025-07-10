@@ -343,7 +343,7 @@ export const store = {
             this.removeMetaMaskListeners(mStateSimple.metamaskProvider)
             await utilEthereum.onDisConnect(mStateSimple.metamaskProvider)
           }
-            await api.logout()
+            // await api.logout()
             mStateSimple.metamaskProvider = null
             mStateSimple.ethersBrowserProvider = null
             mStateSimple.lastWalletRdns = ''

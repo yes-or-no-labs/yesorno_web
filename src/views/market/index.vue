@@ -50,6 +50,8 @@ async function loadMore($state) {
         $state?.loaded()
         state.pageNum++
       }
+    }else{
+      $state?.error()
     }
   } catch (error) {
     console.error(error)
@@ -141,9 +143,7 @@ function calcTotalPrice(list) {
         :key="item.guid"
         @click="
           $router.push(
-            `/marketDetail?eventId=${item.eventId}&conditionId=${
-              item.conditionList[0].conditionId
-            }`,
+            `/marketDetail?eventId=${item.eventId}`,
           )
         "
       >
@@ -172,7 +172,7 @@ function calcTotalPrice(list) {
               </div>
             </div>
           </div>
-          <div class="relative">
+          <div class="relative" v-if="item.conditionList.length == 1">
             <v-progress-circular
               :model-value="state.progress"
               :size="70"

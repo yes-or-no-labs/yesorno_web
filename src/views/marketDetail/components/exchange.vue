@@ -43,7 +43,8 @@ const props = defineProps({
 
 const toast = useToast();
 
-const conditionId = computed(()=>props.curSelectEvent.conditionId)
+const conditionId = computed(()=>props.curSelectEvent?.conditionId)
+const outcome = computed(()=>props.curSelectEvent?.outcome)
 
 const route = useRoute()
 
@@ -69,7 +70,7 @@ onMounted(async () => {
 const appStore = store.useAppStore()
 
 watch(
-  ()=>[state.buyOrder.amount,state.buyOrder.outcome],
+  ()=>[state.buyOrder.amount,outcome.value,state.buyOrder.buyType],
   newVal => {
     if(state.buyOrder.buyType == '1') return
     if(Number(newVal) === 0) {
@@ -81,7 +82,7 @@ watch(
 )
 
 watch(
-  ()=>[state.buyOrder.totalPrice,state.buyOrder.outcome],
+  ()=>[state.buyOrder.totalPrice,outcome.value,state.buyOrder.buyType],
   newVal => {
     if(state.buyOrder.buyType == '2') return
     if(Number(newVal) === 0) {
@@ -92,13 +93,15 @@ watch(
   },
 )
 
+const emit = defineEmits(["success","selectOutcome"]);
+
 function calcPercent(type) {
-  const totalAmount = props.curSelectEvent.yesAmount + props.curSelectEvent.noAmount
+  const totalAmount = props.curSelectEvent?.yesAmount + props.curSelectEvent?.noAmount
   if(Number(totalAmount) === 0) return 0
   if(type === 'yes'){
-    return ( props.curSelectEvent.yesAmount/totalAmount * 100).toFixed(1)
+    return ( props.curSelectEvent?.yesAmount/totalAmount * 100).toFixed(1)
   }else if(type === 'no'){
-    return (props.curSelectEvent.noAmount/totalAmount * 100).toFixed(1)
+    return (props.curSelectEvent?.noAmount/totalAmount * 100).toFixed(1)
   }
 }
 
@@ -152,12 +155,12 @@ async function approveUsdo(value) {
 // 通过份数算出价格
 async function getEstimatedPrice() {
   try {
-    // console.log('getEstimatedPrice',state.eventId,state.conditionId,state.amount,state.buyOrder.outcome);
+    // console.log('getEstimatedPrice',state.eventId,state.conditionId,state.amount,outcome.value);
     const res = await state.marketContract.getEstimatedPrice(
       state.eventId,
       conditionId.value,
       state.buyOrder.amount,
-      state.buyOrder.outcome,
+      outcome.value,
     )
     // console.log('getEstimatedPrice', appStore.formatUnits(res[0]),appStore.formatUnits(res[1]))
     state.buyOrder.curAvgPrice = Number(appStore.formatUnits(res[0]))
@@ -173,7 +176,7 @@ async function getPriceByAmount() {
       amount:state.buyOrder.amount,
       eventId:state.eventId,
       conditionId:conditionId.value,
-      option:state.buyOrder.outcome
+      option:outcome.value
    })
    if(res.success){
     state.buyOrder.curAvgPrice = Number(appStore.formatUnits(res.obj.price))
@@ -190,7 +193,7 @@ async function getAmountByCost() {
       cost:appStore.parseUnits(state.buyOrder.totalPrice),
       eventId:state.eventId,
       conditionId:conditionId.value,
-      option:state.buyOrder.outcome
+      option:outcome.value
    })
    if(res.success){
     state.buyOrder.curAvgPrice = Number(appStore.formatUnits(res.obj.price))
@@ -211,18 +214,21 @@ async function handleClickBuy() {
     console.log(
       'eventId:' + state.eventId,
       'conditionId:' + conditionId.value,
-      'outcome:' + state.buyOrder.outcome,
+      'outcome:' + outcome.value,
       'amount:' + state.buyOrder.amount,
     )
 
     const res = await state.marketContract.bet(
       state.eventId,
       conditionId.value,
-      state.buyOrder.outcome,
+      outcome.value,
       state.buyOrder.amount,
     )
     console.log('handleClickBuy', res)
     await res.wait()
+    setTimeout(() => {
+      emit("success");
+    }, 2000);
   } catch (error) {
     console.error(error)
   } finally {
@@ -248,15 +254,15 @@ async function handleClickBuy() {
                 class="flex-1 h-full flex items-center justify-center rounded-l-[10px] cursor-pointer select-none"
                 v-ripple
                 :style="
-                  state.buyOrder.outcome == '0'
+                  outcome == '0'
                     ? 'background-color:#0AB45A'
                     : 'border-top:1px solid #DBDBDB;border-left:1px solid #DBDBDB;border-bottom:1px solid #DBDBDB;'
                 "
-                @click="state.buyOrder.outcome = '0'"
+                @click="emit('selectOutcome','0')"
               >
                 <div
                   class="flex flex-col gap-[10px]"
-                  :style="state.buyOrder.outcome == '0' ? 'color:#000' : 'color:#9D9D9D'"
+                  :style="outcome == '0' ? 'color:#000' : 'color:#9D9D9D'"
                 >
                   <div class="text-[16px] leading-[16px]">Yes {{ calcPercent('yes') }}</div>
                   <!-- <div class="text-[16px] leading-[16px] font-bold text-center">SOL</div> -->
@@ -266,15 +272,15 @@ async function handleClickBuy() {
                 class="flex-1 h-full flex items-center justify-center rounded-r-[10px] cursor-pointer select-none"
                 v-ripple
                 :style="
-                  state.buyOrder.outcome == '1'
+                  outcome == '1'
                     ? 'background-color:#0AB45A'
                     : 'border-top:1px solid #DBDBDB;border-right:1px solid #DBDBDB;border-bottom:1px solid #DBDBDB;'
                 "
-                @click="state.buyOrder.outcome = '1'"
+                @click="emit('selectOutcome','1')"
               >
                 <div
                   class="flex flex-col gap-[10px]"
-                  :style="state.buyOrder.outcome == '1' ? 'color:#000' : 'color:#9D9D9D'"
+                  :style="outcome == '1' ? 'color:#000' : 'color:#9D9D9D'"
                 >
                   <div class="text-[16px] leading-[16px]">No {{ calcPercent('no') }}</div>
                   <!-- <div class="text-[16px] leading-[16px] font-bold text-center">SOL</div> -->
@@ -636,15 +642,15 @@ async function handleClickBuy() {
                 class="flex-1 h-full flex items-center justify-center rounded-l-[10px] cursor-pointer select-none"
                 v-ripple
                 :style="
-                  state.buyOrder.outcome == 'yes'
+                  outcome == '0'
                     ? 'background-color:#0AB45A'
                     : 'border-top:1px solid #DBDBDB;border-left:1px solid #DBDBDB;border-bottom:1px solid #DBDBDB;'
                 "
-                @click="state.buyOrder.outcome = 'yes'"
+                @click="selectOutcome('0')"
               >
                 <div
                   class="flex flex-col gap-[10px]"
-                  :style="state.buyOrder.outcome == 'yes' ? 'color:#000' : 'color:#9D9D9D'"
+                  :style="outcome == '0' ? 'color:#000' : 'color:#9D9D9D'"
                 >
                   <div class="text-[16px] leading-[16px]">Yes 0.442948294</div>
                   <!-- <div class="text-[16px] leading-[16px] font-bold text-center">SOL</div> -->
@@ -654,15 +660,15 @@ async function handleClickBuy() {
                 class="flex-1 h-full flex items-center justify-center rounded-r-[10px] cursor-pointer select-none"
                 v-ripple
                 :style="
-                  state.buyOrder.outcome == 'no'
+                  outcome == '1'
                     ? 'background-color:#0AB45A'
                     : 'border-top:1px solid #DBDBDB;border-right:1px solid #DBDBDB;border-bottom:1px solid #DBDBDB;'
                 "
-                @click="state.buyOrder.outcome = 'no'"
+                @click="selectOutcome('1')"
               >
                 <div
                   class="flex flex-col gap-[10px]"
-                  :style="state.buyOrder.outcome == 'no' ? 'color:#000' : 'color:#9D9D9D'"
+                  :style="outcome == '1' ? 'color:#000' : 'color:#9D9D9D'"
                 >
                   <div class="text-[16px] leading-[16px]">No 0.442948294</div>
                   <!-- <div class="text-[16px] leading-[16px] font-bold text-center">SOL</div> -->
