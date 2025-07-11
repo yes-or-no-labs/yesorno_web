@@ -36,4 +36,6 @@ export const api = {
   getPriceByAmount: (params) => baseHttp({url:"/v1/price_line/get_price_by_amount",method: 'GET',params}),
   getAmountByCost: (params) => baseHttp({url:"/v1/price_line/get_amount_by_cost",method: 'GET',params}),
   getUserBetRecord: (params) => baseHttp({url:"/v1/user_bet_record/list",method: 'GET',params}),
+  getPriceLine: (params) => baseHttp({url:"/v1/price_line/list",method: 'GET',params}),
+  getOrderList: (params) => baseHttp({url:"/v1/order/list",method: 'GET',params}),
 }

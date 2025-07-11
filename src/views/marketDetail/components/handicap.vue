@@ -1,14 +1,52 @@
 <script setup>
+import { store } from '@/store';
 import network from '@/utils/network'
-import { computed } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
+const props = defineProps({
+  handicapData:{}
+})
+
+const state = reactive({
+  yesOrders:[],
+  noOrders:[],
+  spread:0,
+  totalAmountForYes:0,
+  totalAmountForNo:0
+})
+
+const appStore = store.useAppStore()
+watch(()=>props.handicapData,()=>{
+  console.log('props.handicapData',props.handicapData);
+  const arr1 = [...props.handicapData.yesOrders]
+  const arr2 = [...props.handicapData.noOrders]
+  for (const item of arr1) {
+    item.paidAmt = appStore.formatUnits(item.paidAmt)
+    item.price = Number(item.paidAmt) / Number(item.amount)
+    state.totalAmountForYes += Number(item.amount)
+  }
+  arr1.sort((a,b)=>b.price - a.price)
+  // console.log('sort',arr1.sort((a,b)=>b.price - a.price));
+  
+  for (const item of arr2) {
+    item.paidAmt = appStore.formatUnits(item.paidAmt)
+    item.price = Number(item.paidAmt) / Number(item.amount)
+    state.totalAmountForNo += Number(item.amount)
+  }
+  arr2.sort((a,b)=>b.price - a.price)
+  state.yesOrders = arr1
+  state.noOrders = arr2
+  if(arr1.length>0&&arr2.length>0){
+    state.spread = arr1[0].price - arr2[arr2.length-1].price
+  }
+})
 const env = computed(()=> import.meta.env)
 
 </script>
 
 
 <template>
-  <div class="flex-[0.3] !py-[8px] rounded-[8px] border border-solid border-[#333741]">
+  <div class="w-full lg:flex-[0.3] !py-[8px] rounded-[8px] border border-solid border-[#333741]">
     <div class="flex items-center justify-between !px-[8px]">
       <div class="text-[12px] leading-[18px] font-[500] text-[#CECFD2] !pb-[4px]">Order book</div>
       <svg
@@ -36,38 +74,56 @@ const env = computed(()=> import.meta.env)
     </div>
     <div class="max-h-[404px] h-[404px] flex flex-col">
       <div
-        class="max-h-[189px] h-[189px] flex items-end flex-wrap overflow-y-auto !px-[8px]"
+        class="max-h-[189px] h-[189px] flex flex-col justify-end overflow-y-auto "
         style="scrollbar-width: none"
       >
-        <div class="flex items-center w-full px-[8px]" v-for="item in 10" :key="item">
-          <div class="flex-1 flex items-center gap-[4px]">
-            <div class="text-[12px] leading-[26px] text-[#FDA29B]" style="font-family: inter-bold">
-              40¢
+        <div class="flex items-center w-full !px-[8px] h-[26px] relative" v-for="(item,index) in state.yesOrders" :key="index">
+          <div class="flex-1 flex items-center gap-[4px] relative z-10">
+            <div class="text-[12px] leading-[26px] text-[#FDA29B]">
+              {{ $formatAmount(item.price) }} ¢
             </div>
           </div>
-          <div class="flex-1 text-[12px] leading-[26px] text-[#CECFD2] text-center">2,985.00</div>
-          <div class="flex-1 text-[12px] leading-[26px] text-[#94969C] text-right">2,985.00</div>
+          <div class="flex-1 text-[12px] leading-[26px] text-[#CECFD2] text-center relative z-10">{{ $formatAmount(item.amount) }}</div>
+          <div class="flex-1 text-[12px] leading-[26px] text-[#94969C] text-right relative z-10">{{ $formatAmount(item.paidAmt) }}</div>
+          <div class="absolute left-0 top-0 bg-[#4A1A18] h-full" :style="`width:${(item.amount/state.totalAmountForYes).toFixed(4)*100}%`"></div>
         </div>
+        <div class="w-full h-full flex items-center justify-center text-[14px] text-[#FDA29B]" v-show="state.yesOrders.length == 0">No orders yet</div>
       </div>
       <div
         class="flex items-center justify-center h-[26px] border-y border-solid border-[#333741] bg-[#1F242F] w-full text-[12px] leading-[18px] text-[#CECFD2]"
         style="font-family: inter-bold"
       >
-        Spread: 1.00 ¢
+          <v-tooltip
+                text="Gap between the highest bid and the lowest ask price."
+                location="top"
+                max-width="400"
+              >
+                <template v-slot:activator="{ props }">
+                  <div
+                    v-bind="props"
+                    class="text-[#96949c] border-b border-dotted border-[#333741]"
+                  >
+                    Spread:
+                  </div>
+                </template>
+              </v-tooltip>
+         {{ $formatAmount(state.spread) }} ¢
       </div>
       <div
-        class="max-h-[189px] h-[189px] flex flex-wrap overflow-y-auto !px-[8px]"
+        class="max-h-[189px] h-[189px] overflow-y-auto"
         style="scrollbar-width: none"
       >
-        <div class="flex items-center w-full px-[8px]" v-for="item in 10" :key="item">
+        <div class="flex items-center w-full h-[26px] !px-[8px] relative" v-for="(item,index) in state.noOrders" :key="index">
           <div class="flex-1 flex items-center gap-[4px]">
-            <div class="text-[12px] leading-[26px] text-[#3CCB7F]" style="font-family: inter-bold">
-              40¢
+            <div class="text-[12px] leading-[26px] text-[#3CCB7F] relative z-10">
+              {{ $formatAmount(item.price) }} ¢
             </div>
           </div>
-          <div class="flex-1 text-[12px] leading-[26px] text-[#CECFD2] text-center">2,985.00</div>
-          <div class="flex-1 text-[12px] leading-[26px] text-[#94969C] text-right">2,985.00</div>
+          <div class="flex-1 text-[12px] leading-[26px] text-[#CECFD2] text-center relative z-10">{{ $formatAmount(item.amount) }}</div>
+          <div class="flex-1 text-[12px] leading-[26px] text-[#94969C] text-right relative z-10">{{ $formatAmount(item.paidAmt) }}</div>
+          <div class="absolute left-0 top-0 bg-[#093B27] h-full" :style="`width:${(item.amount/state.totalAmountForNo).toFixed(4)*100}%`"></div>
         </div>
+        <div class="w-full h-full flex items-center justify-center text-[14px] text-[#3CCB7F]" v-show="state.noOrders.length == 0">No orders yet</div>
       </div>
     </div>
   </div>

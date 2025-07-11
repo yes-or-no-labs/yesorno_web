@@ -1,6 +1,9 @@
 <script setup>
+import { useWindowResize } from '@/hooks/useWindowResize';
+import { debounce } from '@/utils/debounce';
+import dayjs from 'dayjs';
 import * as echarts from 'echarts'
-import { nextTick, onMounted, reactive, ref } from 'vue';
+import { nextTick, onMounted, reactive, ref, watch } from 'vue';
 const state = reactive({
   timeLine: [
     { title: '1D', id: 1 },
@@ -26,6 +29,7 @@ const state = reactive({
     },
     yAxis: {
       type: 'value',
+      max: 100,
       axisLabel: {
         // 方法1：缩小标签字体
         // fontSize: 12,
@@ -48,10 +52,19 @@ const state = reactive({
     tooltip: {
       show: true,
       trigger: 'axis',
+      formatter: function(params) {
+        const date = dayjs(props.chartData[params[0].dataIndex].timestamp).format('MMM DD YY hh:mm:ss A')
+        let html = `${date}<br/>`;
+        params.forEach(item => {
+          html += `<div style="width:100%;display:flex;justify-content: space-between;">
+            <span style="color:#0ab45a">●</span>${item.value}%</div>`;
+        });
+        return html;
+      }
     },
     series: [
       {
-        data: [820, 932, 901, 934, 1290, 1330, 1320],
+        // data: [820, 932, 901, 934, 1290, 1330, 1320],
         type: 'line',
         symbol: 'none',
         areaStyle: {
@@ -114,11 +127,36 @@ const state = reactive({
 })
 const chartRef = ref(null)
 
+const props = defineProps({
+  chartData:{
+    type:Array,
+    defalut:()=>[]
+  }
+})
+
+const { width } = useWindowResize()
+
 onMounted(() => {
   // optAnimation();
-  console.log('chartRef onMounted');
   nextTick(()=>{
-    initChart()
+    // initChart()
+  })
+})
+
+watch(()=>props.chartData,()=>{
+  const date = props.chartData.map(item=> dayjs(item.timestamp).format('HH:mm'))
+  state.chartOption.xAxis.data = date
+  const value = props.chartData.map(item=> Number(item.yesPercent)*100)
+  // console.log('date',date);
+  // console.log('value',value);
+  state.chartOption.series[0].data = value
+  initChart()
+})
+
+watch(()=>width.value,()=>{
+  debounce(()=>{
+    const myChart = echarts.init(chartRef.value)
+    myChart.resize();
   })
 })
 
@@ -127,9 +165,9 @@ function initChart() {
   myChart.setOption(state.chartOption)
 }
 
-defineExpose([initChart])
+defineExpose({initChart})
 </script>
 
 <template>
-  <div class="flex-[0.7] h-[462px]" ref="chartRef"></div>
+  <div class="w-full lg:flex-[0.7] h-[462px]" ref="chartRef"></div>
 </template>

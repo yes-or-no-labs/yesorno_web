@@ -25,8 +25,8 @@ const state = reactive({
             class="py-[6px] px-[16px] text-[14px] flex items-center gap-[5px] cursor-pointer text-[#0AB45A] font-bold"
             v-bind="props"
           >
-            <img src="@/assets/img/switch.png" class="w-[16px] h-[16px]" />
-            
+            <!-- <img src="@/assets/img/switch.png" class="w-[16px] h-[16px]" /> -->
+            <v-icon icon="mdi-swap-vertical" color="#0AB45A" size="16"></v-icon>
             {{ state.sortType == 1?'New to Old':'Most Liked' }}
           </div>
         </template>

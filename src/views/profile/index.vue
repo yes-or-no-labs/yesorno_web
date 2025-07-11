@@ -6,6 +6,7 @@ import { computed } from 'vue'
 import { api } from '@/apis'
 import { store } from '@/store'
 import { useWindowResize } from '@/hooks/useWindowResize'
+import dayjs from 'dayjs'
 
 const env = computed(() => import.meta.env)
 
@@ -226,9 +227,9 @@ async function getUserBetRecord($state) {
                 >
                   <div
                     class="!px-[8px] !pt-[8px] !pb-[2px] text-[14px] text-[#CECFD2] underline"
-                    @click="$router.push(`/marketDetail?eventId=${item.eventId}}`)"
+                    @click="$router.push(`/marketDetail?eventId=${item.eventId}`)"
                   >
-                    <span class="cursor-pointer">Israel x Hamas ceasefire by July 15?</span>
+                    <span class="cursor-pointer">{{ item.eventInfo.topic }}</span>
                   </div>
                   <div class="flex items-center">
                     <div
@@ -246,7 +247,7 @@ async function getUserBetRecord($state) {
                     <div
                       class="w-[180px] min-w-[180px] text-[14px] text-[#94969C] whitespace-nowrap border-b border-solid border-[#87878733] !py-[10px] !px-[16px]"
                     >
-                      1.2
+                      {{ dayjs(Number(item.eventInfo.endTime) * 1000).format('MMM D, YYYY') }}
                     </div>
                     <div
                       class="w-[180px] min-w-[180px] text-[14px] text-[#94969C] whitespace-nowrap border-b border-solid border-[#87878733] !py-[10px] !px-[16px]"
@@ -354,9 +355,9 @@ async function getUserBetRecord($state) {
                       >
                         <div
                           class="!px-[8px] !pt-[8px] !pb-[2px] text-[14px] text-[#CECFD2] underline"
-                          @click="$router.push(`/marketDetail?eventId=${item.eventId}}`)"
+                          @click="$router.push(`/marketDetail?eventId=${item.eventId}`)"
                         >
-                          <span class="cursor-pointer">Israel x Hamas ceasefire by July 15?</span>
+                          <span class="cursor-pointer">{{ item.eventInfo.topic }}</span>
                         </div>
                         <div class="flex items-center">
                           <div
@@ -374,7 +375,7 @@ async function getUserBetRecord($state) {
                           <div
                             class="w-[180px] min-w-[180px] text-[14px] text-[#94969C] whitespace-nowrap border-b border-solid border-[#87878733] !py-[10px] !px-[16px]"
                           >
-                            1.2
+                            {{ dayjs(Number(item.eventInfo.endTime) * 1000).format('MMM D, YYYY') }}
                           </div>
                           <div
                             class="w-[180px] min-w-[180px] text-[14px] text-[#94969C] whitespace-nowrap border-b border-solid border-[#87878733] !py-[10px] !px-[16px]"

@@ -318,14 +318,14 @@ async function handleClickBuy() {
                 v-ripple
                 :style="
                   state.buyOrder.orderType == '1'
-                    ? 'background-color:#0AB45A'
+                    ? 'background-color:#0AB45A;border-top:1px solid #0AB45A;border-right:1px solid #0AB45A;border-bottom:1px solid #0AB45A;'
                     : 'border-top:1px solid #DBDBDB;border-left:1px solid #DBDBDB;border-bottom:1px solid #DBDBDB;'
                 "
                 @click="state.buyOrder.orderType = '1'"
               >
                 <div
                   class="flex flex-col gap-[10px]"
-                  :style="state.buyOrder.orderType == '1' ? 'color:#000' : 'color:#9D9D9D'"
+                  :style="state.buyOrder.orderType == '1' ? 'color:#fff' : 'color:#9D9D9D'"
                 >
                   <div class="text-[16px] leading-[16px]">Market</div>
                 </div>
@@ -335,14 +335,14 @@ async function handleClickBuy() {
                 v-ripple
                 :style="
                   state.buyOrder.orderType == '2'
-                    ? 'background-color:#0AB45A'
+                    ? 'background-color:#0AB45A;border-top:1px solid #0AB45A;border-right:1px solid #0AB45A;border-bottom:1px solid #0AB45A;'
                     : 'border-top:1px solid #DBDBDB;border-right:1px solid #DBDBDB;border-bottom:1px solid #DBDBDB;'
                 "
                 @click="debounce(()=>{toast.info('coming soon')})"
               >
                 <div
                   class="flex flex-col gap-[10px]"
-                  :style="state.buyOrder.orderType == '2' ? 'color:#000' : 'color:#9D9D9D'"
+                  :style="state.buyOrder.orderType == '2' ? 'color:#fff' : 'color:#9D9D9D'"
                 >
                   <div class="text-[16px] leading-[16px]">Limit</div>
                 </div>
@@ -377,14 +377,14 @@ async function handleClickBuy() {
                 v-ripple
                 :style="
                   state.buyOrder.buyType == '1'
-                    ? 'background-color:#0AB45A'
+                    ? 'background-color:#0AB45A;border-top:1px solid #0AB45A;border-right:1px solid #0AB45A;border-bottom:1px solid #0AB45A;'
                     : 'border-top:1px solid #DBDBDB;border-left:1px solid #DBDBDB;border-bottom:1px solid #DBDBDB;'
                 "
                 @click="state.buyOrder.buyType = '1'"
               >
                 <div
                   class="flex flex-col gap-[10px]"
-                  :style="state.buyOrder.buyType == '1' ? 'color:#000' : 'color:#9D9D9D'"
+                  :style="state.buyOrder.buyType == '1' ? 'color:#fff' : 'color:#9D9D9D'"
                 >
                   <div class="text-[16px] leading-[16px]">Amount</div>
                 </div>
@@ -394,14 +394,14 @@ async function handleClickBuy() {
                 v-ripple
                 :style="
                   state.buyOrder.buyType == '2'
-                    ? 'background-color:#0AB45A'
+                    ? 'background-color:#0AB45A;border-top:1px solid #0AB45A;border-right:1px solid #0AB45A;border-bottom:1px solid #0AB45A;'
                     : 'border-top:1px solid #DBDBDB;border-right:1px solid #DBDBDB;border-bottom:1px solid #DBDBDB;'
                 "
                 @click="state.buyOrder.buyType = '2'"
               >
                 <div
                   class="flex flex-col gap-[10px]"
-                  :style="state.buyOrder.buyType == '2' ? 'color:#000' : 'color:#9D9D9D'"
+                  :style="state.buyOrder.buyType == '2' ? 'color:#fff' : 'color:#9D9D9D'"
                 >
                   <div class="text-[16px] leading-[16px]">Shares</div>
                 </div>
