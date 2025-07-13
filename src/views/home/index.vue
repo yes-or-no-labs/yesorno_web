@@ -70,6 +70,10 @@ const optAnimation = (json, index) => {
       poster="@/assets/img/home_bg.png"
       muted
       loop
+      playsinline
+      webkit-playsinline
+      x-webkit-airplay="allow" 
+      preload="auto"
       class="absolute lg:top-0 top-[40xp] left-[50%] translate-x-[-50%] w-full object-cover max-w-[1920px]"
       oncontextmenu="return false;"
     ></video>
@@ -132,6 +136,10 @@ const optAnimation = (json, index) => {
         poster="@/assets/img/home_bg2.png"
         muted
         loop
+        playsinline
+        webkit-playsinline
+        x-webkit-airplay="allow" 
+        preload="auto"
         class="w-full object-cover 2xl:h-[200px] xl:h-[180px] lg:h-[160px] sm:h-[140px] h-[80px] 2xl:!mt-[40px] xl:!mt-[30px] lg:!mt-[20px] !mt-[10px]"
         oncontextmenu="return false;"
       ></video>

@@ -36,12 +36,12 @@ onMounted(() => {
       <RouterView />
     </div>
     <FooterSecond v-if="currenRoutePath !== '/login'" />
-    <div class="fixed bottom-0 left-0 lg:hidden flex items-center justify-between !px-[20px] border-t border-solid border-[#FFFFFF80]">
+    <!-- <div class="fixed bottom-0 left-0 lg:hidden flex items-center justify-between !px-[20px] border-t border-solid border-[#FFFFFF80]">
       <div class="flex flex-col gap-[5px] items-center">
         <img src="" class="w-[18px] h-[18px]" alt="">
         <div class="text-[#A7A7A7] text-[14px]">Home</div>
       </div>
-    </div>
+    </div> -->
   </div>
 </template>
 
