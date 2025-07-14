@@ -363,7 +363,7 @@ const optAnimation = (json, index) => {
                   style="background: linear-gradient(90deg, #6ddd25 0%, #0ab45a 100%)"
                 ></div>
                 <div
-                  class="absolute left-[50%] lg:top-[-220px] lg:h-[220px] top-[-240px] h-[240px] translate-x-[-50%] border-l border-solid border-[#fff]"
+                  class="absolute left-[50%] lg:top-[-220px] lg:h-[220px] top-[-250px] h-[250px] translate-x-[-50%] border-l border-solid border-[#fff]"
                 >
                   <div
                     class="absolute left-[-4px] bottom-[20px] flex flex-col gap-[16px] lg:w-[256px] w-[200px]"
@@ -412,7 +412,7 @@ const optAnimation = (json, index) => {
                         style="font-family: Geist"
                       >
                         Integration of<br class="lg:hidden" />
-                        community-suggested features
+                        community-suggested <br class="lg:hidden" /> features
                       </div>
                     </div>
                     <div class="flex gap-[8px]">
@@ -427,8 +427,8 @@ const optAnimation = (json, index) => {
                         class="lg:text-[14px] text-[12px] text-[#fff] flex-1"
                         style="font-family: Geist"
                       >
-                        Strategic collaborations with media<br class="lg:hidden" />
-                        outlets to ensure every hot topic<br class="lg:hidden" />
+                        Strategic collaborations<br class="lg:hidden" /> with media
+                        outlets to ensure every hot topic
                         reflects public sentiment
                       </div>
                     </div>
@@ -451,7 +451,7 @@ const optAnimation = (json, index) => {
                   style="background: linear-gradient(90deg, #6ddd25 0%, #0ab45a 100%)"
                 ></div>
                 <div
-                  class="absolute left-[50%] lg:bottom-[-240px] lg:h-[240px] bottom-[-220px] h-[220px] translate-x-[-50%] border-l border-solid border-[#fff]"
+                  class="absolute left-[50%] lg:bottom-[-240px] lg:h-[240px] bottom-[-240px] h-[240px] translate-x-[-50%] border-l border-solid border-[#fff]"
                 >
                   <div
                     class="absolute left-[-4px] top-[20px] flex flex-col gap-[16px] lg:w-[256px] w-[200px]"
@@ -549,7 +549,7 @@ const optAnimation = (json, index) => {
                   style="background: linear-gradient(90deg, #6ddd25 0%, #0ab45a 100%)"
                 ></div>
                 <div
-                  class="absolute left-[50%] lg:top-[-170px] lg:h-[170px] top-[-180px] h-[180px] translate-x-[-50%] border-l border-solid border-[#fff]"
+                  class="absolute left-[50%] lg:top-[-170px] lg:h-[170px] top-[-200px] h-[200px] translate-x-[-50%] border-l border-solid border-[#fff]"
                 >
                   <div
                     class="absolute left-[-4px] bottom-[20px] flex flex-col gap-[16px] lg:w-[256px] w-[200px]"
@@ -584,7 +584,7 @@ const optAnimation = (json, index) => {
                         class="lg:text-[14px] text-[12px] text-[#fff] flex-1"
                         style="font-family: Geist"
                       >
-                        Native mobile App version launch
+                        Native mobile App version<br/> launch
                       </div>
                     </div>
                     <div class="flex gap-[8px]">

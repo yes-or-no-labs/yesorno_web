@@ -276,12 +276,12 @@ function calcTotalPrice(list) {
       </div>
       
     </div>
-    <div class="w-full flex flex-col lg:grid lg:grid-cols-3 gap-[16px] !px-[10px] !pt-[20px] lg:!px-[38px] overflow-y-auto absolute top-[150px] left-[50%] translate-x-[-50%] max-w-[1300px]" v-show="state.dataList == 0">
+    <div class="w-full flex flex-col lg:grid lg:grid-cols-3 gap-[16px] !px-[10px] !pt-[20px] lg:!px-[38px] overflow-y-auto absolute lg:top-[150px] left-[50%] top-[200px] translate-x-[-50%] max-w-[1300px]" v-show="state.dataList == 0">
       <v-skeleton-loader
         class="mx-auto w-full !rounded-[20px] border border-solid border-[#fff]"
         type="card-avatar, actions"
         v-for="item in 6"
-        height="273"
+        height="263"
         max-height="273"
       >
       </v-skeleton-loader>
