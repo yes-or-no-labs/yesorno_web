@@ -48,9 +48,9 @@ function handleClickCopy() {
 }
 
 async function handleClickItem(index){
-  // console.log('handleClickItem',appStore.onDisConnectClick);
+  console.log('handleClickItem',index);
   
-  if(index == 3){
+  if(index == 2){
     await appStore.onDisConnectClick()
     return
   }

@@ -70,7 +70,7 @@ onMounted(async () => {
 const appStore = store.useAppStore()
 
 watch(()=>state.buyOrder.slider,(newVal)=>{
-  console.log('buyOrder',newVal);
+  // console.log('buyOrder',newVal);
   if(state.buyOrder.buyType == '1'){
     state.buyOrder.totalPrice = newVal
   }else if(state.buyOrder.buyType == '2'){
@@ -442,7 +442,7 @@ async function handleClickBuy() {
             <div
               class="w-full flex items-center justify-end gap-[5px] text-[16px] leading-[16px] text-[#cecfd2]"
             >
-              <div>{{ state.balanceOfUsdo }} {{ network[env.VITE_APP_CHAIN].Denomination }}</div>
+              <div>{{ $formatAmount(state.balanceOfUsdo) }} {{ network[env.VITE_APP_CHAIN].Denomination }}</div>
               <div
                 class="text-[#0AB45A] underline text-[14px] leading-[14px] cursor-pointer font-bold"
                 @click="handleClickMax"
