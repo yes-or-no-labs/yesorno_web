@@ -71,23 +71,21 @@ export default function createRequest(options) {
       // Api code 401 and have token
       if (res && res.code && res.code === '401') {
         // Get new token
-        // const newRes = await api.refreshToken()
-        // if (newRes.success) {
-        //   // store.dispatch(
-        //   //   updateUserInfo({
-        //   //     token: newRes.obj,
-        //   //     walletAddress: user.walletAddress,
-        //   //   }),
-        //   // )
-        //   appStore.onUpdateToken('bearer '+res.obj.accessToken)
-        //   appStore.onUpdateRefreshToken('bearer '+res.obj.refreshToken)
-        //   // Re request
-        //   return await instance.request(config)
-        // } else {
-          
-        //   return Promise.reject(401)
-        // }
+        const newRes = await api.refreshToken({
+          refreshToken:appStore.tomeState.refreshToken
+        })
+        if (newRes.success) {
+          appStore.onUpdateToken('bearer '+res.obj.accessToken)
+          appStore.onUpdateRefreshToken('bearer '+res.obj.refreshToken)
+          // Re request
+          return await instance.request(config)
+        } else {
+          return Promise.reject(401)
+        }
         // toast.error('')
+        // appStore.onDisConnectClick()
+        // return res || {}
+      } else if(res && res.code && res.code == '0945'){
         appStore.onDisConnectClick()
         return res || {}
       } else {
