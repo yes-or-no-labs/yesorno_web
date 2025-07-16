@@ -3,6 +3,7 @@ import { removeEmptyKey } from '../index'
 import { store } from '@/store/index'
 import {constant} from '../constant'
 import { useToast } from "vue-toastification";
+import { api } from '@/apis';
 
 export default function createRequest(options) {
   const instance = axios.create(
@@ -70,10 +71,7 @@ export default function createRequest(options) {
       // Api code 401 and have token
       if (res && res.code && res.code === '401') {
         // Get new token
-        // const newRes = await getNewToken({
-        //   token: user.userInfo[user.walletAddress]?.token,
-        //   refreshToken: user.userInfo[user.walletAddress]?.refreshToken,
-        // })
+        // const newRes = await api.refreshToken()
         // if (newRes.success) {
         //   // store.dispatch(
         //   //   updateUserInfo({
@@ -81,6 +79,8 @@ export default function createRequest(options) {
         //   //     walletAddress: user.walletAddress,
         //   //   }),
         //   // )
+        //   appStore.onUpdateToken('bearer '+res.obj.accessToken)
+        //   appStore.onUpdateRefreshToken('bearer '+res.obj.refreshToken)
         //   // Re request
         //   return await instance.request(config)
         // } else {

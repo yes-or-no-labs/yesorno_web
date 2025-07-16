@@ -167,7 +167,7 @@ async function getOrderList() {
         >
           <div class="flex items-center gap-[10px] lg:gap-[24px] flex-1">
             <img
-              src="https://pub-e95d6af5130d4cb8a791802809e31727.r2.dev/0x18f63f20eead237c83ff75bb7bd2028006fef79d/0xa7e5f55d2381a2cc7c4e709d01603d0c79706746a54d7452006285d9a692eba3"
+              :src="state.dataObj?.imgUrl"
               class="w-[60px] h-[60px] sm:w-[70px] sm:h-[70px] lg:w-[80px] lg:h-[80px] rounded-[10px]"
             />
             <div class="flex flex-col gap-[5px] lg:gap-[10px] justify-center lg:h-[80px] flex-1">

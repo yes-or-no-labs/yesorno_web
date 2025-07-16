@@ -2,7 +2,7 @@
 
 <template>
   <div
-    class="2xl:h-[254px] xl:h-[234px] lg:h-[200px] sm:h-[180px] h-[160px] relative z-10"
+    class="hidden sm:block 2xl:h-[254px] xl:h-[234px] lg:h-[200px] sm:h-[180px] h-[160px] relative z-10"
     style="background: linear-gradient(180deg, #000000 0%, rgba(0, 0, 0, 0) 100%)"
   >
     <img

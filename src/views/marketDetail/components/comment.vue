@@ -106,7 +106,7 @@ const state = reactive({
             hide-spin-buttons
             :min="0"
             :tile="true"
-            color="rgba(255,255,255,.5)"
+            color="#0AB45A"
             rounded="10"
             :loading="state.sending"
           >

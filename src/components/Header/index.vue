@@ -6,6 +6,8 @@ import profile_icon1 from '@/assets/img/profile_icon1.png'
 import profile_icon2 from '@/assets/img/profile_icon2.png'
 import profile_icon3 from '@/assets/img/profile_icon3.png'
 import profile_icon4 from '@/assets/img/profile_icon4.png'
+import settingImg from '@/assets/img/setting.png'
+
 import personImg from '@/assets/img/person.png'
 import {copyToClipboard} from '@/utils/uni-app'
 import { useRouter } from 'vue-router'
@@ -21,6 +23,10 @@ const porfileList=[{
   icon: profile_icon1,
   path:'/profile'
 }, {
+  title: 'Setting',
+  icon: settingImg,
+  path:'/setting'
+},{
   title: 'Terms of Use',
   icon: profile_icon3,
   path:''
@@ -50,7 +56,7 @@ function handleClickCopy() {
 async function handleClickItem(index){
   console.log('handleClickItem',index);
   
-  if(index == 2){
+  if(index == 3){
     await appStore.onDisConnectClick()
     return
   }
@@ -182,9 +188,9 @@ function handleClickMenu(url) {
                   <div class="!pb-[16px] border-b border-solid border-[#333741]  flex gap-[8px] items-center">
                     <img :src="userInfo?.avatarUrl||personImg" class="w-[40px] h-[40px] rounded-full cursor-pointer" />
                     <div class="flex flex-col">
-                      <div class="text-[#fff] text-[14px]" style="font-family: din;">{{ userInfo?.nickname?userInfo?.nickname:`User_${curWalletAddress?.slice(-6)}` }}</div>
+                      <div class="text-[#fff] text-[14px]">{{ userInfo?.nickname?userInfo?.nickname:`User_${curWalletAddress?.slice(-6)}` }}</div>
                       <div class="flex items-center gap-[5px]">
-                        <div class="text-[#fff] text-[14px]" style="font-family: din;">{{ formatAddress(curWalletAddress) }}</div>
+                        <div class="text-[#fff] text-[14px]">{{ formatAddress(curWalletAddress) }}</div>
                         <img src="@/assets/img/copy.png" class="w-[16px] h-[16px] cursor-pointer" @click="handleClickCopy"/>
                       </div>
                     </div>
@@ -194,7 +200,7 @@ function handleClickMenu(url) {
             <v-list-item v-for="(item, index) in porfileList" :key="index" :value="index" @click="handleClickItem(index)">
                 <div class="flex items-center gap-[10px]">
                   <img :src="item.icon" class="w-[20px] h-[20px]" />
-                  <div class="text-[#fff] text-[14px] leading-[14px]" style="font-family: din;">
+                  <div class="text-[#fff] text-[14px] leading-[14px]">
                     {{ item.title }}
                   </div>
                 </div>

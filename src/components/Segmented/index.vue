@@ -1,5 +1,5 @@
 <template>
-  <div class="segmented-container w-full overflow-x-auto" :style="`padding-left: ${offset}px;padding-right: ${offset}px;`">
+  <div class="segmented-container overflow-x-auto" :class="customClass" :style="`padding-left: ${offset}px;padding-right: ${offset}px;`">
     <div class="segmented-wrap">
       <div
         class="segmented-thumb"
@@ -45,6 +45,9 @@ export default {
     },
     value:{
       type: String||Number,
+    },
+    customClass:{
+      type: String,
     }
   },
   mounted() {

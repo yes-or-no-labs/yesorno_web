@@ -34,6 +34,10 @@ const router = createRouter({
       path: '/login',
       name: 'login',
       component: () => import('../views/login/index.vue'),
+    },{
+      path: '/setting',
+      name: 'setting',
+      component: () => import('../views/setting/index.vue'),
     },
   ],
   scrollBehavior(to, from, savedPosition) {

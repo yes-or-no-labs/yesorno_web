@@ -117,7 +117,7 @@ const state = reactive({
       top: 'center',
       z: -1, // 确保在图表下方
       style: {
-        image: 'https://app.olab.xyz/_next/static/media/olabWaterMark.ec835577.png', // 替换为你的Logo URL
+        image: 'https://godyon.s3.ap-southeast-1.amazonaws.com/uploads/image/png/17526590842732960.png', // 替换为你的Logo URL
         width: 250, // 图片宽度
         height: 70, // 图片高度
         opacity: 0.2, // 透明度
