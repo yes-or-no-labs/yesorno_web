@@ -1,6 +1,6 @@
 <script setup>
 import { store } from '@/store'
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, reactive } from 'vue'
 import {formatAddress} from '@/utils/uni-app.js'
 import profile_icon1 from '@/assets/img/profile_icon1.png'
 import profile_icon2 from '@/assets/img/profile_icon2.png'
@@ -11,6 +11,8 @@ import settingImg from '@/assets/img/setting.png'
 import personImg from '@/assets/img/person.png'
 import {copyToClipboard} from '@/utils/uni-app'
 import { useRouter } from 'vue-router'
+import network from '@/utils/network'
+import Erc20ABi from '@/abi/erc_20.json'
 
 const menuList = [
   { title: 'White paper', link: 'https://yesorno-labs.gitbook.io/yesornolabs/' },
@@ -35,6 +37,11 @@ const porfileList=[{
   icon: profile_icon4,
 }]
 
+const state = reactive({
+  tokenContract:null,
+  balanceOfUsdo:0
+})
+
 const appStore = store.useAppStore()
 
 const router = useRouter()
@@ -42,6 +49,8 @@ const router = useRouter()
 
 onMounted(()=>{
   // console.log('userInfo',appStore.tomeState);
+  initErc20Contract()
+  getTokenBalance()
 })
 
 const curWalletAddress = computed(() => appStore.tomeState.curWalletAddress)
@@ -71,6 +80,20 @@ const currenRoutePath = computed(() => {
 
 function handleClickMenu(url) {
   window.open(url)
+}
+
+function initErc20Contract() {
+  state.tokenContract = appStore.initErc20Contract(
+    network[import.meta.env.VITE_APP_CHAIN][network[import.meta.env.VITE_APP_CHAIN].Denomination],
+    Erc20ABi,
+  )
+}
+
+async function getTokenBalance() {
+  if (!state.tokenContract) return
+  const balance = await state.tokenContract.balanceOf(appStore.tomeState.curWalletAddress)
+  state.balanceOfUsdo = appStore.formatUnits(balance)
+  console.log('balanceOfUsdo', state.balanceOfUsdo)
 }
 
 </script>
@@ -148,17 +171,17 @@ function handleClickMenu(url) {
         <div class="flex items-center gap-[45px] h-full flex-1" v-show="appStore.tomeState.curWalletAddress">
           <div class="flex flex-col items-center gap-[5px]">
             <div class="text-[#fff] lg:text-[12px] text-[13px] leading-[13px] whitespace-nowrap" style="font-family: Inter">
-              My ponts
+              My Points
             </div>
-            <div class="text-[#81F963] lg:text-[16px] text-[20px] leading-[20px]" style="font-family: din">
+            <div class="text-[#81F963] lg:text-[16px] text-[20px] leading-[20px]">
               0.00
             </div>
           </div>
           <div class="flex flex-col items-center gap-[5px]">
             <div class="text-[#fff] lg:text-[12px] text-[13px] leading-[13px] whitespace-nowrap" style="font-family: Inter">
-              My Porttollo
+              My Portfolio
             </div>
-            <div class="text-[#81F963] lg:text-[16px] text-[20px] leading-[20px]" style="font-family: din">
+            <div class="text-[#81F963] lg:text-[16px] text-[20px] leading-[20px]">
               $0.00
             </div>
           </div>
@@ -166,8 +189,8 @@ function handleClickMenu(url) {
             <div class="text-[#fff] lg:text-[12px] text-[13px] leading-[13px] whitespace-nowrap" style="font-family: Inter">
               Balance
             </div>
-            <div class="text-[#81F963] lg:text-[16px] text-[20px] leading-[20px]" style="font-family: din">
-              $0.00
+            <div class="text-[#81F963] lg:text-[16px] text-[20px] leading-[20px]">
+              ${{ $formatAmount(state.balanceOfUsdo) }}
             </div>
           </div>
         </div>
