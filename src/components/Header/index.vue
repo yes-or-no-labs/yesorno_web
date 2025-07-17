@@ -1,6 +1,6 @@
 <script setup>
 import { store } from '@/store'
-import { computed, onMounted, reactive } from 'vue'
+import { computed, onMounted, reactive, watch } from 'vue'
 import {formatAddress} from '@/utils/uni-app.js'
 import profile_icon1 from '@/assets/img/profile_icon1.png'
 import profile_icon2 from '@/assets/img/profile_icon2.png'
@@ -47,15 +47,14 @@ const appStore = store.useAppStore()
 const router = useRouter()
 
 
-onMounted(()=>{
-  // console.log('userInfo',appStore.tomeState);
-  initErc20Contract()
-  getTokenBalance()
-})
-
 const curWalletAddress = computed(() => appStore.tomeState.curWalletAddress)
 
 const userInfo = computed(() => appStore.tomeState.userInfo)
+
+watch(()=>appStore.mStateSimple.metamaskProvider,()=>{
+  initErc20Contract()
+  getTokenBalance()
+})
 
 
 function handleClickCopy() {
@@ -93,7 +92,7 @@ async function getTokenBalance() {
   if (!state.tokenContract) return
   const balance = await state.tokenContract.balanceOf(appStore.tomeState.curWalletAddress)
   state.balanceOfUsdo = appStore.formatUnits(balance)
-  console.log('balanceOfUsdo', state.balanceOfUsdo)
+  // console.log('balanceOfUsdo', state.balanceOfUsdo)
 }
 
 </script>
@@ -174,7 +173,7 @@ async function getTokenBalance() {
               My Points
             </div>
             <div class="text-[#81F963] lg:text-[16px] text-[20px] leading-[20px]">
-              0.00
+              {{ $formatAmount(userInfo.point) }}
             </div>
           </div>
           <div class="flex flex-col items-center gap-[5px]">

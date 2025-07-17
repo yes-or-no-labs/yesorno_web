@@ -1,6 +1,6 @@
 <script setup>
 import { store } from '@/store'
-import { computed, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import personImg from '@/assets/img/person.png'
 import { api } from '@/apis'
 import createRequest from '../../utils/request/request'
@@ -21,6 +21,10 @@ const state = reactive({
     uploadLinkObj:null,
     selectedFile:null,
     uploading:false
+})
+
+onMounted(()=>{
+  appStore.getUserInfo()
 })
 
 const fileInput = ref(null);

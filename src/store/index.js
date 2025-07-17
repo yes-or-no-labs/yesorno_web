@@ -14,7 +14,7 @@ export const store = {
     const tomeState = reactive({
       token: localStorage.getItem(constant.tokenKey),
       username: localStorage.getItem(constant.usernameKey),
-      userInfo: localStorage.getItem(constant.userInfoKey) || null,
+      userInfo: localStorage.getItem(constant.userInfoKey)?JSON.parse(localStorage.getItem(constant.userInfoKey)):null,
       refreshToken: localStorage.getItem(constant.refreshTokenKey) || '',
       appConfig: localStorage.getItem(constant.appConfigKey) || {},
       walletAccountList: [],
