@@ -20,6 +20,11 @@ const menuList = [
   { title: 'Audit report', link: '' },
 ]
 
+const marketList = [
+  { title: 'Price Prediction', path: '/market_pricePrediction' },
+  { title: 'Event Prediction', path: '/market' },
+]
+
 const porfileList=[{
   title: 'My Profile',
   icon: profile_icon1,
@@ -118,14 +123,32 @@ async function getTokenBalance() {
         >
           Home
         </div>
-        <div
+        <!-- <div
           class="text-[#fff] lg:text-[14px] text-[16px] font-[600] cursor-pointer"
           style="font-family: Geist"
           @click="$router.push('/market')"
           :class="currenRoutePath=== '/market'?'!text-[#6DDD25]':''"
         >
-          Market
-        </div>
+          
+        </div> -->
+        <v-menu transition="scale-transition" :offset="[10, 0]">
+          <template v-slot:activator="{ props }">
+            <div
+              class="text-[#fff] lg:text-[14px] text-[16px] font-[600] cursor-pointer whitespace-nowrap flex items-center"
+              v-bind="props"
+            >
+            <div>Market</div>
+              <v-icon icon="mdi-menu-down" />
+            </div>
+          </template>
+          <v-list>
+            <v-list-item v-for="(item, index) in marketList" :key="index" :value="index" @click="$router.push(item.path)">
+              <v-list-item-title>
+                <div :class="currenRoutePath=== item.path?'!text-[#6DDD25]':'text-[#fff]'">{{ item.title }}</div>
+              </v-list-item-title>
+            </v-list-item>
+          </v-list>
+        </v-menu>
         <div
           class="text-[#fff] lg:text-[14px] text-[16px] font-[600] cursor-pointer"
           style="font-family: Geist"
@@ -173,7 +196,7 @@ async function getTokenBalance() {
               My Points
             </div>
             <div class="text-[#81F963] lg:text-[16px] text-[20px] leading-[20px]">
-              {{ $formatAmount(userInfo.point) }}
+              {{ $formatAmount(userInfo?.point) }}
             </div>
           </div>
           <div class="flex flex-col items-center gap-[5px]">

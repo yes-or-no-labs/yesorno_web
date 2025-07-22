@@ -1,0 +1,81 @@
+
+/* .theme-dark:root {
+	--tv-color-platform-background: #181818;
+	--tv-color-pane-background: #181818;
+	--tv-color-pane-background-secondary: #181818;
+	--tv-color-toolbar-button-background-hover: #3f4246;    
+	--tv-color-toolbar-button-background-secondary-hover: #24AE8F;     
+	--tv-color-toolbar-button-background-expanded: #3f4246;     
+	--tv-color-toolbar-button-text: #c8c7d8;      
+	--tv-color-toolbar-button-text-hover: #ffffff;     
+	--tv-color-toolbar-button-text-active: #24AE8F;    
+	--tv-color-toolbar-button-text-active-hover: #24AE8F;       
+	--tv-color-item-active-text: rgb(6, 6, 255);       
+	--tv-color-toolbar-toggle-button-background-active: #37A6EF;        
+	--tv-color-toolbar-toggle-button-background-active-hover: #37A6EF;     
+}
+
+.theme-light:root {
+	--tv-color-platform-background: #fff;
+	--tv-color-pane-background: #fff;
+	--tv-color-pane-background-secondary: #fff;
+	--tv-color-toolbar-button-background-hover: #3f4246;    
+	--tv-color-toolbar-button-background-secondary-hover: #24AE8F;     
+	--tv-color-toolbar-button-background-expanded: #3f4246;     
+	--tv-color-toolbar-button-text: #c8c7d8;      
+	--tv-color-toolbar-button-text-hover: #ffffff;     
+	--tv-color-toolbar-button-text-active: #24AE8F;    
+	--tv-color-toolbar-button-text-active-hover: #24AE8F;       
+	--tv-color-item-active-text: rgb(6, 6, 255);       
+	--tv-color-toolbar-toggle-button-background-active: #37A6EF;        
+	--tv-color-toolbar-toggle-button-background-active-hover: #37A6EF;   
+} */
+
+:root:not(.theme-dark) {
+	--tv-color-platform-background: #fff;
+	--tv-color-pane-background: #fff;
+	--tv-color-pane-background-secondary: #fff;
+	--tv-color-toolbar-button-background-hover: #34526e;     /*工具栏按钮的悬停效果颜色*/
+	--tv-color-toolbar-button-background-secondary-hover: #24AE8F;      /*工具栏按钮的其他悬停颜色（例如，右侧有打开的工具栏时）*/
+	--tv-color-toolbar-button-background-expanded: #34526e;      /*右侧工具栏上活动按钮的悬停效果颜色*/
+	--tv-color-toolbar-button-text: #c8c7d8;       /*工具栏按钮的文本和图标颜色*/
+	--tv-color-toolbar-button-text-hover: #ffffff;     /*将鼠标悬停在工具栏按钮上时，文本和图标的颜色*/
+	--tv-color-toolbar-button-text-active: #24AE8F;     /*活动工具栏按钮的文本和图标颜色*/
+	--tv-color-toolbar-button-text-active-hover: #24AE8F;       /* 将鼠标悬停在它们上方时，工具栏按钮的文本和图标颜色*/
+	--tv-color-item-active-text: rgb(6, 6, 255);        /*切换工具栏按钮的文本颜色（例如，“磁铁模式”，“锁定所有图形”）*/
+	--tv-color-toolbar-toggle-button-background-active: #37A6EF;        /*切换工具栏按钮的文本颜色（例如，“磁铁模式”，“锁定所有图形”）*/
+	--tv-color-toolbar-toggle-button-background-active-hover: #37A6EF;      /*将切换工具栏按钮悬停在其上时填充颜色（例如，“磁铁模式”，“锁定所有图形”）*/
+}
+
+:root:not(.theme-light) {
+	--tv-color-platform-background: #181818;
+	--tv-color-pane-background: #181818;
+	--tv-color-pane-background-secondary: #181818;
+	--tv-color-toolbar-button-background-hover: #34526e;     /*工具栏按钮的悬停效果颜色*/
+	--tv-color-toolbar-button-background-secondary-hover: #24AE8F;      /*工具栏按钮的其他悬停颜色（例如，右侧有打开的工具栏时）*/
+	--tv-color-toolbar-button-background-expanded: #34526e;      /*右侧工具栏上活动按钮的悬停效果颜色*/
+	--tv-color-toolbar-button-text: #c8c7d8;       /*工具栏按钮的文本和图标颜色*/
+	--tv-color-toolbar-button-text-hover: #ffffff;     /*将鼠标悬停在工具栏按钮上时，文本和图标的颜色*/
+	--tv-color-toolbar-button-text-active: #24AE8F;     /*活动工具栏按钮的文本和图标颜色*/
+	--tv-color-toolbar-button-text-active-hover: #24AE8F;       /* 将鼠标悬停在它们上方时，工具栏按钮的文本和图标颜色*/
+	--tv-color-item-active-text: rgb(6, 6, 255);        /*切换工具栏按钮的文本颜色（例如，“磁铁模式”，“锁定所有图形”）*/
+	--tv-color-toolbar-toggle-button-background-active: #37A6EF;        /*切换工具栏按钮的文本颜色（例如，“磁铁模式”，“锁定所有图形”）*/
+	--tv-color-toolbar-toggle-button-background-active-hover: #37A6EF;      /*将切换工具栏按钮悬停在其上时填充颜色（例如，“磁铁模式”，“锁定所有图形”）*/
+}
+ 
+/* :root{
+	--tv-color-platform-background: #181818;
+	--tv-color-pane-background: #181818;
+	--tv-color-pane-background-secondary: #181818;
+	--tv-color-toolbar-button-background-hover: #111111;
+	--tv-color-toolbar-button-background-secondary-hover: #24AE8F;
+	--tv-color-toolbar-button-background-expanded: #111111;
+	--tv-color-toolbar-button-text: #c8c7d8;
+	--tv-color-toolbar-button-text-hover: #ffffff;
+	--tv-color-toolbar-button-text-active: #24AE8F;
+	--tv-color-toolbar-button-text-active-hover: #24AE8F;
+	--tv-color-item-active-text: rgb(6, 255, 6);
+	--tv-color-toolbar-toggle-button-background-active: #37A6EF;
+	--tv-color-toolbar-toggle-button-background-active-hover: #37A6EF;
+} */
+

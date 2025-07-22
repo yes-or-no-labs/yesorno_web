@@ -4,7 +4,6 @@ import Segmented from '@/components/Segmented/index.vue'
 import { api } from '@/apis'
 import network from '@/utils/network'
 import { store } from '@/store'
-import AiComponent from '@/components/Ai/index.vue'
 
 const state = reactive({
   menuList: [
@@ -91,7 +90,6 @@ function calcTotalPrice(list) {
   <div
     class="w-full min-h-screen !pb-[100px] max-w-[1300px] mx-auto !px-[10px] lg:!px-[38px] !pt-[20px]"
   >
-    <AiComponent />
     <div class="w-full h-auto lg:h-[58px] block lg:flex items-center justify-between !mt-[20px]">
       <!-- <div class="flex items-center gap-[35px]">
         <div
