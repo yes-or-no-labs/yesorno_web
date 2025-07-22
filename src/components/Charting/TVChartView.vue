@@ -213,6 +213,6 @@
 	.TVChartContainer {
 		flex: 1;
 		overflow: hidden;
-		height: 100%;
+		// height: 100%;
 	}
 </style>

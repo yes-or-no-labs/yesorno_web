@@ -26,7 +26,7 @@ const onSwiper = (swiper) => {
 
 <template>
   <div class="flex flex-col gap-[24px] w-full" style="min-height: calc(100vh - 80px)">
-    <div class="flex-[0.7]">
+    <div class="flex-1">
       <div class="w-[1200px] mx-auto flex items-end justify-between !py-[40px]">
         <div class="flex items-center gap-[10px]">
           <div
@@ -269,7 +269,7 @@ const onSwiper = (swiper) => {
         </swiper>
     </div>
 
-    <div class="flex-[0.3] bg-[#011B0C]">
+    <div class="flex-1 bg-[#011B0C] flex flex-col">
       <div class="w-full h-[42px] bg-[#011B0C] flex items-center justify-center relative cursor-row-resize">
         <div class="w-[96px] h-[6px] rounded-[3px]" style="background: linear-gradient(90deg, #6DDD25 0%, #0AB45A 100%);"></div>
         <div class=" absolute top-0 left-0 translate-y-[-100%] bg-[#191919] h-[42px] flex items-center rounded-t-[6px] z-20">
@@ -278,11 +278,11 @@ const onSwiper = (swiper) => {
           </div>
         </div>
       </div>
-      <div class="w-full h-[400px]" v-show="state.curTabIndex == 0">
+      <div class="flex-1 flex" v-show="state.curTabIndex == 0">
         <tvChart />
       </div>
       
-      <div class="w-[1200px] mx-auto h-[400px]" v-show="state.curTabIndex == 1">
+      <div class="w-[1200px] mx-auto" v-show="state.curTabIndex == 1">
         <AiComponent />
       </div>
     </div>

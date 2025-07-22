@@ -198,7 +198,7 @@ function sendPing() {
 </script>
 
 <template>
-  <div class="w-full flex flex-col gap-[20px]">
+  <div class="w-full h-auto">
 <!--    <div class="flex justify-between items-center w-full">-->
 <!--      <div class="flex items-center gap-[10px] flex-1 h-[48px]">-->
 <!--        <div-->
