@@ -111,10 +111,10 @@
 			custom_css_url: "custom-styles.css",
 			theme: 'dark',
 			locale: 'en',
-			disabled_features: ['use_localstorage_for_settings', 'header_quick_search', 'header_symbol_search',
+			disabled_features: [ "use_localstorage_for_settings",'header_quick_search', 'header_symbol_search',
 				'header_compare', 'header_saveload', 'context_menus', 'symbol_search_hot_key', 'adaptive_logo',
 				'header_screenshot', 'move_logo_to_main_pane', 'volume_force_overlay', 'symbol_info',"compare_symbol",
-				'border_around_the_chart'
+				'border_around_the_chart','timeframes_toolbar'
 			],
 			overrides: {
 				volumePaneSize: 'medium',
@@ -127,7 +127,15 @@
 				'paneProperties.background': '#000', //k线图背景色
 				"paneProperties.backgroundType": "solid",
 				'paneProperties.backgroundGradientStartColor': "#000",
-				'paneProperties.backgroundGradientEndColor': "#000"
+				'paneProperties.backgroundGradientEndColor': "#000",
+				// "timeframesToolbar.timeframes": [
+				// 	{ text: "1m", resolution: "1",title:'1m' },
+				// 	{ text: "30m", resolution: "30" },
+				// 	{ text: "1h", resolution: "1h" },
+				// 	{ text: "5m", resolution: "5" },
+				// ],
+				// "timeframesToolbar.defaultExpanded": true,
+				// "timeframesToolbar.visible": true,
 				// "toolbarBg": "#ff0000",
 				// "toolbarTextColor": "#ffffff", // 修改工具栏文字颜色
 				// "toolbarIconColor": "#ffffff" // 修改工具栏图标颜色
