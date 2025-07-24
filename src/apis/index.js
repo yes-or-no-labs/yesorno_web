@@ -51,4 +51,11 @@ export const api = {
   getOrderList: (params) => baseHttp({url:"/v1/order/list",method: 'GET',params}),
   upload: (data) => baseHttp({url:"/v1/upload/token",method: 'POST',data}),
   getFileinfo: (data) => baseHttp({url:"/v1/upload/file-info",method: 'POST',data}),
+  getTaskList: (params) => baseHttp({url:"/v1/tasks/list",method: 'GET',params}),
+  claimTask: (data) => baseHttp({url:"/v1/user/task-records/create",method: 'POST',data}),
+  getUserTaskList: (params) => baseHttp({url:"/v1/user/task-records/list",method: 'GET',params}),
+  follow: (data) => baseHttp({url:"/v1/user/followers/follow",method: 'POST',data}),
+  unfollow: (data) => baseHttp({url:"/v1/user/followers/unfollow",method: 'POST',data}),
+  getFollowingList: (params) => baseHttp({url:"/v1/user/followers/following",method: 'GET',params}),//我关注的人
+  getFollowersList: (params) => baseHttp({url:"/v1/user/followers/followers",method: 'GET',params}),//我的粉丝
 }

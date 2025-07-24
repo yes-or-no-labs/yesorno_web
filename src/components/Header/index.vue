@@ -190,7 +190,7 @@ async function getTokenBalance() {
         </div> -->
       </div>
       <div class="flex items-center gap-[45px] h-full">
-        <div class="flex items-center gap-[45px] h-full flex-1" v-show="appStore.tomeState.curWalletAddress">
+        <div class="flex items-center gap-[45px] h-full flex-1" v-show="appStore.tomeState.curWalletAddress&&appStore.tomeState.token">
           <div class="flex flex-col items-center gap-[5px]">
             <div class="text-[#fff] lg:text-[12px] text-[13px] leading-[13px] whitespace-nowrap" style="font-family: Inter">
               My Points
@@ -216,7 +216,7 @@ async function getTokenBalance() {
             </div>
           </div>
         </div>
-        <div class="flex-1" v-show="appStore.tomeState.curWalletAddress">
+        <div class="flex-1" v-show="appStore.tomeState.curWalletAddress&&appStore.tomeState.token">
           <v-menu transition="scale-transition" :offset="[10, 0]" >
           <template v-slot:activator="{ props }">
             <div
@@ -255,7 +255,7 @@ async function getTokenBalance() {
         </div>
         
 
-        <VBtnConnect class="rounded-[106px]" v-show="!appStore.tomeState.curWalletAddress" @click="$router.push('/login')">
+        <VBtnConnect class="rounded-[106px]" v-show="!appStore.tomeState.curWalletAddress||!appStore.tomeState.token" @click="$router.push('/login')">
           Connect Wallet
         </VBtnConnect>
       </div>

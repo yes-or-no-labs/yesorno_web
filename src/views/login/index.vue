@@ -62,7 +62,6 @@ async function connectWallet(item) {
     console.log('connectWallet res', res)
     if (res.success) {
       await getSignatrue()
-      router.push('/')
     }else{
         if(res.code === 40001){
          toast.error(`${item.title} is not installed. Please install ${item.title} or try another wallet.`);
@@ -124,6 +123,9 @@ async function getSignatrue() {
         appStore.onUpdateToken('bearer '+res.obj.accessToken)
         appStore.onUpdateRefreshToken('bearer '+res.obj.refreshToken)
         await appStore.getUserInfo()
+        router.push('/')
+      }else{
+        toast.error(res.msg || 'Login failed, please try again.')
       }
     } catch (error) {
       console.error(error);

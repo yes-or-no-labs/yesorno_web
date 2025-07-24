@@ -4,6 +4,7 @@ import { store } from '@/store/index'
 import {constant} from '../constant'
 import { useToast } from "vue-toastification";
 import { api } from '@/apis';
+import { useRouter } from 'vue-router'
 
 export default function createRequest(options) {
   const instance = axios.create(
@@ -66,7 +67,6 @@ export default function createRequest(options) {
       const appStore = store.useAppStore();
       const res = await instance.request(config)
       const toast = useToast();
-
       
       // Api code 401 and have token
       if (res && res.code && res.code === '401') {
@@ -87,6 +87,14 @@ export default function createRequest(options) {
         // return res || {}
       } else if(res && res.code && res.code == '0945'){
         appStore.onDisConnectClick()
+        toast.error('Invalid token,please log in again')
+        // const router = useRouter()
+
+        // setTimeout(() => {
+        //   console.log('router',router);
+          
+        //   router.push('/login')
+        // }, 1000);
         return res || {}
       } else {
         return res || {}
