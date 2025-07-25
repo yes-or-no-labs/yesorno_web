@@ -196,7 +196,7 @@ async function getTokenBalance() {
               My Points
             </div>
             <div class="text-[#81F963] lg:text-[16px] text-[20px] leading-[20px]">
-              {{ $formatAmount(userInfo?.point) }}
+              {{ $formatAmount(userInfo?.point||0) }}
             </div>
           </div>
           <div class="flex flex-col items-center gap-[5px]">

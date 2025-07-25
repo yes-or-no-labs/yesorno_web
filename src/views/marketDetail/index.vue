@@ -156,7 +156,7 @@ async function getOrderList() {
 </script>
 
 <template>
-  <div class="w-full !pb-[40px] min-h-screen !px-[10px] lg:!px-[16px] 2xl:!px-0">
+  <div class="w-full !pb-[80px] min-h-screen !px-[10px] lg:!px-[16px] 2xl:!px-0">
     <!-- <div>
       <img src="@/assets/img/market_bg1.png" class="w-full !h-[127px] object-cover" />
     </div> -->

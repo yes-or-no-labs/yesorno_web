@@ -58,4 +58,9 @@ export const api = {
   unfollow: (data) => baseHttp({url:"/v1/user/followers/unfollow",method: 'POST',data}),
   getFollowingList: (params) => baseHttp({url:"/v1/user/followers/following",method: 'GET',params}),//我关注的人
   getFollowersList: (params) => baseHttp({url:"/v1/user/followers/followers",method: 'GET',params}),//我的粉丝
+  checkFollow: (params) => baseHttp({url:"/v1/user/followers/check_is_follow",method: 'GET',params}),
+  createComment: (data) => baseHttp({url:"/v1/event-comments/create",method: 'POST',data}),
+  getCommentList: (params) => baseHttp({url:"/v1/event-comments/by-event",method: 'GET',params}),
+  getUserinfobyAddress: (params) => baseHttp({url:"/v1/users/infobyaddress",method: 'GET',params}),
+  getPointRecord: (params) => baseHttp({url:"/v1/user/point-records/list",method: 'GET',params}),
 }

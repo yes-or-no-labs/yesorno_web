@@ -59,7 +59,7 @@ async function connectWallet(item) {
     if(!state.checkTerms) return toast.error(`Please check the Terms of Use to proceed.`);
     state.curRdns = item.walletRdns
     const res = await appStore.evmConnectWallet(false, item.walletRdns)
-    console.log('connectWallet res', res)
+    // console.log('connectWallet res', res)
     if (res.success) {
       await getSignatrue()
     }else{
@@ -109,7 +109,7 @@ async function getSignatrue() {
       const signMessage = {nonce,timestamp}
       
       const signatrue = await signer.signMessage(JSON.stringify(signMessage));
-      console.log("signatrue", signatrue);
+      // console.log("signatrue", signatrue);
       const res = await api.login({
         nonce,
         timestamp,
@@ -121,7 +121,7 @@ async function getSignatrue() {
       // console.log('login',res);
       if(res.success){
         appStore.onUpdateToken('bearer '+res.obj.accessToken)
-        appStore.onUpdateRefreshToken('bearer '+res.obj.refreshToken)
+        appStore.onUpdateRefreshToken(res.obj.refreshToken)
         await appStore.getUserInfo()
         router.push('/')
       }else{

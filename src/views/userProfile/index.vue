@@ -6,7 +6,9 @@ import { api } from '@/apis'
 import { store } from '@/store'
 import { useWindowResize } from '@/hooks/useWindowResize'
 import dayjs from 'dayjs'
-import Follow from './component/Follow.vue'
+import Follow from '../profile/component/Follow.vue'
+import { useRoute } from 'vue-router'
+import { useToast } from 'vue-toastification'
 
 const env = computed(() => import.meta.env)
 
@@ -34,24 +36,36 @@ const state = reactive({
   followingList: [],
   pageSize: 10,
   pageNum: 1,
+  userWalletAddress: '',
+  isFollow:false,
+  btnLoading:false,
+  userInfoByOther: null,
 })
 
-onMounted(() => {
+const route = useRoute()
+
+onMounted(async () => {
   // getUserBetRecord()
+  state.userWalletAddress = route.query?.address || ''
+  await getUserinfobyAddress()
+  await checkFollow()
 })
 
+const toast = useToast();
 const { width } = useWindowResize()
 
 const appStore = store.useAppStore()
 
+
 const userInfo = computed(() => appStore.tomeState.userInfo)
 const curWalletAddress = computed(() => appStore.tomeState.curWalletAddress)
+// 0xae1e3ffa0a95b7c11cfd0a8f02d3250f20b51ff2
 async function getUserBetRecord($state) {
   try {
     const res = await api.getUserBetRecord({
       pageSize: state.pageSize,
       pageNum: state.pageNum,
-      address: curWalletAddress.value
+      address: state.userWalletAddress
     })
     console.log('getUserBetRecord', res)
     if (res.success) {
@@ -68,6 +82,65 @@ async function getUserBetRecord($state) {
   } catch (error) {
     console.error(error)
     $state?.error()
+  }
+}
+
+async function getUserinfobyAddress() {
+  try {
+    const res = await api.getUserinfobyAddress({
+      address: state.userWalletAddress
+    })
+    if(res.success){
+      state.userInfoByOther = res.obj.userInfo
+    }
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+async function checkFollow() {
+  try {
+    const res = await api.checkFollow({
+      following: state.userWalletAddress
+    })
+    if(res.success){
+      state.isFollow = res.obj.is_follow
+    }
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+async function handleClickFollow() {
+  try {
+    state.btnLoading = true
+    const res = await api.follow({
+      following: state.userWalletAddress
+    })
+    if(res.success){
+      toast.success(`Following Success`)
+      state.isFollow = true
+    }
+  } catch (error) {
+    console.error(error);
+  }finally{
+    state.btnLoading = false
+  }
+}
+async function handleClickUnfollow() {
+  try {
+    state.btnLoading = true
+    const res = await api.unfollow({
+      following: state.userWalletAddress
+    })
+    if(res.success){
+      toast.success(`UnFollowing Success`)
+      state.isFollow = false
+    }
+  } catch (error) {
+    console.error(error);
+  }finally{
+    state.btnLoading = false
   }
 }
 </script>
@@ -95,10 +168,16 @@ async function getUserBetRecord($state) {
                 <img :src="personImg" class="w-[32px] h-[32px] rounded-full" />
                 <div class="text-[14px] text-[#fff]">
                   {{
-                    userInfo?.nickname ? userInfo?.nickname : `User_${curWalletAddress?.slice(-6)}`
+                    state.userInfoByOther?.nickname ? state.userInfoByOther?.nickname : `User_${curWalletAddress?.slice(-6)}`
                   }}
                 </div>
               </div>
+              <VBtnConnect class="rounded-[106px] !h-[34px] !px-[10px] !py-[6px] !bg-transparent border border-solid !border-[#FFFFFF80]" v-if="!state.isFollow">
+                Follow
+              </VBtnConnect>
+              <v-btn class="rounded-full !h-[34px] !px-[10px] !py-[6px]" v-else>
+                Unfollow
+              </v-btn>
             </div>
             <div class="!mt-[20px] flex justify-end !px-[10px]">
               <v-btn
@@ -521,25 +600,31 @@ async function getUserBetRecord($state) {
               class="!px-[10px] !pb-[10px] border-b border-solid !border-[#FFFFFF4D] flex items-center justify-between"
             >
               <div class="flex items-center gap-[10px]">
-                <img :src="userInfo?.avatarUrl||personImg" class="w-[32px] h-[32px] rounded-full" />
+                <img :src="state.userInfoByOther?.avatarUrl||personImg" class="w-[32px] h-[32px] rounded-full" />
                 <div class="text-[14px] text-[#fff]">
                   {{
-                    userInfo?.nickname ? userInfo?.nickname : `User_${curWalletAddress?.slice(-6)}`
+                    state.userInfoByOther?.nickname ? state.userInfoByOther?.nickname : `User_${curWalletAddress?.slice(-6)}`
                   }}
                 </div>
               </div>
+              <VBtnConnect class="rounded-[106px] !h-[34px] !px-[10px] !py-[6px] !bg-transparent border border-solid !border-[#FFFFFF80]" :loading="state.btnLoading" v-if="!state.isFollow" @click="handleClickFollow">
+                Follow
+              </VBtnConnect>
+              <v-btn class="!rounded-full !h-[34px] !px-[10px] !py-[6px]" :loading="state.btnLoading" v-else @click="handleClickUnfollow">
+                Unfollow
+              </v-btn>
             </div>
-            <div class="!mt-[20px] flex justify-end !px-[10px]">
+            <!-- <div class="!mt-[20px] flex justify-end !px-[10px]">
               <v-btn
                 class="!text-[12px] !rounded-full font-[600] text-[#fff] !bg-transparent border border-solid !border-[#FFFFFF80]"
                 @click="$router.push('/setting')"
                 >Edit Profile</v-btn
               >
-            </div>
+            </div> -->
           </div>
         </div>
         <div class="hidden lg:block">
-         <Follow :userWalletAddress="state.userWalletAddress" />
+          <Follow :userWalletAddress="state.userWalletAddress" />
         </div>
       </div>
     </div>

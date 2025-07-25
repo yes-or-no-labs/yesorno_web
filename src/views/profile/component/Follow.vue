@@ -19,15 +19,23 @@ const state = reactive({
   followingTotal: 0,
 })
 
+const props = defineProps({
+  userWalletAddress: {
+    type: String,
+    default: ''
+  }
+})
+
 // 查询当前我关注人的列表
 async function getFollowingList($state) {
   try {
     const res = await api.getFollowingList({
       pageSize: state.pageSizeForFollowing,
       pageNum: state.pageNumForFollowing,
+      address: props.userWalletAddress
     })
     console.log('getUserBetRecord', res)
-    if (res.success) {
+    if (res&&res.success) {
       state.followingList = state.followingList.concat(res.obj.list)
        state.tabList[1].total = res.obj.total
       if (Array.isArray(res.obj.list) && res.obj?.list.length < state.pageSizeForFollowing) {
@@ -51,9 +59,10 @@ async function getFollowersList($state) {
     const res = await api.getFollowersList({
       pageSize: state.pageSizeForFollower,
       pageNum: state.pageNumForFollower,
+      address: props.userWalletAddress
     })
     console.log('getUserBetRecord', res)
-    if (res.success) {
+    if (res&&res.success) {
       state.followerList = state.followerList.concat(res.obj.list)
       state.tabList[0].total = res.obj.total
       if (Array.isArray(res.obj.list) && res.obj?.list.length < state.pageSizeForFollower) {
@@ -93,7 +102,7 @@ async function getFollowersList($state) {
               <img :src="personImg" class="w-[32px] h-[32px] rounded-full cursor-pointer" />
               <div class="text-[14px] text-[#94969c] cursor-pointer">123123</div>
             </div>
-            <infinite-loading @infinite="getFollowingList" target="followingEl">
+            <infinite-loading @infinite="getFollowersList" target="followingEl">
               <template #spinner>
                 <div class="text-center !mt-[20px]">Loading...</div>
               </template>
@@ -117,10 +126,10 @@ async function getFollowersList($state) {
               v-for="item in state.followingList"
               :key="item.guid"
             >
-              <img :src="personImg" class="w-[32px] h-[32px] rounded-full cursor-pointer" />
-              <div class="text-[14px] text-[#94969c] cursor-pointer">123123</div>
+              <img :src="item.following_user_info.avatarUrl||personImg" class="w-[32px] h-[32px] rounded-full cursor-pointer" />
+              <div class="text-[14px] text-[#94969c] cursor-pointer">{{ item.following_user_info.avatarUrl.nickname?item.following_user_info.avatarUrl.nickname:`User_${item.following_user_info.userAddress?.slice(-6)}` }}</div>
             </div>
-            <infinite-loading @infinite="getFollowersList" target="followerEl">
+            <infinite-loading @infinite="getFollowingList" target="followerEl">
               <template #spinner>
                 <div class="text-center !mt-[20px]">Loading...</div>
               </template>

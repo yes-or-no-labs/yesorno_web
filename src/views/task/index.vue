@@ -2,11 +2,12 @@
 import { reactive } from 'vue'
 import { formatAddress } from '@/utils/uni-app.js'
 import { api } from '@/apis'
+import { useToast } from 'vue-toastification';
 
 const state = reactive({
   tabList: [
     { title: 'Tasks', value: '1' },
-    { title: 'Points History', value: '2',disabled:true },
+    { title: 'Points History', value: '2',disabled:false },
   ],
   currentTab: '1',
   dataList: [
@@ -33,8 +34,12 @@ const state = reactive({
   ],
   taskList:[],
   pageSize:10,
-  pageNum:1
+  pageNum:1,
+  btnLoading:false,
+  pointRecordList:[],
 })
+
+const toast = useToast();
 
 async function getData($state) {
   try {
@@ -43,6 +48,9 @@ async function getData($state) {
       pageNum: state.pageNum,
     })
     if(res.success){
+      for (const item of res.obj.list) {
+        item.isOpen = false
+      }
       state.taskList = state.taskList.concat(res.obj.list)
       if (Array.isArray(res.obj.list) && res.obj?.list.length < state.pageSize) {
         $state?.complete()
@@ -59,14 +67,52 @@ async function getData($state) {
   }
 }
 
-async function claimTask(id) {
+async function getPointRecord($state) {
   try {
-    const res = await api.claimTask({
-      taskId: id, // Replace with the actual task ID you want to claim
+    const res = await api.getPointRecord({
+      pageSize: state.pageSize,
+      pageNum: state.pageNum,
     })
+    if(res.success){
+      state.pointRecordList = state.pointRecordList.concat(res.obj.list)
+      if (Array.isArray(res.obj.list) && res.obj?.list.length < state.pageSize) {
+        $state?.complete()
+      } else {
+        $state?.loaded()
+        state.pageNum++
+      }
+    } else {
+      $state?.error()
+    }
   } catch (error) {
     console.error(error);
+    $state?.error()
   }
+}
+
+async function claimTask(item) {
+  try {
+    state.btnLoading = true
+    const res = await api.claimTask({
+      taskId: item.guid, // Replace with the actual task ID you want to claim
+    })
+    if(res.success){
+      item.isCompleted = true
+    }else{
+      toast.error(res.msg || 'Failed to claim task')
+    }
+  } catch (error) {
+    console.error(error);
+  }finally{
+    state.btnLoading = false
+  }
+}
+
+function openLink(item) {
+  window.open(item.link_url, '_blank')
+  setTimeout(() => {
+    item.isOpen = true
+  }, 1000);
 }
 </script>
 
@@ -155,16 +201,68 @@ async function claimTask(id) {
                         </div>
                       </div>
                     </div>
+                    <div v-if="!item.isCompleted">
+                      <VBtn
+                        class="!rounded-full !h-[40px] !bg-[#0AB45A] !text-[12px] md:!text-[14px] lg:!text-[16px] !leading-[14px] !text-[#fff] !w-[85px] !font-[600]"
+                        variant="flat"
+                        @click="openLink(item)"
+                        v-show="!item.isOpen"
+                      >
+                        Go
+                      </VBtn>
+                      <VBtn
+                        class="!rounded-full !h-[40px] !bg-[#0AB45A] !text-[12px] md:!text-[14px] lg:!text-[16px] !leading-[14px] !text-[#fff] !w-[85px] !font-[600]"
+                        variant="flat"
+                        @click="claimTask(item)"
+                        v-show="item.isOpen"
+                        :loading="state.btnLoading"
+                      >
+                        Claim
+                      </VBtn>
+                    </div>
+                    
                     <VBtn
-                      class="!rounded-full !h-[40px] !bg-[#0AB45A] !text-[12px] md:!text-[14px] lg:!text-[16px] !leading-[14px] !text-[#fff] !w-[85px] !font-[600]"
+                      class="!rounded-full !h-[40px] !bg-transparent !text-[12px] md:!text-[14px] lg:!text-[16px] !leading-[14px] !text-[#0AB45A] !font-[600] border border-solid"
+                      style="border-color: rgba(255, 255, 255, 0.5) !important"
                       variant="flat"
+                      v-else
                     >
-                      Go
+                      Completed
                     </VBtn>
                   </div>
                 </div>
               </div>
               <infinite-loading @infinite="getData" target="taskEl">
+                  <template #spinner>
+                    <div class="text-center !mt-[20px]">Loading...</div>
+                  </template>
+                  <template #complete>
+                    <div class="text-center !mt-[20px]">No more</div>
+                  </template>
+                </infinite-loading>
+            </div>
+          </v-tabs-window-item>
+          <v-tabs-window-item value="2">
+            <div class="!py-[30px] flex flex-col gap-[50px] h-[500px] overflow-y-auto pointRecordEl">
+              <div>
+                <!-- <div class="text-[#fff] text-[14px] leading-[14px]">Social Task</div> -->
+                <div class="flex flex-col gap-[16px] !mt-[16px] ">
+                  <div
+                    class="w-full rounded-[10px] border border-solid !p-[16px] flex justify-between items-center"
+                    style="border-color: rgba(255, 255, 255, 0.5) !important"
+                    v-for="item in state.pointRecordList"
+                  >
+                    <div class="flex items-center justify-between">
+                      <div class="flex flex-col gap-[10px]">
+                        <div class="text-[18px] text-[#0AB45A]">+20</div>
+                        <div class="text-[14px] text-[#A7A7A7]">2025-06-20 12:54:36</div>
+                      </div>
+                      <div class="text-[16px] text-[#fff] font-[600]">Follow us on X</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <infinite-loading @infinite="getPointRecord" target="pointRecordEl">
                   <template #spinner>
                     <div class="text-center !mt-[20px]">Loading...</div>
                   </template>

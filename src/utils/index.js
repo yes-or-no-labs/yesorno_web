@@ -1,5 +1,6 @@
-
 // const appStore = store.useAppStore();
+import dayjs from 'dayjs'
+
 const isNil = (value) => value === null || value === undefined
 const isObjectLike = (value) => value && typeof value === 'object' && !Array.isArray(value)
 export const tools = {
@@ -63,4 +64,26 @@ export function removeEmptyKey(obj = {}) {
     }
   }
   return obj
+}
+
+export function formatRelativeTime(date) {
+  const now = dayjs()
+  const target = dayjs(date)
+  const diffSeconds = now.diff(target, 'second')
+  const diffMinutes = now.diff(target, 'minute')
+  const diffHours = now.diff(target, 'hour')
+  const diffDays = now.diff(target, 'day')
+  const diffMonths = now.diff(target, 'month')
+  const diffYears = now.diff(target, 'year')
+
+  if (diffSeconds < 10) return 'Just now'
+  if (diffSeconds < 60) return `${diffSeconds}s ago`
+  if (diffMinutes < 60) return `${diffMinutes}m ago`
+  if (diffHours < 24) return `${diffHours}h ago`
+  if (diffDays === 1) return 'Yesterday'
+  if (diffDays < 30) return `${diffDays}d ago`
+  if (diffMonths === 1) return '1 month ago'
+  if (diffMonths < 12) return `${diffMonths} months ago`
+  if (diffYears === 1) return '1 year ago'
+  return `${diffYears} years ago`
 }
