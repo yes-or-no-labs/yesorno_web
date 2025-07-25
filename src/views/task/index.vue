@@ -1,8 +1,9 @@
 <script setup>
-import { reactive } from 'vue'
+import { computed, reactive } from 'vue'
 import { formatAddress } from '@/utils/uni-app.js'
 import { api } from '@/apis'
 import { useToast } from 'vue-toastification';
+import { store } from '@/store';
 
 const state = reactive({
   tabList: [
@@ -39,13 +40,17 @@ const state = reactive({
   pointRecordList:[],
 })
 
+
+const appStore = store.useAppStore()
 const toast = useToast();
+const curWalletAddress = computed(() => appStore.tomeState.curWalletAddress)
 
 async function getData($state) {
   try {
     const res = await api.getTaskList({
       pageSize: state.pageSize,
       pageNum: state.pageNum,
+      address:curWalletAddress.value
     })
     if(res.success){
       for (const item of res.obj.list) {
@@ -72,6 +77,7 @@ async function getPointRecord($state) {
     const res = await api.getPointRecord({
       pageSize: state.pageSize,
       pageNum: state.pageNum,
+      address:curWalletAddress.value
     })
     if(res.success){
       state.pointRecordList = state.pointRecordList.concat(res.obj.list)

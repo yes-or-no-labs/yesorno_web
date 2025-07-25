@@ -453,7 +453,7 @@ async function getUserBetRecord($state) {
               </div>
             </v-tabs-window-item>
             <v-tabs-window-item value="2">
-              <Follow :userWalletAddress="state.userWalletAddress" />
+              <Follow :userWalletAddress="curWalletAddress" />
               <!-- <div
                 class="w-full !mt-[10px] bg-[#000] border border-solid !border-[#FFFFFF80] rounded-[6px] overflow-hidden"
               >
@@ -539,7 +539,7 @@ async function getUserBetRecord($state) {
           </div>
         </div>
         <div class="hidden lg:block">
-         <Follow :userWalletAddress="state.userWalletAddress" />
+         <Follow :userWalletAddress="curWalletAddress" />
         </div>
       </div>
     </div>

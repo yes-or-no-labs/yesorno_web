@@ -63,9 +63,13 @@ async function getCommentList($state) {
         if(!item.commentUserInfo.nickname){
           item.commentUserInfo.nickname = `User_${item.commentUserInfo.userAddress?.slice(-6)}`
         }
-
+        for (const item1 of item?.subComments) {
+          if(!item1.toCommentUserInfo.nickname){
+            item1.toCommentUserInfo.nickname = `User_${item1.toCommentUserInfo.userAddress?.slice(-6)}`
+          }
+        }
         item.subCommentsIndex = 3
-        item.subCommentsCopy = item.subComments.slice(0, item.subCommentsIndex)
+        item.subCommentsCopy = item.subComments.splice(0, item.subCommentsIndex)
       }
       state.commentList = state.commentList.concat(res.obj.list)
       state.commentTotal = res.obj.total
@@ -124,8 +128,8 @@ async function handleClickCreateComment() {
 }
 
 function handleClickExpand(item) {
-  item.subCommentsCopy = item.subComments.slice(item.subCommentsIndex, item.subCommentsIndex + 3)
-  item.subCommentsIndex += 3
+  const arr = item.subComments.splice(0, item.subCommentsIndex)
+  item.subCommentsCopy = item.subCommentsCopy.concat(arr)
 }
 </script>
 
@@ -193,13 +197,22 @@ function handleClickExpand(item) {
                 <div class="flex flex-col gap-[3px] text-[14px] leading-[20px] flex-1">
                   <div class="flex items-center justify-between text-[#94969C] flex-1">
                     <div class="underline cursor-pointer" @click="$router.push(reply.commentUserInfo.userAddress == curWalletAddress?'/profile':`/userProfile?address=${reply.commentUserInfo.userAddress}`)">{{ reply.commentUserInfo?.nickname }}</div>
-                    <div class="text-[13px]">{{ formatRelativeTime(dayjs(item.created)) }}</div>
+                    <div class="text-[13px]">{{ formatRelativeTime(dayjs(reply.created)) }}</div>
                   </div>
-                  <div
-                    class="w-full text-[#94969C] overflow-hidden whitespace-break-spaces text-ellipsis leading-[18px]"
-                  >
-                    {{ reply.content }}
+                  <div class="flex gap-[10px]">
+                    <div
+                      class="text-[#0AB45A] cursor-pointer underline"
+                      @click="$router.push(reply.commentUserInfo.userAddress == curWalletAddress?'/profile':`/userProfile?address=${reply.toCommentUserInfo.userAddress}`)"
+                    >
+                      @{{ reply.toCommentUserInfo.nickname }}
+                    </div>
+                    <div
+                      class="flex-1 text-[#94969C] overflow-hidden whitespace-break-spaces text-ellipsis leading-[18px]"
+                    >
+                      {{ reply.content }}
+                    </div>
                   </div>
+                  
                   <div class="flex items-center gap-[16px]">
                     <!-- <div class="flex items-center gap-[4px] cursor-pointer">
                       <v-icon icon="mdi-heart-outline" size="16"></v-icon>
@@ -207,9 +220,9 @@ function handleClickExpand(item) {
                     </div> -->
                     <div class="text-[12px] text-[#CECFD2] underline cursor-pointer" @click="state.replyInfo = reply">Reply</div>
                   </div>
-                  <div class="text-[12px] text-[#0AB45A] underline cursor-pointer" @click="handleClickExpand(item)" v-show="item.subCommentsCopy.length>item.subCommentsIndex">Expand more</div>
                 </div>
               </div>
+              <div class="text-[12px] text-[#0AB45A] underline cursor-pointer !pl-[44px]" @click="handleClickExpand(item)" v-show="item.subComments.length>0">Expand more</div>
             </div>
           </div>
         </div>
