@@ -40,7 +40,10 @@ async function getAllSymbols() {
 
 
 export class Datafeed {
-
+    constructor(data) {
+        this.vueInstenceData = data; // 传入 Vue 组件的方法
+        this.subscribers = new Map(); // 存储订阅的回调
+    }
     onReady(callback) {
         console.log('[onReady]: Method call');
         setTimeout(() => callback(configurationData));
@@ -203,7 +206,8 @@ export class Datafeed {
 
 
     subscribeBars(symbolInfo, resolution, onRealtimeCallback, subscriberUID, onResetCacheNeededCallback) {
-        console.log('[subscribeBars]: Method call with subscriberUID:', subscriberUID);
+        console.log('subscribeBars', resolution);
+        this.vueInstenceData.getRealtimeData(resolution,onRealtimeCallback)
         /*subscribeOnStream(
             symbolInfo,
             resolution,

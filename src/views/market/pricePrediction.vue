@@ -10,7 +10,8 @@ import { reactive, ref, onMounted } from 'vue'
 
 const state = reactive({
   curTabIndex:0,
-  tabList:[{title:'TradingView chart'},{title:'AI Prediction'}]
+  tabList:[{title:'TradingView chart'},{title:'AI Prediction'}],
+  currentPrice: 0,
 })
 
 onMounted(() => {
@@ -21,6 +22,11 @@ const swiperInstance = ref(null)
 const onSwiper = (swiper) => {
   swiperInstance.value = swiper;
 };
+
+function getCurrentPrice(e) {
+  // console.log('getCurrentPrice', e);
+  state.currentPrice = e.price;
+}
 
 </script>
 
@@ -279,11 +285,11 @@ const onSwiper = (swiper) => {
         </div>
       </div>
       <div class="flex-1 flex" v-show="state.curTabIndex == 0">
-        <tvChart />
+        <tvChart @currentPrice="getCurrentPrice" />
       </div>
       
       <div class="w-[1200px] mx-auto" v-show="state.curTabIndex == 1">
-        <AiComponent />
+        <AiComponent :currentPrice="state.currentPrice" />
       </div>
     </div>
   </div>

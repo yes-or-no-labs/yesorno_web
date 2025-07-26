@@ -25,7 +25,8 @@ const state = reactive({
   curSelectEvent: null, //当前选择的事件
   selectPanel: '',
   chartData:[],
-  handicapData:{}
+  handicapData:{},
+  dayChange: 0,
 })
 
 const route = useRoute()
@@ -122,16 +123,36 @@ function handleClickRule() {
 
 async function getPriceLine() {
   try {
-    console.log('getPriceLine',state.curSelectEvent.conditionId);
+    // console.log('getPriceLine',state.curSelectEvent.conditionId);
     
     const res = await api.getPriceLine({
       eventId:state.eventId,
       conditionId:state.curSelectEvent.conditionId,
       interval: state.timeLine[state.selectTimeLine].interval
     })
-    // console.log('getPriceLine',res);
+    console.log('getPriceLine',res);
     if(res.success){
       state.chartData = res.obj.line
+    }
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+async function getPriceLineForDay() {
+  try {
+    // console.log('getPriceLine',state.curSelectEvent.conditionId);
+    
+    const res = await api.getPriceLine({
+      eventId:state.eventId,
+      conditionId:state.curSelectEvent.conditionId,
+      interval: 'daily'
+    })
+    console.log('getPriceLine',res);
+    if(res.success){
+      // state.chartData = res.obj.line
+      state.dayChange = res.obj.line[res.obj.line.length - 1].yesPercent - res.obj.line[res.obj.line.length - 2].yesPercent
+
     }
   } catch (error) {
     console.error(error);
@@ -213,11 +234,11 @@ async function getOrderList() {
             class="!mt-[30px] grid grid-cols-3 lg:flex items-center gap-[20px]"
             v-if="state.dataObj?.conditionList?.length == 1"
           >
-            <div class="flex flex-col gap-[4px] lg:gap-[8px]">
+            <div class="flex flex-col gap-[4px]">
               <div class="text-[#787878] text-[12px] lg:text-[14px]">Outcome</div>
               <div class="text-[#A2D00C] text-[14px] sm:text-[16px] md:text-[20px] lg:text-[24px]">Yes</div>
             </div>
-            <div class="flex flex-col gap-[4px] lg:gap-[8px]">
+            <div class="flex flex-col gap-[4px]">
               <div class="text-[#787878] text-[12px] lg:text-[14px] whitespace-nowrap">
                 % Chance
               </div>
@@ -225,27 +246,27 @@ async function getOrderList() {
                 {{ calcPercent(state.curSelectEvent, 'yes') }} %
               </div>
             </div>
-            <div class="flex flex-col gap-[4px] lg:gap-[8px]">
+            <div class="flex flex-col gap-[4px]">
               <div class="text-[#787878] text-[12px] lg:text-[14px]">Last Price</div>
-              <div class="text-[#A2D00C] text-[14px] sm:text-[16px] md:text-[20px] lg:text-[24px]">50 ¢</div>
+              <div class="text-[#A2D00C] text-[14px] sm:text-[16px] md:text-[20px] lg:text-[24px]">{{ calcPercent(state.curSelectEvent, 'yes') }} ¢</div>
             </div>
-            <div class="flex flex-col gap-[4px] lg:gap-[8px]">
+            <div class="flex flex-col gap-[4px]">
               <div class="text-[#787878] text-[12px] lg:text-[14px]">24h Change</div>
-              <div class="text-[#A2D00C] text-[14px] sm:text-[16px] md:text-[20px] lg:text-[24px]">50%</div>
+              <div class="text-[#A2D00C] text-[14px] sm:text-[16px] md:text-[20px] lg:text-[24px]">{{state.dayChange}}%</div>
             </div>
-            <div class="flex flex-col gap-[4px] lg:gap-[8px]">
+            <div class="flex flex-col gap-[4px]">
               <div class="text-[#787878] text-[12px] lg:text-[14px]">Total Volume</div>
               <div class="text-[#A2D00C] text-[14px] sm:text-[16px] md:text-[20px] lg:text-[24px]">
                 {{ $formatAmount(calcTotalPrice(state.dataObj.conditionList)) }}
               </div>
             </div>
-            <div class="flex flex-col gap-[4px] lg:gap-[8px]">
+            <div class="flex flex-col gap-[4px]">
               <div class="text-[#787878] text-[12px] lg:text-[14px]">Est. End Date</div>
               <div class="text-[#A2D00C] text-[14px] sm:text-[16px] md:text-[20px] lg:text-[24px]">
                 {{ dayjs(Number(state.dataObj.endTime) * 1000).format('MMM D, YYYY') }}
               </div>
             </div>
-            <div class="flex-col gap-[4px] lg:gap-[8px] hidden lg:flex">
+            <div class="flex-col gap-[4px] hidden lg:flex">
               <div class="text-[#787878] text-[12px] lg:text-[14px]">Settlement Token</div>
               <div class="text-[#A2D00C] text-[14px] sm:text-[16px] md:text-[20px] lg:text-[24px]">
                 {{ network[env.VITE_APP_CHAIN].Denomination }}({{

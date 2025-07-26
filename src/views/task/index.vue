@@ -4,6 +4,7 @@ import { formatAddress } from '@/utils/uni-app.js'
 import { api } from '@/apis'
 import { useToast } from 'vue-toastification';
 import { store } from '@/store';
+import dayjs from 'dayjs';
 
 const state = reactive({
   tabList: [
@@ -258,10 +259,10 @@ function openLink(item) {
                     style="border-color: rgba(255, 255, 255, 0.5) !important"
                     v-for="item in state.pointRecordList"
                   >
-                    <div class="flex items-center justify-between">
-                      <div class="flex flex-col gap-[10px]">
-                        <div class="text-[18px] text-[#0AB45A]">+20</div>
-                        <div class="text-[14px] text-[#A7A7A7]">2025-06-20 12:54:36</div>
+                    <div class="flex items-center justify-between w-full">
+                      <div class="flex flex-col">
+                        <div class="text-[18px] text-[#0AB45A]">+{{ item.change_points }}</div>
+                        <div class="text-[14px] text-[#A7A7A7]">{{ dayjs(item.created).format('MMM D, YYYY') }}</div>
                       </div>
                       <div class="text-[16px] text-[#fff] font-[600]">Follow us on X</div>
                     </div>
