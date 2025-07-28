@@ -6,7 +6,7 @@ import { Datafeed } from './datafeed'
 
 const props = defineProps({
   symbol: {
-    default: 'BTC',
+    default: '',
     type: String,
   },
   interval: {
@@ -61,6 +61,10 @@ onMounted(() => {
 
 onUnmounted(() => {
   closeBinanceSocket()
+  if (state.chartWidget !== null) {
+    state.chartWidget.remove()
+    state.chartWidget = null
+  }
 })
 
 const emit = defineEmits(['currentPrice'])
@@ -69,6 +73,7 @@ const state = reactive({
   spotSocket: null,
   klineData: null,
   curInterval: '',
+  chartWidget:null
 })
 
 const Resolutions = {
@@ -107,19 +112,89 @@ const Resolutions = {
 // 	}
 // })
 
-function getRealtimeData(interVal, onRealtimeCallback) {
-//   console.log('getRealtimeData', interVal)
+watch(()=> props.symbol, (newVal,oldVal) => {
+  if(oldVal){
+    state.chartWidget.onChartReady(() => {
+      console.log('onChartReady')
+      state.chartWidget.chart().setSymbol(newVal, () => {})
+    })
+    state.spotSocket.send(
+      JSON.stringify({
+        method: 'UNSUBSCRIBE',
+        params: [`${oldVal.toLocaleLowerCase()}@kline_${Resolutions[state.curInterval]}`],
+        id: 2,
+      }),
+    )
+  }
+  
+})
+
+function getRealtimeData(interVal, onRealtimeCallback,symbolInfo) {
+  // console.log('getRealtimeData', symbolInfo)
   state.curInterval = interVal
   if (!state.spotSocket) {
-    state.spotSocket = new WebSocket('wss://stream.binance.com:443/ws')
+    createSocket(symbolInfo,onRealtimeCallback)
+    return
   }
-  console.log('getRealtimeData', state.spotSocket)
+  // console.log('getRealtimeData', state.spotSocket)
+  state.spotSocket.send(
+    JSON.stringify({
+      method: 'SUBSCRIBE',
+      params: [`${symbolInfo.name.toLocaleLowerCase()}@kline_${Resolutions[state.curInterval]}`],
+      id: 2,
+    }),
+  )
+  state.spotSocket.onmessage = (res) => {
+    const data = JSON.parse(res.data)
+    // console.log('data?>>>>>>>>',data);
+
+    if (data.e == 'kline') {
+      state.klineData = data.k
+	   emit('currentPrice', {
+		price: Number(state.klineData.c),
+		time: state.klineData.t,
+	  })
+      if (['D', 'W', 'M'].includes(state.curInterval)) {
+        if (onRealtimeCallback) {
+          const barsData = {
+            // 当时间精度为1day以上的时候时间精度要往前推8个小时
+            time: Number(state.klineData.t) + 8 * 60 * 60 * 1000,
+            open: Number(state.klineData.o), //开盘价
+            high: Number(state.klineData.h),
+            low: Number(state.klineData.l),
+            close: Number(state.klineData.c), //收盘价
+            volume: Number(state.klineData.v),
+          }
+          onRealtimeCallback(barsData)
+        }
+      } else {
+        if (onRealtimeCallback) {
+          const barsData = {
+            time: Number(state.klineData.t),
+            open: Number(state.klineData.o), //开盘价
+            high: Number(state.klineData.h),
+            low: Number(state.klineData.l),
+            close: Number(state.klineData.c), //收盘价
+            volume: Number(state.klineData.v),
+          }
+          onRealtimeCallback(barsData)
+        }
+      }
+    }
+  }
+}
+
+
+
+function createSocket(symbolInfo,onRealtimeCallback) {
+  state.spotSocket = new WebSocket('wss://stream.binance.com:443/ws')
+
   state.spotSocket.onopen = () => {
     // console.log('onopen')
     state.spotSocket.send(
       JSON.stringify({
         method: 'SUBSCRIBE',
-        params: [`btcusdt@kline_${Resolutions[state.curInterval]}`],
+        params: [`${symbolInfo.name.toLocaleLowerCase()}@kline_${Resolutions[state.curInterval]}`],
         id: 2,
       }),
     )
@@ -168,7 +243,7 @@ function closeBinanceSocket() {
   state.spotSocket.send(
     JSON.stringify({
       method: 'UNSUBSCRIBE',
-      params: [`btcusdt@kline_${Resolutions[state.curInterval]}`],
+      params: [`${props.symbol.toLocaleLowerCase()}@kline_${Resolutions[state.curInterval]}`],
       id: 2,
     }),
   )
@@ -245,21 +320,20 @@ const initView = () => {
     autosize: props.autosize,
     studies_overrides: props.studiesOverrides,
   }
-  chartWidget = new widget(widgetOptions)
+  state.chartWidget = new widget(widgetOptions)
 
   /*chartWidget.onIntervalChanged().subscribe(null, (interval, timeFrameParameters) => {
 		console.log("onIntervalChanged", interval, timeFrameParameters);
 	})*/
 
-  console.log('11111111111111111111111111', chartWidget)
-  chartWidget.onChartReady(() => {
-    console.log('onChartReady')
+  state.chartWidget.onChartReady(() => {
+    // console.log('onChartReady')
 
     //chartWidget.activeChart().getAllStudies().forEach(({ name }) => console.log("getAllStudies",name));
 
     // streamInit();
 
-    chartWidget.activeChart().createStudy('Volume', true)
+    state.chartWidget.activeChart().createStudy('Volume', true)
     // chartWidget.activeChart().createStudy('MACD', true, false, [14, 30, "close", 9]);
     // chartWidget.activeChart().createStudy('Moving Average Exponential', false, false, [26])
 
@@ -285,12 +359,7 @@ const initView = () => {
   })
 }
 
-onUnmounted(() => {
-  if (chartWidget !== null) {
-    chartWidget.remove()
-    chartWidget = null
-  }
-})
+
 </script>
 
 <template>

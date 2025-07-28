@@ -12,6 +12,11 @@ const state = reactive({
   curTabIndex:0,
   tabList:[{title:'TradingView chart'},{title:'AI Prediction'}],
   currentPrice: 0,
+  menuList:[
+    { symbol: 'BTCUSDT' },
+    { symbol: 'ETHUSDT' },
+  ],
+  selectSymbolIndex: 0,
 })
 
 onMounted(() => {
@@ -41,8 +46,23 @@ function getCurrentPrice(e) {
             <img src="@/assets/img/bsc.png" class="w-[28px] h-[28px]" />
           </div>
           <div class="flex-col gap-[10px]">
-            <div class="text-[#fff] text-[16px] font-[600]">BNBUSD</div>
-            <div class="text-[#6DDD25] text-[24px] font-[600]">$756.4866</div>
+            <v-menu transition="scale-transition" :offset="[10, 0]">
+              <template v-slot:activator="{ props }">
+                <div
+                  class="text-[#fff] lg:text-[14px] text-[16px] font-[600] cursor-pointer whitespace-nowrap flex items-center"
+                  v-bind="props"
+                >
+                <div>{{ state.menuList[state.selectSymbolIndex].symbol }}</div>
+                  <v-icon icon="mdi-menu-down" />
+                </div>
+              </template>
+              <v-list>
+                <v-list-item v-for="(item, index) in state.menuList" :key="index" :value="index" @click="state.selectSymbolIndex = index">
+                  <v-list-item-title>{{ item.symbol }}</v-list-item-title>
+                </v-list-item>
+              </v-list>
+            </v-menu>
+            <div class="text-[#6DDD25] text-[24px] font-[600]">${{ state.currentPrice }}</div>
           </div>
         </div>
 
@@ -285,11 +305,11 @@ function getCurrentPrice(e) {
         </div>
       </div>
       <div class="flex-1 flex" v-show="state.curTabIndex == 0">
-        <tvChart @currentPrice="getCurrentPrice" />
+        <tvChart @currentPrice="getCurrentPrice" :symbol="state.menuList[state.selectSymbolIndex].symbol" />
       </div>
       
       <div class="w-[1200px] mx-auto" v-show="state.curTabIndex == 1">
-        <AiComponent :currentPrice="state.currentPrice" />
+        <AiComponent :currentPrice="state.currentPrice" :symbol="state.menuList[state.selectSymbolIndex].symbol" />
       </div>
     </div>
   </div>

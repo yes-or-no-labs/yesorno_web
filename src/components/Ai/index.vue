@@ -1,7 +1,12 @@
 <script setup>
-import { onMounted, reactive } from 'vue'
+import { onMounted, onUnmounted, reactive, watch } from 'vue'
 import Segmented from '../Segmented/index.vue'
 import { color } from 'echarts'
+import icon_bullish from '@/assets/img/ai_icon4.png'
+import icon_bearish from '@/assets/img/ai_icon6.png'
+import icon_neutral from '@/assets/img/ai_icon7.png'
+import { constant } from '@/utils/constant'
+import dayjs from 'dayjs'
 
 const state = reactive({
   currentTab: 1,
@@ -17,6 +22,8 @@ const state = reactive({
     ['medium', 'Medium risk'],
     ['high', 'High risk'],
   ]),
+  timer: null,
+  recordList: localStorage.getItem(constant.predictionRecordKey)?JSON.parse(localStorage.getItem(constant.predictionRecordKey)) : [],
 })
 
 const props = defineProps({
@@ -24,23 +31,50 @@ const props = defineProps({
     type: Number,
     default: 0,
   },
+  symbol: {
+    default: '',
+    type: String,
+  },
 })
 
 onMounted(() => {
-  getData()
-  // connectWebSocket()
+  // console.log('Symbol changed:', props.symbol);
 })
 
-const TEST_URL =
-  'https://iavertwlopfihqyampsa.supabase.co/functions/v1/unified-confidence-api/analysis?crypto=BTC'
+onUnmounted(() => {
+  if (state.timer) {
+    clearInterval(state.timer)
+  }
+})
+
+watch(
+  () => props.symbol,
+  (newVal) => {
+    console.log('Symbol changed:', newVal)
+    if (state.timer) {
+      clearInterval(state.timer)
+    } else {
+      getData()
+    }
+    state.timer = setInterval(() => {
+      getData()
+    }, 5000)
+  },
+  { immediate: true },
+)
+
+// const TEST_URL =
+//   `https://iavertwlopfihqyampsa.supabase.co/functions/v1/unified-confidence-api/analysis?crypto=${props.symbol}`
 
 async function getData() {
   try {
     console.log('Testing health endpoint...')
-    const response = await fetch(TEST_URL)
+    const response = await fetch(
+      `https://iavertwlopfihqyampsa.supabase.co/functions/v1/unified-confidence-api/analysis?crypto=${props.symbol.match(/^(.+?)USDT$/i)[1]}`,
+    )
     const res = await response.json()
     // console.log(`Health test response: ${JSON.stringify(res, null, 2)}`)
-    console.log('getData', res)
+    // console.log('getData', res)
     if (res.success) {
       state.dataObj = res.data
     }
@@ -58,6 +92,48 @@ function filterRiskColor() {
   } else if (riskLevel === 'high') {
     return '#E72F2F' // Red for high risk
   }
+}
+
+function filterDirectionImg(dire) {
+  let direction
+  if (!dire) {
+    direction = state.dataObj?.summary?.trend?.direction
+  } else {
+    direction = dire
+  }
+  if (direction === 'bullish') {
+    return icon_bullish
+  } else if (direction === 'bearish') {
+    return icon_bearish // Orange for medium risk
+  } else if (direction === 'neutral') {
+    return icon_neutral // Red for high risk
+  }
+}
+
+function filterDirectionColor(dire) {
+  let direction
+  if (!dire) {
+    direction = state.dataObj?.summary?.trend?.direction
+  } else {
+    direction = dire
+  }
+  if (direction === 'bullish') {
+    return '#0AB45A'
+  } else if (direction === 'bearish') {
+    return '#E72F2F' // Orange for medium risk
+  } else if (direction === 'neutral') {
+    return '#F6E316' // Red for high risk
+  }
+}
+
+function handleClickSave() {
+  state.recordList.push({
+    symbol: props.symbol.match(/^(.+?)USDT$/i)[1],
+    time: new Date().getTime(),
+    confidence: state.dataObj?.current?.confidence_score,
+    direction: state.dataObj?.summary?.trend?.direction,
+  })
+  localStorage.setItem(constant.predictionRecordKey, JSON.stringify(state.recordList))
 }
 </script>
 
@@ -196,7 +272,13 @@ function filterRiskColor() {
           <div class="!mt-[5px] flex flex-col gap-[5px] items-center">
             <div class="text-[14px] text-[#666]">Current Price</div>
             <div class="text-[24px] text-[#fff]">${{ props.currentPrice }}</div>
-            <div class="text-[14px] text-[#fff]">Target price:123123</div>
+            <div class="text-[14px] text-[#fff]">
+              Target price:{{
+                state.dataObj?.current?.target_prices[
+                  `${state.dataObj?.summary?.trend?.direction}_target`
+                ]
+              }}
+            </div>
           </div>
         </div>
         <div class="flex flex-col gap-[10px] justify-between flex-1">
@@ -217,10 +299,15 @@ function filterRiskColor() {
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-[10px]">
               <div
-                class="!px-[10px] !py-[5px] border border-solid !border-[#0AB45A] text-[#0AB45A] text-[12px] flex items-center rounded-full gap-[5px]"
+                class="!px-[10px] !py-[5px] border border-solid text-[12px] flex items-center rounded-full gap-[5px] capitalize"
+                :style="`border-color:${filterDirectionColor()} !important;color:${filterDirectionColor()}`"
               >
-                <img src="@/assets/img/ai_icon4.png" class="w-[14px] h-[14px]" />
-                Bullish
+                <img
+                  :src="filterDirectionImg()"
+                  class="w-[14px] h-[14px]"
+                  :style="state.dataObj?.summary?.trend?.direction == 'neutral' ? 'height:6px' : ''"
+                />
+                {{ state.dataObj?.summary?.trend?.direction }}
               </div>
               <div class="text-[#fff] text-[14px]">
                 Risk level:
@@ -229,7 +316,7 @@ function filterRiskColor() {
                 }}</span>
               </div>
             </div>
-            <VBtnConnect> Save prediction </VBtnConnect>
+            <VBtnConnect @click="handleClickSave"> Save prediction </VBtnConnect>
           </div>
         </div>
       </div>
@@ -242,30 +329,38 @@ function filterRiskColor() {
         </div>
         <div class="w-full flex items-center !mt-[10px]">
           <div class="flex-1 text-[12px] text-[#666]">Type</div>
-          <div class="flex-1 text-[12px] text-[#666]">Time</div>
+          <div class="flex-1 text-[12px] text-[#666] text-center">Time</div>
           <div class="flex-1 text-[12px] flex items-center">
-            <div class="flex-1 text-[12px] text-[#666]">Confidence</div>
-            <div class="flex-1 text-[12px] text-[#666] text-right">Result</div>
+            <div class="flex-1 text-[12px] text-[#666] text-right">Confidence</div>
+            <!-- <div class="flex-1 text-[12px] text-[#666] text-right">Result</div> -->
           </div>
         </div>
         <div class="h-[200px] overflow-y-auto">
           <div
             class="!py-[15px] !px-[5px] flex items-center border-b border-solid !border-[#FFFFFF80] last:!border-0"
-            v-for="item in 10"
+            v-for="(item, index) in state.recordList"
+            :key="index"
           >
             <div class="flex-1 text-[12px] flex items-center justify-between !pr-[5px]">
-              <div class="text-[12px] text-[#fff]">BTC</div>
+              <div class="text-[12px] text-[#fff]">{{ item.symbol }}</div>
               <div
-                class="!px-[10px] !py-[5px] border border-solid !border-[#0AB45A] text-[#0AB45A] text-[12px] flex items-center rounded-full gap-[5px]"
+                class="!px-[10px] !py-[5px] border border-solid text-[12px] flex items-center rounded-full gap-[5px] capitalize"
+                :style="`border-color:${filterDirectionColor(item.direction)} !important;color:${filterDirectionColor(item.direction)}`"
               >
-                <img src="@/assets/img/ai_icon4.png" class="w-[14px] h-[14px]" />
-                Bullish
+                <img
+                  :src="filterDirectionImg(item.direction)"
+                  class="w-[14px] h-[14px]"
+                  :style="state.dataObj?.summary?.trend?.direction == 'neutral' ? 'height:6px' : ''"
+                />
+                {{ item.direction }}
               </div>
             </div>
-            <div class="flex-1 text-[12px] text-[#fff] flex items-center">2025/7/14 14:48:39</div>
+            <div class="flex-1 text-[12px] text-[#fff] text-center">
+              {{ dayjs(Number(item.time)).format('MMM D, YYYY') }}
+            </div>
             <div class="flex-1 text-[12px] flex items-center">
-              <div class="flex-1 text-[12px] text-[#fff] text-center">60%</div>
-              <div class="flex-1 text-[12px] text-[##0AB45A] text-right">Correct</div>
+              <div class="flex-1 text-[12px] text-[#fff] text-right">{{ item.confidence }}%</div>
+              <!-- <div class="flex-1 text-[12px] text-[##0AB45A] text-right">Correct</div> -->
             </div>
           </div>
         </div>

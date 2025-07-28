@@ -64,7 +64,7 @@ export class Datafeed {
 
 
     async resolveSymbol(symbolName, onSymbolResolvedCallback, onResolveErrorCallback) {
-        console.log('[resolveSymbol]: Method call', symbolName);
+        // console.log('[resolveSymbol]: Method call', symbolName);
         // const symbols: any = await getAllSymbols();
 
         // const symbolItem = symbols.find((target: any) => target.full_name === symbolName);
@@ -93,12 +93,14 @@ export class Datafeed {
             data_status: 'streaming',
         };
 
-        console.log('[resolveSymbol]: Symbol resolved', symbolName);
+        // console.log('[resolveSymbol]: Symbol resolved', symbolName);
         onSymbolResolvedCallback(symbolInfo);
     }
 
 
     async getBars(symbolInfo, resolution, periodParams, onHistoryCallback, onErrorCallback) {
+        // console.log('getBars',symbolInfo);
+        
         //async getBars(symbolInfo: LibrarySymbolInfo, resolution: ResolutionString, rangeStartDate: number, rangeEndDate: number, onHistoryCallback: HistoryCallback, onErrorCallback: ErrorCallback, firstDataRequest: boolean) {
 
         const {from, to, firstDataRequest} = periodParams;
@@ -117,7 +119,7 @@ export class Datafeed {
         const query = Object.keys(urlParameters)
             .map(name => `${name}=${encodeURIComponent(urlParameters[name])}`)
             .join('&');*/
-        const response = await fetch(`https://api1.binance.com/api/v3/klines?symbol=BTCUSDT&interval=${Resolutions[resolution]}&startTime=${from*1000}&endTime=${to*1000}`);
+        const response = await fetch(`https://api1.binance.com/api/v3/klines?symbol=${symbolInfo.name.toUpperCase()}&interval=${Resolutions[resolution]}&startTime=${from*1000}&endTime=${to*1000}`);
 
         //streamFetchHistory("0x3C70DDCd072A684e82B52CC776E3C96722f05b35");
         // const result = await apiCandleHistory("0xd203eAB4E8c741473f7456A9f32Ce310d521fa41", from, 1000);
@@ -139,7 +141,7 @@ export class Datafeed {
             close: parseFloat(kline[4]),
             volume: parseFloat(kline[5]),
         }));
-        console.log('kline', kline);
+        // console.log('kline', kline);
         onHistoryCallback(kline, {
             noData: false,
         });
@@ -206,8 +208,8 @@ export class Datafeed {
 
 
     subscribeBars(symbolInfo, resolution, onRealtimeCallback, subscriberUID, onResetCacheNeededCallback) {
-        console.log('subscribeBars', resolution);
-        this.vueInstenceData.getRealtimeData(resolution,onRealtimeCallback)
+        // console.log('subscribeBars', symbolInfo);
+        this.vueInstenceData.getRealtimeData(resolution,onRealtimeCallback,symbolInfo)
         /*subscribeOnStream(
             symbolInfo,
             resolution,
