@@ -23,7 +23,9 @@ const state = reactive({
     ['high', 'High risk'],
   ]),
   timer: null,
-  recordList: localStorage.getItem(constant.predictionRecordKey)?JSON.parse(localStorage.getItem(constant.predictionRecordKey)) : [],
+  recordList: localStorage.getItem(constant.predictionRecordKey)
+    ? JSON.parse(localStorage.getItem(constant.predictionRecordKey))
+    : [],
 })
 
 const props = defineProps({
@@ -237,12 +239,16 @@ function handleClickSave() {
         </div>
       </div>
     </div> -->
-    <div class="flex items-center gap-[20px]">
+    <div class="flex flex-col lg:flex-row items-center justify-center gap-[10px] w-full">
       <div
-        class="flex-[0.7] bg-[#000] border border-solid !border-[#FFFFFF80] rounded-[4px] !p-[10px] flex gap-[10px]"
+        class="flex-1 w-full lg:flex-[0.7] bg-[#000] border-0 lg:!border border-solid !border-[#FFFFFF80] rounded-[4px] !p-[10px] flex flex-col lg:flex-row gap-[10px]"
       >
-        <div>
-          <div class="w-[160px] h-[160px] rounded-full border-[2px] border-solid border-[#0AB45A]">
+        <div
+          class="lg:!border-0 border border-solid !border-[#FFFFFF80] rounded-[4px] !py-[16px] lg:!py-0"
+        >
+          <div
+            class="w-[160px] h-[160px] rounded-full border-[2px] border-solid border-[#0AB45A] mx-auto"
+          >
             <div class="w-full h-full rounded-full border-[4px] border-solid border-[#000]">
               <div
                 class="w-full h-full rounded-full"
@@ -283,7 +289,7 @@ function handleClickSave() {
         </div>
         <div class="flex flex-col gap-[10px] justify-between flex-1">
           <div class="h-[180px] overflow-y-auto">
-            <div class="grid grid-cols-2 gap-x-[5px] gap-y-[10px]">
+            <div class="flex flex-col lg:grid grid-cols-2 gap-x-[5px] gap-y-[10px]">
               <div
                 class="!px-[10px] h-[52px] rounded-[6px] border border-solid !border-[#FFFFFF80] flex items-center justify-between"
                 v-for="item in state.dataObj?.current?.chinese_technical_signals"
@@ -296,7 +302,7 @@ function handleClickSave() {
             </div>
           </div>
 
-          <div class="flex items-center justify-between">
+          <div class="flex flex-col gap-[20px] lg:gap-0 lg:flex-row items-center justify-between">
             <div class="flex items-center gap-[10px]">
               <div
                 class="!px-[10px] !py-[5px] border border-solid text-[12px] flex items-center rounded-full gap-[5px] capitalize"
@@ -316,51 +322,57 @@ function handleClickSave() {
                 }}</span>
               </div>
             </div>
-            <VBtnConnect @click="handleClickSave"> Save prediction </VBtnConnect>
+            <VBtnConnect @click="handleClickSave" class="!w-full lg:!w-auto">
+              Save prediction
+            </VBtnConnect>
           </div>
         </div>
       </div>
-      <div
-        class="flex-[0.3] bg-[#000] border border-solid !border-[#FFFFFF80] rounded-[4px] !p-[10px] h-[275px]"
-      >
-        <div class="flex items-center gap-[5px]">
-          <img src="@/assets/img/ai_icon5.png" class="w-[16px] h-[16px]" />
-          <div class="text-[14px] text-[#6DDD25] font-[600]">Prediction record</div>
-        </div>
-        <div class="w-full flex items-center !mt-[10px]">
-          <div class="flex-1 text-[12px] text-[#666]">Type</div>
-          <div class="flex-1 text-[12px] text-[#666] text-center">Time</div>
-          <div class="flex-1 text-[12px] flex items-center">
-            <div class="flex-1 text-[12px] text-[#666] text-right">Confidence</div>
-            <!-- <div class="flex-1 text-[12px] text-[#666] text-right">Result</div> -->
+      <div class="!px-[10px] lg:!px-0 w-full lg:w-auto lg:flex-[0.3] !pb-[200px] lg:!pb-0">
+        <div
+          class="flex-1 w-full lg:w-auto lg:flex-[0.3] bg-[#000] border border-solid !border-[#FFFFFF80] rounded-[4px] !p-[10px] h-[275px]"
+        >
+          <div class="flex items-center gap-[5px]">
+            <img src="@/assets/img/ai_icon5.png" class="w-[16px] h-[16px]" />
+            <div class="text-[14px] text-[#6DDD25] font-[600]">Prediction record</div>
           </div>
-        </div>
-        <div class="h-[200px] overflow-y-auto">
-          <div
-            class="!py-[15px] !px-[5px] flex items-center border-b border-solid !border-[#FFFFFF80] last:!border-0"
-            v-for="(item, index) in state.recordList"
-            :key="index"
-          >
-            <div class="flex-1 text-[12px] flex items-center justify-between !pr-[5px]">
-              <div class="text-[12px] text-[#fff]">{{ item.symbol }}</div>
-              <div
-                class="!px-[10px] !py-[5px] border border-solid text-[12px] flex items-center rounded-full gap-[5px] capitalize"
-                :style="`border-color:${filterDirectionColor(item.direction)} !important;color:${filterDirectionColor(item.direction)}`"
-              >
-                <img
-                  :src="filterDirectionImg(item.direction)"
-                  class="w-[14px] h-[14px]"
-                  :style="state.dataObj?.summary?.trend?.direction == 'neutral' ? 'height:6px' : ''"
-                />
-                {{ item.direction }}
-              </div>
-            </div>
-            <div class="flex-1 text-[12px] text-[#fff] text-center">
-              {{ dayjs(Number(item.time)).format('MMM D, YYYY') }}
-            </div>
+          <div class="w-full flex items-center !mt-[10px]">
+            <div class="flex-1 text-[12px] text-[#666]">Type</div>
+            <div class="flex-1 text-[12px] text-[#666] text-center">Time</div>
             <div class="flex-1 text-[12px] flex items-center">
-              <div class="flex-1 text-[12px] text-[#fff] text-right">{{ item.confidence }}%</div>
-              <!-- <div class="flex-1 text-[12px] text-[##0AB45A] text-right">Correct</div> -->
+              <div class="flex-1 text-[12px] text-[#666] text-right">Confidence</div>
+              <!-- <div class="flex-1 text-[12px] text-[#666] text-right">Result</div> -->
+            </div>
+          </div>
+          <div class="h-[200px] overflow-y-auto">
+            <div
+              class="!py-[15px] !px-[5px] flex items-center border-b border-solid !border-[#FFFFFF80] last:!border-0"
+              v-for="(item, index) in state.recordList"
+              :key="index"
+            >
+              <div class="flex-1 text-[12px] flex items-center justify-between !pr-[5px]">
+                <div class="text-[12px] text-[#fff]">{{ item.symbol }}</div>
+                <div
+                  class="!px-[10px] !py-[5px] border border-solid text-[12px] flex items-center rounded-full gap-[5px] capitalize"
+                  :style="`border-color:${filterDirectionColor(item.direction)} !important;color:${filterDirectionColor(item.direction)}`"
+                >
+                  <img
+                    :src="filterDirectionImg(item.direction)"
+                    class="w-[14px] h-[14px]"
+                    :style="
+                      state.dataObj?.summary?.trend?.direction == 'neutral' ? 'height:6px' : ''
+                    "
+                  />
+                  {{ item.direction }}
+                </div>
+              </div>
+              <div class="flex-1 text-[12px] text-[#fff] text-center">
+                {{ dayjs(Number(item.time)).format('MMM D, YYYY') }}
+              </div>
+              <div class="flex-1 text-[12px] flex items-center">
+                <div class="flex-1 text-[12px] text-[#fff] text-right">{{ item.confidence }}%</div>
+                <!-- <div class="flex-1 text-[12px] text-[##0AB45A] text-right">Correct</div> -->
+              </div>
             </div>
           </div>
         </div>

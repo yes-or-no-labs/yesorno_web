@@ -250,7 +250,7 @@ const optAnimation = (json, index) => {
           class="2xl:text-[34px] xl:text-[28px] sm:text-[25px] text-[20px] text-center text-[#fff] font-bold relative z-10"
           style="font-family: Geist"
         >
-          Roodmap
+          Road map
         </div>
         <img
           src="@/assets/img/home_bg9.png"

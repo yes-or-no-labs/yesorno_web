@@ -265,6 +265,9 @@ const initView = () => {
     custom_css_url: 'custom-styles.css',
     theme: 'dark',
     locale: 'en',
+    preset: 'mobile',
+    height: '400px',
+    width:'100%',
     disabled_features: [
       'use_localstorage_for_settings',
       'header_quick_search',
@@ -283,9 +286,9 @@ const initView = () => {
       'timeframes_toolbar',
     ],
     overrides: {
-      volumePaneSize: 'medium',
-      'paneProperties.topMargin': 10,
-      'paneProperties.bottomMargin': 10,
+      // volumePaneSize: 'medium',
+      // 'paneProperties.topMargin': 10,
+      // 'paneProperties.bottomMargin': 10,
       // 'paneProperties.vertGridProperties.color':getTheme('background_dark_light'), //tv网格颜色
       // 'paneProperties.horzGridProperties.color': getTheme('background_dark_light'),
       // "scalesProperties.textColor" : getTheme('color_main'),
@@ -311,7 +314,11 @@ const initView = () => {
       // 'backgroundGradientEndColor':'#000'
     },
     // toolbar_bg: getTheme('background_dark'),
-    enabled_features: [],
+    enabled_features: [
+      'touch_events',
+      'hide_left_toolbar_by_default',
+      'study_templates'
+    ],
     charts_storage_url: props.chartsStorageUrl,
     charts_storage_api_version: props.chartsStorageApiVersion,
     client_id: props.clientId,
@@ -369,7 +376,8 @@ const initView = () => {
 <style scoped lang="scss">
 .TVChartContainer {
   flex: 1;
-  overflow: hidden;
+  overflow: hidden !important;
+  max-height: 100vh !important;
   // height: 100%;
 }
 </style>

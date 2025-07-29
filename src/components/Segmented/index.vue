@@ -17,7 +17,10 @@
         @click.self="$emit('change', item.value)"
       >
         <input type="radio" name="segmented" />
-        <div class="select-none sm:text-[16px] sm:!leading-[16px] text-[14px] sm:!py-[10px]">{{ item.label }}</div>
+        <div class="select-none sm:text-[16px] sm:!leading-[16px] text-[14px] sm:!py-[10px]" v-if="item.label">{{ item.label }}</div>
+        <div class="!py-[5px]" v-if="item.icon">
+          <img :src="curIndex==index?item.selectIcon:item.icon" alt="" :draggable="false" class="select-none w-[16px] h-[16px]"></img>
+        </div>
       </label>
     </div>
   </div>
@@ -31,6 +34,7 @@ export default {
       w: 0,
       x: 0,
       isInit: false,
+      curIndex:0
     }
   },
   emits: ['change'],
@@ -57,6 +61,7 @@ export default {
     value(newVal){
       const index = this.options.findIndex(item=>item.value === this.value)
       this.changeHandler(this.options[index],this.$refs.labelRef[index])
+      this.curIndex = index
       // console.log('props.value',this.$refs.labelRef[index]);
     }
   },
@@ -77,6 +82,26 @@ export default {
       this.w = ev.clientWidth + this.offset * 2
       this.x = ev.offsetLeft - this.offset
     },
+    
+    handleClickNext(){
+      if(this.curIndex === this.options.length - 1){
+        const item = this.options[0]
+        this.$emit('change', item.value)
+      }else{
+        const item = this.options[this.curIndex + 1]
+        this.$emit('change', item.value)
+      }
+    },
+
+    handleClickPre(){
+      if(this.curIndex === 0){
+        const item = this.options[this.options.length - 1]
+        this.$emit('change', item.value)
+      }else{
+        const item = this.options[this.curIndex - 1]
+        this.$emit('change', item.value)
+      }
+    }
   },
 }
 </script>
