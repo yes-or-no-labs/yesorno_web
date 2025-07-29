@@ -117,8 +117,8 @@ function handleClickPanel(item, outcome) {
 }
 
 function handleClickRule(item) {
-  console.log('handleClickRule',item)
-  state.curRules = item.desc
+  // console.log('handleClickRule',item)
+  // state.curRules = item.desc
   state.isShowDialog = true
   // debounce(() => toast.info('coming soon'))
 }
@@ -489,7 +489,8 @@ async function getOrderList() {
           ></v-icon>
         </div>
         <div class="!mt-[12px] rounded-[12px] border border-solid border-[#87878733] bg-[#1A1A1E] !p-[16px] max-h-[470px] overflow-y-auto text-[16px]">
-          {{ state.curRules }}
+          <!-- {{ state.curRules }} -->
+            {{ state.dataObj?.description }}
         </div>
       </div>
     </v-dialog>

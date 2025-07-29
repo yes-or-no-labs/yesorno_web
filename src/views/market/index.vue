@@ -8,7 +8,7 @@ import { store } from '@/store'
 const state = reactive({
   menuList: [
     { label: 'All', value: 4 },
-    { label: 'Encryption', value: 0 },
+    { label: 'Crypto', value: 0 },
     { label: 'Sport', value: 1 },
     { label: 'Business', value: 2 },
     { label: 'Culture', value: 3 },
