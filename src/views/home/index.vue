@@ -539,7 +539,7 @@ const optAnimation = (json, index) => {
                 class="absolute left-0 lg:top-[-70px] top-[-40px] gradient-text lg:text-[34px] text-[20px] font-bold whitespace-nowrap"
                 style="font-family: Geist"
               >
-                2025 Q5
+                2026 Q1
               </div>
             </div>
             <div class="absolute lg:left-[70%] left-[50%] top-[50%] translate-y-[-50%]">
@@ -610,7 +610,7 @@ const optAnimation = (json, index) => {
                 class="absolute left-0 lg:bottom-[-70px] bottom-[-40px] gradient-text lg:text-[34px] text-[20px] font-bold whitespace-nowrap"
                 style="font-family: Geist"
               >
-                2025 Q6
+                2026 Q2
               </div>
             </div>
           </div>

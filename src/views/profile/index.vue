@@ -280,7 +280,7 @@ async function getUserBetRecord($state) {
                     <div
                       class="w-[180px] min-w-[180px] text-[14px] text-[#94969C] whitespace-nowrap border-b border-solid border-[#87878733] !py-[10px] !px-[16px]"
                     >
-                      {{ Number(appStore.formatUnits(item.paidAmt)) / item.amount }}
+                      {{ $formatAmount(Number(appStore.formatUnits(item.paidAmt)) / item.amount) }}
                     </div>
                     <!-- <div
                       class="w-[180px] min-w-[180px] text-[14px] text-[#94969C] whitespace-nowrap border-b border-solid border-[#87878733] !py-[10px] !px-[16px]"
