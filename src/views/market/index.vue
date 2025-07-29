@@ -7,13 +7,11 @@ import { store } from '@/store'
 
 const state = reactive({
   menuList: [
-    { label: 'Trending', value: 1 },
-    { label: 'New', value: 2 },
-    { label: 'Crypto', value: 3 },
-    { label: 'Business', value: 4 },
-    { label: 'Politics', value: 5 },
-    { label: 'Sports', value: 6 },
-    { label: 'Culture', value: 7 },
+    { label: 'All', value: 4 },
+    { label: 'Encryption', value: 0 },
+    { label: 'Sport', value: 1 },
+    { label: 'Business', value: 2 },
+    { label: 'Culture', value: 3 },
   ],
   searchInputLoading: false,
   progress: 50,
@@ -21,25 +19,34 @@ const state = reactive({
   pageNum: 1,
   pageSize: 10,
   dataList: [],
-  currentTab: 1,
+  currentTab: 4,
+  loadingState:null
 })
 
 onMounted(() => {
   // loadMore()
 })
 
+function handleClickChange(e) {
+  state.currentTab = e
+  loadMore(state.loadingState,true)
+} 
+
 const appStore = store.useAppStore()
 
 const env = computed(() => import.meta.env)
 
-async function loadMore($state) {
+
+async function loadMore($state,isRefresh) {
   console.log('onScroll', $state)
+  state.loadingState = $state
   try {
+    if(isRefresh) state.pageNum = 1
     const res = await api.getMarketData({
       pageSize: state.pageSize,
       pageNum: state.pageNum,
       topic: '',
-      eventType: '',
+      eventType: state.currentTab == 4?'':state.currentTab,
     })
     console.log('getMarketData', res)
     if (res.success) {
@@ -48,7 +55,11 @@ async function loadMore($state) {
           item.progress = calcPercent(item.conditionList[0], 'yes')
         }
       }
-      state.dataList = state.dataList.concat(res.obj.result)
+      if(isRefresh) {
+        state.dataList = res.obj.result
+      }else{
+        state.dataList = state.dataList.concat(res.obj.result)
+      }
       if (Array.isArray(res.obj.result) && res.obj?.result.length < state.pageSize) {
         $state?.complete()
       } else {
@@ -104,7 +115,7 @@ function calcTotalPrice(list) {
 
       <Segmented
         :options="state.menuList"
-        @change="(e) => (state.currentTab = e)"
+        @change="handleClickChange"
         :value="state.currentTab"
       />
       <div class="w-full !mt-[10px] lg:!mt-0 lg:w-auto flex items-center gap-[16px]">
@@ -174,7 +185,7 @@ function calcTotalPrice(list) {
           </div>
           <div class="flex justify-between items-center !mt-[15px]">
             <div class="flex items-center gap-[20px]">
-              <img :src="item.imgUrl" class="w-[58px] h-[58px] rounded-[8px]" />
+              <img :src="item.imgUrl" class="w-[58px] h-[58px] rounded-[8px] object-cover" />
               <div class="flex flex-col gap-[5px]">
                 <div
                   class="text-[#fff] text-[16px] font-bold leading-[20px]"

@@ -27,6 +27,8 @@ const state = reactive({
   chartData:[],
   handicapData:{},
   dayChange: 0,
+  curRules:'',
+  isShowDialog:false
 })
 
 const route = useRoute()
@@ -114,10 +116,11 @@ function handleClickPanel(item, outcome) {
   getOrderList()
 }
 
-function handleClickRule() {
-  console.log('handleClickRule')
-
-  debounce(() => toast.info('coming soon'))
+function handleClickRule(item) {
+  console.log('handleClickRule',item)
+  state.curRules = item.desc
+  state.isShowDialog = true
+  // debounce(() => toast.info('coming soon'))
 }
 
 
@@ -189,7 +192,7 @@ async function getOrderList() {
           <div class="flex items-center gap-[10px] lg:gap-[24px] flex-1">
             <img
               :src="state.dataObj?.imgUrl"
-              class="w-[60px] h-[60px] sm:w-[70px] sm:h-[70px] lg:w-[80px] lg:h-[80px] rounded-[10px]"
+              class="w-[60px] h-[60px] sm:w-[70px] sm:h-[70px] lg:w-[80px] lg:h-[80px] rounded-[10px] object-cover"
             />
             <div class="flex flex-col gap-[5px] lg:gap-[10px] justify-center lg:h-[80px] flex-1">
               <div class="text-[14px] sm:text-[16px] md:text-[20px] lg:text-[24px] text-[#fff]">
@@ -328,7 +331,7 @@ async function getOrderList() {
                         Rules
                         <div
                           class="absolute top-0 left-0 z-10 rounded-[4px] border border-solid border-[#333741] bg-[#131316] !px-[6px] !py-[2px] text-[14px]"
-                          @click.stop="handleClickRule"
+                          @click.stop="handleClickRule(item)"
                         >
                           Rules
                         </div>
@@ -383,7 +386,7 @@ async function getOrderList() {
                           Rules
                           <div
                             class="absolute top-0 left-0 z-10 rounded-[4px] border border-solid border-[#333741] bg-[#131316] !px-[6px] !py-[2px] text-[14px]"
-                            @click.stop="handleClickRule"
+                            @click.stop="handleClickRule(item)"
                           >
                             Rules
                           </div>
@@ -473,6 +476,23 @@ async function getOrderList() {
       </div>
       <comment />
     </div>
+    <v-dialog max-width="500" v-model="state.isShowDialog">
+      <div class="!p-[16px] rounded-[20px] bg-[#131316]">
+        <div class="w-full flex items-center justify-between">
+          <div class="text-[#fff] text-[20px]">Rules</div>
+          <v-icon
+            color="#fff"
+            icon="mdi-close"
+            size="16"
+            class=" cursor-pointer"
+            @click="state.isShowDialog = false"
+          ></v-icon>
+        </div>
+        <div class="!mt-[12px] rounded-[12px] border border-solid border-[#87878733] bg-[#1A1A1E] !p-[16px] max-h-[470px] overflow-y-auto text-[16px]">
+          {{ state.curRules }}
+        </div>
+      </div>
+    </v-dialog>
   </div>
 </template>
 

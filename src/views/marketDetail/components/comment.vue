@@ -142,13 +142,12 @@ function handleClickExpand(item) {
       >
         Comments({{ state.commentTotal }})
       </div>
-      <v-menu location="bottom" offset="10">
+      <!-- <v-menu location="bottom" offset="10">
         <template v-slot:activator="{ props }">
           <div
             class="py-[6px] px-[16px] text-[14px] flex items-center gap-[5px] cursor-pointer text-[#0AB45A] font-bold"
             v-bind="props"
           >
-            <!-- <img src="@/assets/img/switch.png" class="w-[16px] h-[16px]" /> -->
             <v-icon icon="mdi-swap-vertical" color="#0AB45A" size="16"></v-icon>
             {{ state.sortType == 1?'New to Old':'Most Liked' }}
           </div>
@@ -167,7 +166,7 @@ function handleClickExpand(item) {
               </div>
           </v-list-item>
         </v-list>
-      </v-menu>
+      </v-menu> -->
     </div>
     <div class="flex flex-col gap-[16px] !pt-[20px]">
       <div class="overflow-y-auto min-h-[150px] max-h-[350px] w-full commentEl">
