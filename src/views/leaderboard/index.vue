@@ -1,28 +1,14 @@
 <script setup>
-import { reactive } from 'vue'
+import { onMounted, reactive } from 'vue'
 import {formatAddress} from '@/utils/uni-app.js'
 import Segmented from '@/components/Segmented/index.vue'
 import { useWindowResize } from '@/hooks/useWindowResize';
+import { api } from '@/apis';
 
 const state = reactive({
     tabList:[{title:'Today', value:'1'}, {title:'Last Week', value:'2'}, {title:'Last 2 Weeks', value:'3'}, {title:'Last Month', value:'4'}],
     currentTab: '1',
-    dataList:[{
-        address: '0x1234567890abcdef1234567890abcdef12345678',
-        usdc: '1000',
-    }, {
-        address: '0xabcdef1234567890abcdef1234567890abcdef12',
-        usdc: '800',
-    }, {
-        address: '0x7890abcdef1234567890abcdef12345678901234',
-        usdc: '600',
-    }, {
-        address: '0xabcdef1234567890abcdef1234567890abcdef12',
-        usdc: '800',
-    }, {
-        address: '0x7890abcdef1234567890abcdef12345678901234',
-        usdc: '600',
-    }],
+    dataList:[],
     menuList: [
     { label: 'Today', value: '1' },
     { label: 'Last Week', value: '2'},
@@ -42,6 +28,22 @@ function filterStyle(index) {
         return 'background: linear-gradient(90deg, rgba(224, 239, 24, 0.3) 0%, rgba(224, 239, 24, 0) 30%, rgba(224, 239, 24, 0) 100%);'
     } else {
         return ''
+    }
+}
+
+onMounted(()=>{
+    getData()
+})
+
+async function getData() {
+    try {
+        const res = await api.getPointRank()
+        console.log('getData',res);
+        if(res.success){
+            state.dataList = res.obj.rank
+        }
+    } catch (error) {
+        console.error(error);
     }
 }
 
@@ -74,14 +76,14 @@ function tabChange(val) {
             >
                 <v-tab :value="item.value" v-for="item in state.tabList" style="font-size: 20px">{{ item.title }}</v-tab>
             </v-tabs> -->
-            <Segmented :options="state.menuList" @change="e=>state.currentTab = e" :value="state.currentTab" />
+            <!-- <Segmented :options="state.menuList" @change="e=>state.currentTab = e" :value="state.currentTab" /> -->
             <v-window v-model="state.currentTab">
                 <v-window-item value="1">
                     <div class="w-full !pb-[30px] border border-solid !border-[rgba(255,255,255,.5)] rounded-[20px] !mt-[20px] sm:h-[800px] h-[500px] overflow-y-auto">
                         <div class="flex items-center !px-[40px] !py-[20px]">
                             <div class="lg:flex-[0.3] sm:flex-[0.5] flex-1 text-left text-[#7A7A7A] text-[16px] font-[600] leading-[16px]">Rank</div>
                             <div class="flex-1 sm:!text-left text-center text-[#7A7A7A] text-[16px] font-[600] leading-[16px]">Address</div>
-                            <div class="flex-1 text-right text-[#7A7A7A] text-[16px] font-[600] leading-[16px]">USDC</div>
+                            <div class="flex-1 text-right text-[#7A7A7A] text-[16px] font-[600] leading-[16px]">Points</div>
                         </div>
                         <div class="flex items-center !py-[20px] !px-[40px]" :style="filterStyle(index)" v-for="(item, index) in state.dataList" :key="index">
                             <div class="lg:flex-[0.3] sm:flex-[0.5] flex-1 flex items-center lg:gap-[30px] gap-[10px] text-[#9F9F9F] text-[24px] font-[600] leading-[24px]">
@@ -90,8 +92,8 @@ function tabChange(val) {
                                 <img src="@/assets/img/no2.png" class="w-[18px] h-[18px]" v-show="index+1 == 2" />
                                 <img src="@/assets/img/no3.png" class="w-[18px] h-[18px]" v-show="index+1 == 3" />
                             </div>
-                            <div class="flex-1 sm:!text-left text-center text-[#fff] text-[14px] font-[600] leading-[14px]">{{ width<630?formatAddress(item.address):item.address }}</div>
-                            <div class="flex-1 text-right text-[#fff] text-[14px] font-[600] leading-[14px]">{{ item.usdc }}</div>
+                            <div class="flex-1 sm:!text-left text-center text-[#fff] text-[14px] font-[600] leading-[14px]">{{ width<630?formatAddress(item.userAddress):item.userAddress }}</div>
+                            <div class="flex-1 text-right text-[#fff] text-[14px] font-[600] leading-[14px]">{{ item.point }}</div>
                         </div>
                     </div>
                 </v-window-item>
@@ -100,7 +102,7 @@ function tabChange(val) {
                         <div class="flex items-center !px-[40px] !py-[20px]">
                             <div class="lg:flex-[0.3] sm:flex-[0.5] flex-1 text-left text-[#7A7A7A] text-[16px] font-[600] leading-[16px]">Rank</div>
                             <div class="flex-1 sm:!text-left text-center text-[#7A7A7A] text-[16px] font-[600] leading-[16px]">Address</div>
-                            <div class="flex-1 text-right text-[#7A7A7A] text-[16px] font-[600] leading-[16px]">USDC</div>
+                            <div class="flex-1 text-right text-[#7A7A7A] text-[16px] font-[600] leading-[16px]">Points</div>
                         </div>
                         <div class="flex items-center !py-[20px] !px-[40px]" :style="filterStyle(index)" v-for="(item, index) in state.dataList" :key="index">
                             <div class="lg:flex-[0.3] sm:flex-[0.5] flex-1 flex items-center lg:gap-[30px] gap-[10px] text-[#9F9F9F] text-[24px] font-[600] leading-[24px]">
@@ -109,8 +111,8 @@ function tabChange(val) {
                                 <img src="@/assets/img/no2.png" class="w-[18px] h-[18px]" v-show="index+1 == 2" />
                                 <img src="@/assets/img/no3.png" class="w-[18px] h-[18px]" v-show="index+1 == 3" />
                             </div>
-                            <div class="flex-1 sm:!text-left text-center text-[#fff] text-[14px] font-[600] leading-[14px]">{{ width<630?formatAddress(item.address):item.address }}</div>
-                            <div class="flex-1 text-right text-[#fff] text-[14px] font-[600] leading-[14px]">{{ item.usdc }}</div>
+                            <div class="flex-1 sm:!text-left text-center text-[#fff] text-[14px] font-[600] leading-[14px]">{{ width<630?formatAddress(item.userAddress):item.userAddress }}</div>
+                            <div class="flex-1 text-right text-[#fff] text-[14px] font-[600] leading-[14px]">{{ item.point }}</div>
                         </div>
                     </div>
                 </v-window-item>

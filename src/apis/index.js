@@ -63,4 +63,5 @@ export const api = {
   getCommentList: (params) => baseHttp({url:"/v1/event-comments/by-event",method: 'GET',params}),
   getUserinfobyAddress: (params) => baseHttp({url:"/v1/users/infobyaddress",method: 'GET',params}),
   getPointRecord: (params) => baseHttp({url:"/v1/user/point-records/list",method: 'GET',params}),
+  getPointRank: (params) => baseHttp({url:"/v1/users/pointRank",method: 'GET',params}),
 }

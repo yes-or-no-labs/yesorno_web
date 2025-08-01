@@ -197,7 +197,7 @@ function openLink(item) {
                     v-for="item in state.taskList"
                   >
                     <div class="flex items-center gap-[20px]">
-                      <img src="@/assets/img/task_bg1.png" class="w-[37px] h-[37px]" />
+                      <img :src="item.image_url" class="w-[37px] h-[37px] rounded-full" />
                       <div class="flex flex-col gap-[10px]">
                         <div class="text-[#fff] text-[14px] leading-[14px]">
                           {{ item.title }}
