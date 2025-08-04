@@ -17,7 +17,7 @@ import Erc20ABi from '@/abi/erc_20.json'
 const menuList = [
   { title: 'White paper', link: 'https://yesorno-labs.gitbook.io/yesornolabs/' },
   { title: 'Medium', link: 'https://medium.com/@yesorno_labs' },
-  { title: 'Audit report', link: '' },
+  { title: 'Audit report', link: '/report' },
 ]
 
 const marketList = [
@@ -83,7 +83,11 @@ const currenRoutePath = computed(() => {
 })
 
 function handleClickMenu(url) {
-  window.open(url)
+  if(url === '/report'){
+    router.push('/report')
+  }else{
+    window.open(url)
+  }
 }
 
 function initErc20Contract() {
