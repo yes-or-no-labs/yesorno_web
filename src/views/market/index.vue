@@ -1,9 +1,10 @@
 <script setup>
-import { computed, onMounted, reactive } from 'vue'
+import { computed, onMounted, reactive, watch } from 'vue'
 import Segmented from '@/components/Segmented/index.vue'
 import { api } from '@/apis'
 import network from '@/utils/network'
 import { store } from '@/store'
+import { useRouter } from 'vue-router'
 
 const state = reactive({
   menuList: [
@@ -20,11 +21,31 @@ const state = reactive({
   pageSize: 10,
   dataList: [],
   currentTab: 4,
+  tabList: [
+    { title: 'Event Prediction', value: '1',path:'/market' },
+    { title: 'Price Prediction', value: '2',path:'/market_pricePrediction'},
+  ],
+  currentFirstTab:'1',
   loadingState:null
 })
 
 onMounted(() => {
   // loadMore()
+})
+
+const router = useRouter()
+
+const currenRoutePath = computed(() => {
+  // console.log('currenRoutePath', router.currentRoute.value)
+
+  return router.currentRoute.value.fullPath
+})
+
+watch(()=>state.currentFirstTab,newVal=>{
+  const index = state.tabList.findIndex(item=>item.value == newVal)
+  if(currenRoutePath.value !== state.tabList[index].path){
+    router.push(state.tabList[index].path)
+  }
 })
 
 function handleClickChange(e) {
@@ -101,6 +122,14 @@ function calcTotalPrice(list) {
   <div
     class="w-full min-h-screen !pb-[100px] max-w-[1300px] mx-auto !px-[10px] lg:!px-[38px] !pt-[20px]"
   >
+    <div class="block lg:hidden">
+      <v-tabs v-model="state.currentFirstTab" fixed-tabs align-tabs="center" color="#0AB45A" height="60">
+        <v-tab :value="item.value" v-for="item in state.tabList" style="font-size: 16px">
+          <span>{{ item.title }}</span></v-tab
+        >
+      </v-tabs>
+    </div>
+      
     <div class="w-full h-auto lg:h-[58px] block lg:flex items-center justify-between !mt-[20px]">
       <!-- <div class="flex items-center gap-[35px]">
         <div

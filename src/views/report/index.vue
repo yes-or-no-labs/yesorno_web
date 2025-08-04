@@ -5,14 +5,10 @@
       <button @click="prevPage" :disabled="currentPage <= 1">上一页</button>
       <span>第 {{ currentPage }} 页 / 共 {{ pageCount }} 页</span>
       <button @click="nextPage" :disabled="currentPage >= pageCount">下一页</button>
-      <input 
-        type="range" 
-        :min="1" 
-        :max="100" 
-        @input="updateZoom"
-        v-model.number="zoomLevel"
-      >
-      <span>{{ zoomLevel }}</span>
+      <div class="hidden sm:block">
+        <input type="range" :min="1" :max="100" @input="updateZoom" v-model.number="zoomLevel" />
+        <span>{{ zoomLevel }}</span>
+      </div>
     </div>
     <!-- PDF 查看器 -->
     <vue-pdf-embed
@@ -22,17 +18,17 @@
       @error="handlePdfError"
       ref="pdfRef"
       class="pdf-viewer"
-        :style="scale"
+      :style="scale"
+      :key="width"
     />
-
-    
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, reactive, computed } from 'vue'
+import { ref, onMounted, reactive, computed, watch } from 'vue'
 import VuePdfEmbed from 'vue-pdf-embed'
 import auditReport from '@/assets/audit-report.pdf'
+import { useWindowResize } from '@/hooks/useWindowResize';
 
 // const props = defineProps({
 //   pdfUrl: {
@@ -42,8 +38,10 @@ import auditReport from '@/assets/audit-report.pdf'
 // })
 
 const state = reactive({
-    scale:1
+  scale: 1,
 })
+
+const { width } = useWindowResize();
 
 // 响应式数据
 const pdfSource = ref(auditReport)
@@ -51,8 +49,21 @@ const currentPage = ref(1)
 const pageCount = ref(0)
 const zoomLevel = ref(100)
 const pdfRef = ref(null)
+const pdfKey = ref(0)
 
-const scale = computed(() => `transform:scale(${state.scale})`);
+const scale = computed(() => `transform:scale(${state.scale})`)
+
+const reloadPdf = () => {
+    console.log('reloadPdf',pdfKey.value);
+    
+  pdfKey.value++ // 修改key会强制组件重新创建
+}
+
+watch(()=>width,()=>{
+    console.log('width',width);
+    
+    reloadPdf()
+})
 
 // 方法
 const nextPage = () => {
@@ -68,7 +79,7 @@ const prevPage = () => {
 }
 
 const updateZoom = () => {
-    state.scale = zoomLevel.value / 100
+  state.scale = zoomLevel.value / 100
 }
 
 const handlePdfRendered = () => {
@@ -85,7 +96,7 @@ onMounted(async () => {
   try {
     // 如果你需要获取总页数，可以使用 pdf-lib
     const { PDFDocument } = await import('pdf-lib')
-    const arrayBuffer = await fetch(pdfSource.value).then(res => res.arrayBuffer())
+    const arrayBuffer = await fetch(pdfSource.value).then((res) => res.arrayBuffer())
     const pdfDoc = await PDFDocument.load(arrayBuffer)
     pageCount.value = pdfDoc.getPageCount()
   } catch (error) {
@@ -125,7 +136,7 @@ button:disabled {
   cursor: not-allowed;
 }
 
-input[type="range"] {
+input[type='range'] {
   width: 150px;
 }
 </style>

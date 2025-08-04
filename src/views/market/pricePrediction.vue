@@ -8,7 +8,7 @@ import { useWindowResize } from '@/hooks/useWindowResize'
 import Segmented from '@/components/Segmented/index.vue'
 
 import 'swiper/css/free-mode'
-import { reactive, ref, onMounted } from 'vue'
+import { reactive, ref, onMounted, computed, watch } from 'vue'
 import pricePrediction_icon1 from '@/assets/img/pricePrediction_icon1.png'
 import pricePrediction_icon2 from '@/assets/img/pricePrediction_icon2.png'
 import pricePrediction_icon3 from '@/assets/img/pricePrediction_icon3.png'
@@ -17,6 +17,7 @@ import pricePrediction_select1 from '@/assets/img/pricePrediction_select1.png'
 import pricePrediction_select2 from '@/assets/img/pricePrediction_select2.png'
 import pricePrediction_select3 from '@/assets/img/pricePrediction_select3.png'
 import pricePrediction_select4 from '@/assets/img/pricePrediction_select4.png'
+import { useRouter } from 'vue-router'
 
 const state = reactive({
   curTabIndex: 0,
@@ -31,6 +32,11 @@ const state = reactive({
     { icon: pricePrediction_icon4, selectIcon: pricePrediction_select4, value: 4 },
   ],
   currentTab: 1,
+  tabList: [
+    { title: 'Event Prediction', value: '1',path:'/market' },
+    { title: 'Price Prediction', value: '2',path:'/market_pricePrediction'},
+  ],
+  currentFirstTab:'2',
 })
 
 const segmentedRef = ref(null)
@@ -38,6 +44,21 @@ const segmentedRef = ref(null)
 onMounted(() => {})
 
 const swiperInstance = ref(null)
+
+const router = useRouter()
+
+const currenRoutePath = computed(() => {
+  // console.log('currenRoutePath', router.currentRoute.value)
+
+  return router.currentRoute.value.fullPath
+})
+
+watch(()=>state.currentFirstTab,newVal=>{
+  const index = state.tabList.findIndex(item=>item.value == newVal)
+  if(currenRoutePath.value !== state.tabList[index].path){
+    router.push(state.tabList[index].path)
+  }
+})
 
 const onSwiper = (swiper) => {
   swiperInstance.value = swiper
@@ -64,6 +85,13 @@ function handleClickChange(e) {
 
 <template>
   <div class="flex flex-col gap-[24px] w-full" style="min-height: calc(100vh - 80px)">
+    <div class="block lg:hidden">
+      <v-tabs v-model="state.currentFirstTab" fixed-tabs align-tabs="center" color="#0AB45A" height="60">
+        <v-tab :value="item.value" v-for="item in state.tabList" style="font-size: 16px">
+          <span>{{ item.title }}</span></v-tab
+        >
+      </v-tabs>
+    </div>
     
     <div class="flex-1 sm:hidden" v-if="state.currentTab == 1">
       <div

@@ -1,10 +1,11 @@
+import { debounce } from '@/utils/debounce';
 import { ref, onMounted, onUnmounted } from 'vue';
 
 export function useWindowResize() {
   const width = ref(window.innerWidth);
 
   const handleResize = () => {
-    width.value = window.innerWidth;
+    debounce(()=>width.value =window.innerWidth) 
   };
 
   onMounted(() => {
