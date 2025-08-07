@@ -54,9 +54,11 @@ async function handleClickBtn() {
 
 async function uploadImg(file) {
     try {
+        console.log('file',file);
+        const fileType = file.type=='image/svg+xml'?'svg':file.type.split('/')[1]
         const res = await api.upload({
-            fileName: generateTimestampWithRandom()+'.'+file.type.split('/')[1],
-            uploadType:file.type
+            fileName: generateTimestampWithRandom()+'.'+ fileType,
+            uploadType:file.type=='image/svg+xml'?'svg':file.type
         })
         // console.log('uploadImg',res);
         if(res.success){

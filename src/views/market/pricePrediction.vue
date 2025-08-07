@@ -84,7 +84,7 @@ function handleClickChange(e) {
 </script>
 
 <template>
-  <div class="flex flex-col gap-[24px] w-full" style="min-height: calc(100vh - 80px)">
+  <div class="flex flex-col gap-[24px] w-full !pb-[80px] sm:pb-0" style="min-height: calc(100vh - 80px)">
     <div class="block lg:hidden">
       <v-tabs v-model="state.currentFirstTab" fixed-tabs align-tabs="center" color="#0AB45A" height="60">
         <v-tab :value="item.value" v-for="item in state.tabList" style="font-size: 16px">
@@ -491,7 +491,7 @@ function handleClickChange(e) {
         @swiper="onSwiper"
       >
         <swiper-slide v-for="item in 7">
-          <div class="w-[302px] rounded-[6px] border border-solid border-[#666]">
+          <div class="w-[302px] rounded-[6px] border border-solid border-[#666]  ">
             <div class="!px-[10px] !py-[15px] flex items-center justify-between">
               <div class="flex items-center gap-[5px]">
                 <img src="@/assets/img/player.png" class="w-[15px] h-[15px]" />

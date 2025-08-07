@@ -5,6 +5,7 @@ import { api } from '@/apis'
 import { useToast } from 'vue-toastification';
 import { store } from '@/store';
 import dayjs from 'dayjs';
+import task_icon1 from '@/assets/img/task_icon1.svg'
 
 const state = reactive({
   tabList: [
@@ -197,7 +198,10 @@ function openLink(item) {
                     v-for="item in state.taskList"
                   >
                     <div class="flex items-center gap-[20px]">
-                      <img :src="item.image_url" class="w-[37px] h-[37px] rounded-full" />
+                      <img :src="item.image_url" class="w-[37px] h-[37px]" />
+                       <!-- <img :src="task_icon1" class="w-[37px] h-[37px]" /> -->
+                       <!-- <task_icon1/> -->
+                       <!-- <div v-html="task_icon1"></div> -->
                       <div class="flex flex-col gap-[10px]">
                         <div class="text-[#fff] text-[14px] leading-[14px]">
                           {{ item.title }}

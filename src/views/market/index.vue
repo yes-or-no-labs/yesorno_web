@@ -1,10 +1,15 @@
 <script setup>
-import { computed, onMounted, reactive, watch } from 'vue'
+import { computed, onMounted, reactive, ref, watch } from 'vue'
 import Segmented from '@/components/Segmented/index.vue'
 import { api } from '@/apis'
 import network from '@/utils/network'
 import { store } from '@/store'
 import { useRouter } from 'vue-router'
+import WebApp from '@twa-dev/sdk'
+import { Swiper, SwiperSlide } from 'swiper/vue'
+import { FreeMode } from 'swiper/modules'
+import 'swiper/css'
+import { useWindowResize } from '@/hooks/useWindowResize'
 
 const state = reactive({
   menuList: [
@@ -21,17 +26,23 @@ const state = reactive({
   pageSize: 10,
   dataList: [],
   currentTab: 4,
+  total:0,
   tabList: [
-    { title: 'Event Prediction', value: '1',path:'/market' },
-    { title: 'Price Prediction', value: '2',path:'/market_pricePrediction'},
+    { title: 'Event Prediction', value: '1', path: '/market' },
+    { title: 'Price Prediction', value: '2', path: '/market_pricePrediction' },
   ],
-  currentFirstTab:'1',
-  loadingState:null
+  currentFirstTab: '1',
+  loadingState: null,
 })
 
 onMounted(() => {
-  // loadMore()
-})
+  // console.log('onMounted',WebApp.initData);
+  if(WebApp.initData){
+    loadMore()
+  }
+});
+
+const { width } = useWindowResize()
 
 const router = useRouter()
 
@@ -41,44 +52,47 @@ const currenRoutePath = computed(() => {
   return router.currentRoute.value.fullPath
 })
 
-watch(()=>state.currentFirstTab,newVal=>{
-  const index = state.tabList.findIndex(item=>item.value == newVal)
-  if(currenRoutePath.value !== state.tabList[index].path){
-    router.push(state.tabList[index].path)
-  }
-})
+watch(
+  () => state.currentFirstTab,
+  (newVal) => {
+    const index = state.tabList.findIndex((item) => item.value == newVal)
+    if (currenRoutePath.value !== state.tabList[index].path) {
+      router.push(state.tabList[index].path)
+    }
+  },
+)
 
 function handleClickChange(e) {
   state.currentTab = e
-  loadMore(state.loadingState,true)
-} 
+  loadMore(state.loadingState, true)
+}
 
 const appStore = store.useAppStore()
 
 const env = computed(() => import.meta.env)
 
-
-async function loadMore($state,isRefresh) {
+async function loadMore($state, isRefresh) {
   console.log('onScroll', $state)
   state.loadingState = $state
   try {
-    if(isRefresh) state.pageNum = 1
+    if (isRefresh) state.pageNum = 1
     const res = await api.getMarketData({
       pageSize: state.pageSize,
       pageNum: state.pageNum,
       topic: '',
-      eventType: state.currentTab == 4?'':state.currentTab,
+      eventType: state.currentTab == 4 ? '' : state.currentTab,
     })
     console.log('getMarketData', res)
     if (res.success) {
+      state.total = res.obj.total
       for (const item of res.obj.result) {
-        if(item.conditionList.length == 1){
+        if (item.conditionList.length == 1) {
           item.progress = calcPercent(item.conditionList[0], 'yes')
         }
       }
-      if(isRefresh) {
+      if (isRefresh) {
         state.dataList = res.obj.result
-      }else{
+      } else {
         state.dataList = state.dataList.concat(res.obj.result)
       }
       if (Array.isArray(res.obj.result) && res.obj?.result.length < state.pageSize) {
@@ -116,6 +130,14 @@ function calcTotalPrice(list) {
   }
   return total
 }
+
+const onSwiper = (swiper) => {
+  const index = swiper.activeIndex
+  if(index == state.dataList.length - 4 && state.dataList.length<state.total){
+    loadMore()
+  }
+  // swiperEl.value = swiper
+}
 </script>
 
 <template>
@@ -123,14 +145,23 @@ function calcTotalPrice(list) {
     class="w-full min-h-screen !pb-[100px] max-w-[1300px] mx-auto !px-[10px] lg:!px-[38px] !pt-[20px]"
   >
     <div class="block lg:hidden">
-      <v-tabs v-model="state.currentFirstTab" fixed-tabs align-tabs="center" color="#0AB45A" height="60">
+      <v-tabs
+        v-model="state.currentFirstTab"
+        fixed-tabs
+        align-tabs="center"
+        color="#0AB45A"
+        height="60"
+      >
         <v-tab :value="item.value" v-for="item in state.tabList" style="font-size: 16px">
           <span>{{ item.title }}</span></v-tab
         >
       </v-tabs>
     </div>
-      
-    <div class="w-full h-auto lg:h-[58px] block lg:flex items-center justify-between !mt-[20px]">
+
+    <div
+      class="w-full h-auto lg:h-[58px] block lg:flex items-center justify-between !mt-[20px]"
+      v-if="!WebApp.initData"
+    >
       <!-- <div class="flex items-center gap-[35px]">
         <div
           class="text-[15px] text-[#fff] cursor-pointer"
@@ -142,11 +173,7 @@ function calcTotalPrice(list) {
         </div>
       </div> -->
 
-      <Segmented
-        :options="state.menuList"
-        @change="handleClickChange"
-        :value="state.currentTab"
-      />
+      <Segmented :options="state.menuList" @change="handleClickChange" :value="state.currentTab" />
       <div class="w-full !mt-[10px] lg:!mt-0 lg:w-auto flex items-center gap-[16px]">
         <div
           class="flex-1 lg:w-auto flex items-center border border-solid border-[#22242D] !rounded-[40px] overflow-hidden"
@@ -195,6 +222,7 @@ function calcTotalPrice(list) {
     <div class="relative">
       <div
         class="w-full flex flex-col lg:grid lg:grid-cols-3 gap-[16px] !pt-[20px] overflow-y-auto"
+        v-if="!WebApp.initData"
       >
         <div
           class="rounded-[20px] border border-solid !border-[#FFFFFF80] !p-[15px] cursor-pointer boxItem"
@@ -330,9 +358,173 @@ function calcTotalPrice(list) {
           </div>
         </div>
       </div>
+
+
+      <!-- tg -->
+      <div class="!mt-[20px]" v-else>
+        <swiper
+          :slidesPerView="1.1"
+          :spaceBetween="10"
+          :freeMode="false"
+          :centered-slides="true"
+          :loop="false"
+          @slideChange="onSwiper"
+          :watch-overflow="true"
+        >
+          <swiper-slide v-for="item in state.dataList">
+            <div
+              class="min-h-[80%] h-[80%] rounded-[20px] border border-solid !border-[#FFFFFF80] !p-[15px] flex flex-col gap-[20px]"
+            >
+              <div class="flex justify-between items-center">
+                <div
+                  class="!py-[5px] !px-[8px] border-[0.5px] border-solid !border-[#fff] rounded-[4px] text-[#fff] text-[12px] leading-[12px]"
+                >
+                  Trending
+                </div>
+                <!-- <div>
+              <v-btn icon="mdi-dots-horizontal" variant="text"></v-btn>
+              </div> -->
+              </div>
+
+              <div class="flex items-center gap-[20px]">
+                <img :src="item.imgUrl" class="w-[58px] h-[58px] rounded-[8px] object-cover" />
+                <div class="flex flex-col gap-[5px]">
+                  <div
+                    class="text-[#fff] text-[16px] font-bold leading-[20px] line-clamp-3"
+                    style="font-family: 'Inter'"
+                  >
+                    {{ item.topic }}
+                  </div>
+                </div>
+              </div>
+              <div
+                class="flex items-center justify-center my-[10px]"
+                v-if="item.conditionList.length == 1"
+              >
+                <div class="relative">
+                  <v-progress-circular
+                    :model-value="item.progress"
+                    :size="137"
+                    :width="10"
+                    bg-color="#fff"
+                    color="#6DDD25"
+                  >
+                    <div
+                      class="text-[#6DDD25] text-[38px] font-bold absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]"
+                    >
+                      {{ item.progress }}%
+                    </div>
+                  </v-progress-circular>
+                </div>
+              </div>
+              <div class="w-[137px] h-[137px]" v-else></div>
+              <div
+                class="!mt-[12px] h-[98px] flex flex-col items-center gap-[10px] !px-[15px]"
+                v-if="item.conditionList.length == 1"
+              >
+                <div
+                  class=" w-full rounded-[10px] !py-[12px] !px-[15px] flex justify-between gap-[5px] cursor-pointer"
+                  style="background: rgba(255, 255, 255, 0.05)"
+                  v-ripple
+                  @click.stop="() => console.log('Yes clicked')"
+                >
+                  <div
+                    class="text-[#6DDD25] text-[14px] leading-[14px] select-none"
+                    style="font-family: Inter"
+                  >
+                    Yes
+                  </div>
+                  <div
+                    class="text-[#787878] text-[12px] leading-[12px] select-none"
+                    style="font-family: Inter"
+                  >
+                    {{ calcPercent(item.conditionList[0], 'yes') }} ¢
+                  </div>
+                </div>
+                <div
+                  class="w-full rounded-[10px] !py-[12px] !px-[15px] flex justify-between gap-[5px] cursor-pointer"
+                  style="background: rgba(255, 255, 255, 0.05)"
+                  v-ripple
+                  @click.stop="() => console.log('No clicked')"
+                >
+                  <div
+                    class="text-[#E72F2F] text-[14px] leading-[14px] select-none"
+                    style="font-family: Inter"
+                  >
+                    No
+                  </div>
+                  <div
+                    class="text-[#787878] text-[12px] leading-[12px] select-none"
+                    style="font-family: Inter"
+                  >
+                    {{ calcPercent(item.conditionList[0], 'no') }} ¢
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="h-[98px] w-full overflow-y-auto !mt-[12px] flex flex-col gap-[12px]"
+                v-else
+              >
+                <div
+                  class="w-full flex items-center gap-[8px]"
+                  v-for="item1 in item.conditionList"
+                  :key="item1.conditionId"
+                >
+                  <div class="flex-1 relative rounded-[8px] overflow-hidden">
+                    <div class="flex-1 flex items-center gap-[12px] !px-[4px]">
+                      <div class="text-[14px] text-[#F5F5F6] flex-1 truncate w-[40px]">
+                        {{ item1.conditionDesc }}
+                      </div>
+                      <div class="text-[14px] text-[#F5F5F6]">{{ calcPercent(item1, 'yes') }}%</div>
+                    </div>
+                    <div
+                      class="h-full absolute left-0 top-0 bg-[#ffffff33]"
+                      :style="`width: ${calcPercent(item1, 'yes')}%;`"
+                    ></div>
+                  </div>
+                  <div class="flex-[0.8] flex items-center gap-[5px]">
+                    <div
+                      class="h-[24px] rounded-[8px] text-[14px] bg-[#1A1A1E] text-[#6DDD25] flex-1 flex justify-center items-center hover:bg-[rgb(109,221,37,.5)]"
+                      v-ripple
+                    >
+                      Yes
+                    </div>
+                    <div
+                      class="h-[24px] rounded-[8px] text-[14px] bg-[#1A1A1E] text-[#E72F2F] flex-1 flex justify-center items-center hover:bg-[rgb(231,47,47,.5)]"
+                      v-ripple
+                    >
+                      No
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="flex items-center justify-between">
+                <div class="text-[16px] text-[#787878]">
+                  RTG:{{ $formatAmount(calcTotalPrice(item.conditionList)) }}
+                  {{ network[env.VITE_APP_CHAIN].Denomination }}
+                </div>
+                <!-- <v-icon icon="mdi-star-outline" size="20" class="cursor-pointer" /> -->
+                <img src="@/assets/img/star.png" class="w-[20px] h-[20px] cursor-pointer" />
+              </div>
+            </div>
+            
+          </swiper-slide>
+          <swiper-slide v-if="state.dataList.length==0">
+            <v-skeleton-loader
+              class="mx-auto w-full !rounded-[20px] border border-solid border-[#fff]"
+              type="card, actions"
+              height="467"
+              max-height="467"
+            >
+            </v-skeleton-loader>
+          </swiper-slide>
+        </swiper>
+      </div>
+
       <div
         class="w-full flex flex-col lg:grid lg:grid-cols-3 gap-[16px] !pt-[20px] overflow-y-auto absolute lg:top-[150px] left-[50%] top-0 translate-x-[-50%] max-w-[1300px]"
-        v-show="state.dataList == 0"
+        v-show="state.dataList == 0 && !WebApp.initData"
       >
         <v-skeleton-loader
           class="mx-auto w-full !rounded-[20px] border border-solid border-[#fff]"
@@ -345,7 +537,7 @@ function calcTotalPrice(list) {
       </div>
     </div>
 
-    <infinite-loading @infinite="loadMore">
+    <infinite-loading @infinite="loadMore" v-if="!WebApp.initData">
       <template #spinner>
         <div class="text-center !mt-[20px]">Loading...</div>
       </template>
@@ -368,4 +560,11 @@ function calcTotalPrice(list) {
   translate: 0px -1px;
   box-shadow: 0px 0px 6px 4px #69db2740;
 }
+
+.line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
 </style>
