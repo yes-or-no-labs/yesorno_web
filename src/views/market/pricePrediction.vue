@@ -18,12 +18,17 @@ import pricePrediction_select2 from '@/assets/img/pricePrediction_select2.png'
 import pricePrediction_select3 from '@/assets/img/pricePrediction_select3.png'
 import pricePrediction_select4 from '@/assets/img/pricePrediction_select4.png'
 import { useRouter } from 'vue-router'
+import PriceMarketAbi from '@/abi/PriceMarket.json'
+import { store } from '@/store'
+import network from '@/utils/network'
+import { AbiCoder } from 'ethers'
+import { parseAbiItem } from 'viem'
 
 const state = reactive({
   curTabIndex: 0,
   tabList: [{ title: 'TradingView chart' }, { title: 'AI Prediction' }],
   currentPrice: 0,
-  menuList: [{ symbol: 'BTCUSDT' }, { symbol: 'ETHUSDT' }],
+  menuList: [],
   selectSymbolIndex: 0,
   tabbarList: [
     { icon: pricePrediction_icon1, selectIcon: pricePrediction_select1, value: 1 },
@@ -37,11 +42,17 @@ const state = reactive({
     { title: 'Price Prediction', value: '2',path:'/market_pricePrediction'},
   ],
   currentFirstTab:'2',
+  priceMarketContract:null,
+  roundsList:[]
 })
 
 const segmentedRef = ref(null)
+const appStore = store.useAppStore()
 
-onMounted(() => {})
+onMounted(async () => {
+  await initControlContract()
+  getActiveAssets()
+})
 
 const swiperInstance = ref(null)
 
@@ -69,6 +80,58 @@ function getCurrentPrice(e) {
   state.currentPrice = e.price
 }
 
+async function initControlContract() {
+  state.priceMarketContract = await appStore.initErc20ContractSign(
+    network[import.meta.env.VITE_APP_CHAIN].priceMarketContract,
+    PriceMarketAbi.abi,
+  )
+  console.log('initControlContract',network[import.meta.env.VITE_APP_CHAIN].priceMarketContract);
+}
+
+async function getActiveAssets() {
+  const activeAssetIds = await state.priceMarketContract.getActiveAssets();
+  for (const item of activeAssetIds) {
+    console.log('getActiveAssets',Number(item));
+    getAsset(Number(item))
+  }
+}
+
+async function getAsset(id) {
+  const assetInfo = await state.priceMarketContract.getAsset(id);
+  console.log('getAsset',assetInfo);
+  if(assetInfo[2]){
+    const arr = assetInfo[0].split('/')
+    state.menuList.push({
+      id,
+      symbol:arr[0]+arr[1]+'T',
+      minPrice:appStore.formatUnits(assetInfo[3])
+    })
+    console.log('state.menuList',state.menuList);
+    getRounds()
+  }
+}
+
+async function getRounds() {
+  const round = await state.priceMarketContract.rounds(state.menuList[state.selectSymbolIndex].id,1);
+  console.log('getRounds',round);
+  state.roundsList.push({
+    epoch:Number(round[0]), // 轮次编号
+    startTimestamp:Number(round[1]), // 开始时间戳
+    lockTimestamp:Number(round[2]), // 锁定时间戳
+    closeTimestamp:Number(round[3]), // 结束时间戳
+    lockPrice:Number(round[4]), // 锁定价格
+    closePrice:Number(round[5]),  // 结算价格
+    lockOracleId:Number(round[6]),  // 锁定时预言机轮次ID
+    closeOracleId:Number(round[7]), // 结算时预言机轮次ID
+    totalAmount:Number(round[8]), //总投注金额
+    bullAmount:Number(round[9]),  // 看涨总金额
+    bearAmount:Number(round[10]), // 看跌总金额
+    rewardBaseCalAmount:Number(round[11]),  //奖励基础计算金额
+    rewardAmount:Number(round[12]), // 总奖励金额
+    oracleCalled:round[13], // 是否已调用预言机
+  })
+}
+
 const { width } = useWindowResize()
 
 function filterPerview() {
@@ -81,10 +144,15 @@ function handleClickChange(e) {
 
   // (e) => (state.currentTab = e)
 }
+
+function handleClickMenu(index) {
+  state.selectSymbolIndex = index
+  getRounds()
+}
 </script>
 
 <template>
-  <div class="flex flex-col gap-[24px] w-full !pb-[80px] sm:pb-0" style="min-height: calc(100vh - 80px)">
+  <div class="flex flex-col gap-[24px] w-full !pb-[80px] sm:!pb-0" style="height: calc(100vh - 80px)">
     <div class="block lg:hidden">
       <v-tabs v-model="state.currentFirstTab" fixed-tabs align-tabs="center" color="#0AB45A" height="60">
         <v-tab :value="item.value" v-for="item in state.tabList" style="font-size: 16px">
@@ -110,7 +178,7 @@ function handleClickChange(e) {
                   class="text-[#fff] lg:text-[14px] text-[16px] font-[600] cursor-pointer whitespace-nowrap flex items-center"
                   v-bind="props"
                 >
-                  <div>{{ state.menuList[state.selectSymbolIndex].symbol }}</div>
+                  <div>{{ state.menuList[state.selectSymbolIndex]?.symbol }}</div>
                   <v-icon icon="mdi-menu-down" />
                 </div>
               </template>
@@ -119,13 +187,13 @@ function handleClickChange(e) {
                   v-for="(item, index) in state.menuList"
                   :key="index"
                   :value="index"
-                  @click="state.selectSymbolIndex = index"
+                  @click="handleClickMenu(index)"
                 >
                   <v-list-item-title>{{ item.symbol }}</v-list-item-title>
                 </v-list-item>
               </v-list>
             </v-menu>
-            <div class="text-[#6DDD25] text-[24px] font-[600]">${{ state.currentPrice }}</div>
+            <div class="text-[#6DDD25] text-[24px] font-[600]">${{ $formatAmount(state.currentPrice) }}</div>
           </div>
         </div>
 
@@ -365,13 +433,13 @@ function handleClickChange(e) {
     <div class="sm:hidden flex" v-if="state.currentTab == 2" style="height: calc(100vh - 172px)">
       <tvChart
         @currentPrice="getCurrentPrice"
-        :symbol="state.menuList[state.selectSymbolIndex].symbol"
+        :symbol="state.menuList[state.selectSymbolIndex]?.symbol"
       />
     </div>
     <div class="sm:hidden flex" v-if="state.currentTab == 3" style="height: calc(100vh - 172px)">
       <AiComponent
         :currentPrice="state.currentPrice"
-        :symbol="state.menuList[state.selectSymbolIndex].symbol"
+        :symbol="state.menuList[state.selectSymbolIndex]?.symbol"
       />
     </div>
     <div class="sm:flex-1 sm:block hidden">
@@ -384,14 +452,14 @@ function handleClickChange(e) {
           >
             <img src="@/assets/img/bsc.png" class="w-[28px] h-[28px]" />
           </div>
-          <div class="flex-col gap-[10px]">
+          <div class="flex-col gap-[10px] min-w-[120px]">
             <v-menu transition="scale-transition" :offset="[10, 0]">
               <template v-slot:activator="{ props }">
                 <div
                   class="text-[#fff] lg:text-[14px] text-[16px] font-[600] cursor-pointer whitespace-nowrap flex items-center"
                   v-bind="props"
                 >
-                  <div>{{ state.menuList[state.selectSymbolIndex].symbol }}</div>
+                  <div>{{ state.menuList[state.selectSymbolIndex]?.symbol }}</div>
                   <v-icon icon="mdi-menu-down" />
                 </div>
               </template>
@@ -406,7 +474,7 @@ function handleClickChange(e) {
                 </v-list-item>
               </v-list>
             </v-menu>
-            <div class="text-[#6DDD25] text-[24px] font-[600]">${{ state.currentPrice }}</div>
+            <div class="text-[#6DDD25] text-[24px] font-[600]">${{ $formatAmount(state.currentPrice) }}</div>
           </div>
         </div>
 
@@ -672,14 +740,14 @@ function handleClickChange(e) {
       <div class="flex-1 flex" v-show="state.curTabIndex == 0">
         <tvChart
           @currentPrice="getCurrentPrice"
-          :symbol="state.menuList[state.selectSymbolIndex].symbol"
+          :symbol="state.menuList[state.selectSymbolIndex]?.symbol"
         />
       </div>
 
       <div class="w-[1200px] mx-auto" v-show="state.curTabIndex == 1">
         <AiComponent
           :currentPrice="state.currentPrice"
-          :symbol="state.menuList[state.selectSymbolIndex].symbol"
+          :symbol="state.menuList[state.selectSymbolIndex]?.symbol"
         />
       </div>
     </div>

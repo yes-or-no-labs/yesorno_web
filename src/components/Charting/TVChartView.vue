@@ -53,11 +53,11 @@ const props = defineProps({
 const chartContainer = ref()
 let chartWidget
 
-onMounted(() => {
-  nextTick(() => {
-    initView()
-  })
-})
+// onMounted(() => {
+//   nextTick(() => {
+//     initView()
+//   })
+// })
 
 onUnmounted(() => {
   closeBinanceSocket()
@@ -113,6 +113,7 @@ const Resolutions = {
 // })
 
 watch(()=> props.symbol, (newVal,oldVal) => {
+  initView()
   if(oldVal){
     state.chartWidget.onChartReady(() => {
       console.log('onChartReady')
