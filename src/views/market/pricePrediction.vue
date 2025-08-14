@@ -104,7 +104,8 @@ async function getAsset(id) {
     state.menuList.push({
       id,
       symbol:arr[0]+arr[1]+'T',
-      minPrice:appStore.formatUnits(assetInfo[3])
+      minPrice:appStore.formatUnits(assetInfo[3]),
+      currentEpoch:Number(assetInfo[6])
     })
     console.log('state.menuList',state.menuList);
     getRounds()
@@ -112,7 +113,7 @@ async function getAsset(id) {
 }
 
 async function getRounds() {
-  const round = await state.priceMarketContract.rounds(state.menuList[state.selectSymbolIndex].id,1);
+  const round = await state.priceMarketContract.rounds(state.menuList[state.selectSymbolIndex].id,state.menuList[state.selectSymbolIndex].currentEpoch);
   console.log('getRounds',round);
   state.roundsList.push({
     epoch:Number(round[0]), // 轮次编号
