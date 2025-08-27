@@ -84,6 +84,8 @@ function handleClickCopy() {
 }
 
 function openLink(item) {
+    console.log('openLink');
+    
   if (item.action_type === 'ai_prediction') {
     const url = location.origin + `/ai_predictions`
     window.open(url, '_blank')
