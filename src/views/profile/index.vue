@@ -73,7 +73,7 @@ async function getUserBetRecord($state) {
 </script>
 
 <template>
-  <div class="w-full relative min-h-screen">
+  <div class="w-full relative min-h-screen !pb-[60px] lg:!pb-0">
     <!-- <img
       src="@/assets/img/leaderboard_bg1.png"
       class="w-full h-[448px] absolute top-0 left-0 object-cover"

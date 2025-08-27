@@ -112,7 +112,7 @@ async function getTokenBalance() {
       class="hidden lg:flex max-w-[1440px] mx-auto items-center justify-between !px-[32px] h-full gap-[70px]"
     >
       <div class="flex items-center lg:gap-[40px] gap-[25px] h-full">
-        <div class="flex items-center lg:gap-[20px] gap-[40px] cursor-pointer" @click="$router.push('/')">
+        <div class="flex items-center lg:gap-[20px] gap-[40px] cursor-pointer w-[120px] h-[30px] lg:w-[160px] lg:h-[40px]" @click="$router.push('/')">
           <img src="@/assets/img/logo.png" mode="scaleToFill" class="w-[120px] h-[30px] lg:w-[160px] lg:h-[40px]" />
           <!-- <div class="flex flex-col gap-[5px]">
             <div class="text-[#fff] text-[24px] leading-[24px]">Yesorno.Fun</div>
@@ -153,6 +153,14 @@ async function getTokenBalance() {
             </v-list-item>
           </v-list>
         </v-menu>
+        <div
+          class="text-[#fff] lg:text-[14px] text-[16px] font-[600] cursor-pointer whitespace-nowrap"
+          style="font-family: Geist"
+          @click="$router.push('/ai_predictions')"
+          :class="currenRoutePath=== '/ai_predictions'?'!text-[#6DDD25]':''"
+        >
+          AI Predictions
+        </div>
         <div
           class="text-[#fff] lg:text-[14px] text-[16px] font-[600] cursor-pointer"
           style="font-family: Geist"
@@ -220,7 +228,7 @@ async function getTokenBalance() {
             </div>
           </div>
         </div>
-        <div class="flex-1" v-show="appStore.tomeState.curWalletAddress&&appStore.tomeState.token">
+        <div class="w-[50px] h-[50px]" v-show="appStore.tomeState.curWalletAddress&&appStore.tomeState.token">
           <v-menu transition="scale-transition" :offset="[10, 0]" >
           <template v-slot:activator="{ props }">
             <div

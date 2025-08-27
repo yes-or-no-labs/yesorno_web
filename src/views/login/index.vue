@@ -1,5 +1,5 @@
 <script setup>
-import { computed, reactive } from 'vue'
+import { computed, onMounted, reactive } from 'vue'
 import backpackImg from '@/assets/img/backpack.png'
 import hahaImg from '@/assets/img/haha.png'
 import metamaskImg from '@/assets/img/metamask.png'
@@ -7,7 +7,7 @@ import coinbaseImg from '@/assets/img/coinbase.png'
 import okxImg from '@/assets/img/okx.png'
 import phantomImg from '@/assets/img/phantom.png'
 import { store } from '@/store'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useToast } from "vue-toastification";
 import { ethers } from 'ethers'
 import { api } from '@/apis'
@@ -46,12 +46,19 @@ const state = reactive({
     // },
   ],
   checkTerms:false,
-  curRdns:''
+  curRdns:'',
+  inviteCode:''
 })
 
 const appStore = store.useAppStore()
 const router = useRouter()
 const toast = useToast();
+const route = useRoute()
+
+onMounted(()=>{
+  console.log('route',route);
+  state.inviteCode = route.query.inviteCode
+})
 
 
 async function connectWallet(item) {
@@ -122,7 +129,7 @@ async function getSignatrue() {
       if(res.success){
         appStore.onUpdateToken('bearer '+res.obj.accessToken)
         appStore.onUpdateRefreshToken(res.obj.refreshToken)
-        await appStore.getUserInfo()
+        await appStore.getUserInfo(state.inviteCode)
         router.push('/')
       }else{
         toast.error(res.msg || 'Login failed, please try again.')

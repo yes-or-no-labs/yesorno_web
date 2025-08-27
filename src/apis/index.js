@@ -40,7 +40,7 @@ export const api = {
   login: (data) => baseHttp({url:"/v1/login/login",method: 'POST', data}),
   logout: () => baseHttp({url:"/v1/login/logout",method: 'POST'}),
   refreshToken: (data) => refreshHttp({url:"/v1/login/refresh_token",method: 'POST',data}),
-  getUserInfo: () => baseHttp({url:"/v1/users/info",method: 'GET',}),
+  getUserInfo: (params) => baseHttp({url:"/v1/users/info",method: 'GET',params}),
   updateUserInfo: (data) => baseHttp({url:"/v1/users/update",method: 'POST',data}),
   getMarketData: (params) => baseHttp({url:"/v1/guess/list",method: 'GET',params}),
   getMarketInfo: (params) => baseHttp({url:"/v1/guess/detail",method: 'GET',params}),
@@ -64,4 +64,10 @@ export const api = {
   getUserinfobyAddress: (params) => baseHttp({url:"/v1/users/infobyaddress",method: 'GET',params}),
   getPointRecord: (params) => baseHttp({url:"/v1/user/point-records/list",method: 'GET',params}),
   getPointRank: (params) => baseHttp({url:"/v1/users/pointRank",method: 'GET',params}),
+  getAssetEvents: (params) => baseHttp({url:"/v1/price_prediction/asset_events",method: 'GET',params}),
+  getRounds: (params) => baseHttp({url:"/v1/price_prediction/rounds",method: 'GET',params}),
+  getPointTaskList: (params) => baseHttp({url:"/v1/ai/points/tasks",method: 'GET',params}),
+  getInviteList: (params) => baseHttp({url:"/v1/users/invite/users",method: 'GET',params}),
+  claimPointTask: (data) => baseHttp({url:"/v1/ai/points/tasks/claim",method: 'POST',data}),
 }
+

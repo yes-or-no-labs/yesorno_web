@@ -76,7 +76,7 @@ export default {
     },
 
     changeHandler(item, ev) {
-      if (item.disabled) return
+      if (item?.disabled) return
       // this.w = ev.target.clientWidth + this.offset * 2
       // this.x = ev.target.offsetLeft - this.offset
       this.w = ev.clientWidth + this.offset * 2

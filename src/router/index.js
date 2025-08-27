@@ -51,6 +51,10 @@ const router = createRouter({
       path: '/report',
       name: 'Report',
       component: () => import('../views/report/index.vue'),
+    },{
+      path: '/ai_predictions',
+      name: 'Predictions',
+      component: () => import('../views/aiPredictions/index.vue'),
     },
   ],
   scrollBehavior(to, from, savedPosition) {

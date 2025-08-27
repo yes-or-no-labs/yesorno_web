@@ -29,7 +29,7 @@ export default function createRequest(options) {
         ...config.params,
       }
       // config.headers['chainId'] = config.params.chainId ? config.params.chainId : user.chainId || 1
-      removeEmptyKey(config.data)
+      removeEmptyKey(config.params)
     }
 
     if (['post', 'POST'].includes(config.method)) {

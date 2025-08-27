@@ -5,7 +5,6 @@ import * as util_base from '@/utils/kiwi/util_base'
 import { ethers } from 'ethers'
 import { constant } from '@/utils/constant.js'
 import * as uniapp from '@/utils/uni-app'
-import { blackList } from '../utils/blackList'
 import { defineStore } from 'pinia'
 import { api } from '@/apis'
 
@@ -148,7 +147,7 @@ export const store = {
         mStateSimple.metamaskProvider = metamaskProvider
         console.log('metamaskProvider>>>>>>>', metamaskProvider)
         tomeState.hasProvider = true
-        console.log('getSign', tomeState.token, tomeState.signMessage, tomeState.userInfo)
+        // console.log('getSign', tomeState.token, tomeState.signMessage, tomeState.userInfo)
         const provider = new ethers.BrowserProvider(metamaskProvider)
         // 等待 provider 初始化完成
         // await provider.ready
@@ -226,8 +225,26 @@ export const store = {
           tomeState.isLoading = false
         }
       },
-      async getUserInfo() {
-        const res = await api.getUserInfo()
+      async getBlockInfo() {
+        try {
+          const provider = new ethers.BrowserProvider(mStateSimple.metamaskProvider)
+
+          const block = await provider.getBlock('latest')
+          return {
+            timestamp: block.timestamp,
+            readableTime: new Date(block.timestamp * 1000).toLocaleString(),
+            blockNumber: block.number
+          };
+        } catch (error) {
+          console.error(error);
+        }
+      },
+      async getUserInfo(code) {
+        console.log('getUserInfo',code);
+        
+        const res = await api.getUserInfo({
+          invite_code:code
+        })
         console.log('getUserInfo',res);
         if (res.success) {
           this.onUpdateUserInfo(res.obj.userInfo)

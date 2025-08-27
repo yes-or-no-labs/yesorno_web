@@ -85,4 +85,5 @@ function handleClickTap(item) {
       </div>
     </div>
   </div>
+  <div class="w-full h-[60px] block lg:hidden"></div>
 </template>
