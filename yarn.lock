@@ -992,7 +992,7 @@
     "@tailwindcss/oxide" "4.1.12"
     tailwindcss "4.1.12"
 
-"@twa-dev/sdk@^8.0.2":
+"@twa-dev/sdk@^8.0.1":
   version "8.0.1"
   resolved "https://registry.npmmirror.com/@twa-dev/sdk/-/sdk-8.0.1.tgz#c34119c0822a2b5583a201ccd1e755efe39b55e1"
   integrity sha512-mBR5dnAvSyRx7YGt/n0Owq1z8MsWhsuh76JD1abV0TZWHi6RQSPXBNAG0XMOMO7Vf5hsAwUTul+x54vf43Ku0A==
