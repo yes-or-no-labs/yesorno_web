@@ -276,8 +276,8 @@ function closeBinanceSocket() {
 </script>
 
 <template>
-  <div class="w-[1200px] mx-auto !py-[30px] flex flex-col gap-[20px]">
-    <div class="flex items-center justify-between">
+  <div class="w-[90%] lg:w-[80%] mx-auto !py-[30px] flex flex-col gap-[20px]">
+    <div class="flex lg:items-center justify-between flex-col gap-[10px] lg:flex-row">
       <div class="flex items-center gap-[10px]">
         <div
           class="w-[48px] h-[48px] rounded-[4px] bg-[#6DDD2526] flex items-center justify-center"
@@ -319,9 +319,9 @@ function closeBinanceSocket() {
         :value="state.currentTab"
       />
     </div>
-    <div class="w-full flex items-center gap-[20px]">
+    <div class="w-full flex items-center gap-[20px] flex-col lg:flex-row">
       <div
-        class="flex-1 !px-[10px] !py-[20px] border border-solid !border-[#FFFFFF80] rounded-[4px]"
+        class="w-full !px-[10px] !py-[20px] border border-solid !border-[#FFFFFF80] rounded-[4px]"
       >
         <div class="flex items-center justify-between w-full">
           <div class="flex items-center gap-[10px]">
@@ -347,7 +347,7 @@ function closeBinanceSocket() {
         </div>
       </div>
       <div
-        class="flex-1 !px-[10px] !py-[20px] border border-solid !border-[#FFFFFF80] rounded-[4px]"
+        class="w-full !px-[10px] !py-[20px] border border-solid !border-[#FFFFFF80] rounded-[4px]"
       >
         <div class="flex items-center justify-between w-full">
           <div class="flex items-center gap-[10px]">
@@ -373,7 +373,7 @@ function closeBinanceSocket() {
         </div>
       </div>
       <div
-        class="flex-1 !px-[10px] !py-[20px] border border-solid !border-[#FFFFFF80] rounded-[4px]"
+        class="w-full !px-[10px] !py-[20px] border border-solid !border-[#FFFFFF80] rounded-[4px]"
       >
         <div class="flex items-center justify-between w-full">
           <div class="flex items-center gap-[10px]">
@@ -506,15 +506,15 @@ function closeBinanceSocket() {
         <div class="w-full flex items-center !mt-[10px]">
           <div class="flex-1 flex items-center justify-center flex-col">
             <div class="text-[#fff] text-[24px] font-bold">{{state.recordList.length}}</div>
-            <div class="text-[#666] text-[14px]">Total Predictions</div>
+            <div class="text-[#666] text-[12px] lg:text-[14px]">Total</div>
           </div>
           <div class="flex-1 flex items-center justify-center flex-col">
             <div class="text-[#fff] text-[24px] font-bold">{{calcRigthNum}}</div>
-            <div class="text-[#666] text-[14px]">Correct</div>
+            <div class="text-[#666] text-[12px] lg:text-[14px]">Correct</div>
           </div>
           <div class="flex-1 flex items-center justify-center flex-col">
             <div class="text-[#fff] text-[24px] font-bold">{{calcActiveNum}}</div>
-            <div class="text-[#666] text-[14px]">Active</div>
+            <div class="text-[#666] text-[12px] lg:text-[14px]">Active</div>
           </div>
         </div>
       </div>
