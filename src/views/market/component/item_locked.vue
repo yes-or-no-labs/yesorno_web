@@ -178,13 +178,15 @@ watch(()=>props.item,()=>{
         return
     }
     const diff = props.item.endTimestamp - now
+    // console.log('diff',diff);
+    
     state.timeCount = 300 - diff
-    state.timer = setInterval(() => {
-        state.timeCount ++
-        if(state.timeCount == 300){
-            clearInterval(state.timer)
-        }
-    }, 1000);
+    // state.timer = setInterval(() => {
+    //     state.timeCount ++
+    //     if(state.timeCount == 300){
+    //         clearInterval(state.timer)
+    //     }
+    // }, 1000);
 })
 
 const lockPriceCom = computed(()=>{

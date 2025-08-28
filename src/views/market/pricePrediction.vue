@@ -114,7 +114,7 @@ watch(
     const now = Math.floor(new Date().getTime() / 1000)
     for (const item of state.roundsList) {
       if (item.status == 'started') {
-        console.log('started', item.lockTimestamp, now)
+        // console.log('started', item.lockTimestamp, now)
         if (item.lockTimestamp < now) {
           state.timeCount = 0
           return
