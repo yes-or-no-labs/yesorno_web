@@ -4,12 +4,12 @@ import network from '@/utils/network'
 import { computed, onMounted, onUnmounted, reactive, watch } from 'vue'
 import Segmented from '@/components/Segmented/index.vue'
 import AiComponent from '@/components/Ai/index.vue'
-import icon_bullish from '@/assets/img/ai_icon4.png'
-import icon_bearish from '@/assets/img/ai_icon6.png'
+import icon_up from '@/assets/img/ai_icon4.png'
+import icon_down from '@/assets/img/ai_icon6.png'
 import icon_neutral from '@/assets/img/ai_icon7.png'
 import { constant } from '@/utils/constant'
 import dayjs from 'dayjs'
-import { useToast } from "vue-toastification";
+import { useToast } from 'vue-toastification'
 
 const state = reactive({
   menuList: [],
@@ -32,6 +32,7 @@ const state = reactive({
     : [],
   spotSocket: null,
   klineData: null,
+  timer: null,
 })
 
 onMounted(async () => {
@@ -39,27 +40,32 @@ onMounted(async () => {
   await getAssetEvents()
   getData()
   getEndPrice()
+
+  state.timer = setInterval(() => {
+    getData()
+  }, 5000)
 })
 
 onUnmounted(() => {
   closeBinanceSocket()
+  clearInterval(state.timer)
 })
 
-watch(
-  () => state.recordList,
-  () => {
-    getEndPrice()
-  },
-)
+// watch(
+//   () => state.recordList,
+//   () => {
+//     getEndPrice()
+//   },{ deep: true }
+// )
 
-const calcRigthNum = computed(()=>{
-    const arr = state.recordList.filter(item=>item.isRight)
-    return arr.length
+const calcRigthNum = computed(() => {
+  const arr = state.recordList.filter((item) => item.isRight)
+  return arr.length
 })
 
-const calcActiveNum = computed(()=>{
-    const arr = state.recordList.filter(item=>item.diff>0)
-    return arr.length
+const calcActiveNum = computed(() => {
+  const arr = state.recordList.filter((item) => item.diff > 0)
+  return arr.length
 })
 
 async function getHistoryPrice(item) {
@@ -75,35 +81,51 @@ async function getHistoryPrice(item) {
   const res = await response.json()
   console.log('getHistoryPrice', res)
   item.endPrice = parseFloat(res[res.length - 1][4])
-  if(item.direction == 'bullish' && Number(item.targetPrice)<=Number(item.endPrice)){
-        item.isRight = true
-    }else if(item.direction == 'bearish' && Number(item.targetPrice)>=Number(item.endPrice)){
-        item.isRight = true
-    }else{
-        item.isRight = false
-    }
+  if (item.direction == 'up' && Number(item.targetPrice) <= Number(item.endPrice)) {
+    item.isRight = true
+    createPredictions('correct')
+  } else if (item.direction == 'down' && Number(item.targetPrice) >= Number(item.endPrice)) {
+    item.isRight = true
+    createPredictions('correct')
+  } else {
+    item.isRight = false
+    createPredictions('incorrect')
+  }
   localStorage.setItem(constant.predictionRecordKey, JSON.stringify(state.recordList))
+}
+
+async function createPredictions(status) {
+  try {
+    const res = await api.createPredictions({
+      status
+    })
+    console.log('createPredictions', res)
+  } catch (error) {
+    console.error(error)
+  }
 }
 
 function getEndPrice() {
   for (const item of state.recordList) {
     console.log('getEndPrice', item)
-    if (item.endPrice) return
-    const now = new Date().getTime()
-    const time = item.time + item?.interval * 1000
-    item.diff = time - now
-    if (item.diff > 0) {
-      item.timer = setInterval(() => {
-        item.diff--
-        if (item.diff == 0) {
-          getHistoryPrice(item)
-          clearInterval(item.timer)
-        }
-      }, 1000)
-      return
-    }
-    if (item.diff < 0) {
-      getHistoryPrice(item)
+    // if (item.endPrice) break
+    if (!item.endPrice) {
+      const now = new Date().getTime()
+      const time = item.time + item?.interval * 1000
+      item.diff = time - now
+      if (item.diff > 0) {
+        item.timer = setInterval(() => {
+          item.diff--
+          if (item.diff == 0) {
+            getHistoryPrice(item)
+            clearInterval(item.timer)
+          }
+        }, 1000)
+        // return
+      }
+      if (item.diff < 0) {
+        getHistoryPrice(item)
+      }
     }
   }
 }
@@ -141,10 +163,11 @@ async function getData() {
     )
     const res = await response.json()
     // console.log(`Health test response: ${JSON.stringify(res, null, 2)}`)
-    // console.log('getData', res)
-    if (res.success) {
-      state.dataObj = res.data
-    }
+    console.log('getData', res)
+    // if (res.success) {
+    //   state.dataObj = res
+    // }
+    state.dataObj = res
   } catch (error) {
     console.log(`Health test error: ${error.message}`)
   }
@@ -168,10 +191,10 @@ function filterDirectionImg(dire) {
   } else {
     direction = dire
   }
-  if (direction === 'bullish') {
-    return icon_bullish
-  } else if (direction === 'bearish') {
-    return icon_bearish // Orange for medium risk
+  if (direction === 'up') {
+    return icon_up
+  } else if (direction === 'down') {
+    return icon_down // Orange for medium risk
   } else if (direction === 'neutral') {
     return icon_neutral // Red for high risk
   }
@@ -184,9 +207,9 @@ function filterDirectionColor(dire) {
   } else {
     direction = dire
   }
-  if (direction === 'bullish') {
+  if (direction === 'up') {
     return '#0AB45A'
-  } else if (direction === 'bearish') {
+  } else if (direction === 'down') {
     return '#E72F2F' // Orange for medium risk
   } else if (direction === 'neutral') {
     return '#F6E316' // Red for high risk
@@ -194,47 +217,48 @@ function filterDirectionColor(dire) {
 }
 
 function handleClickSave() {
+  // createPredictions()
   state.recordList.push({
     symbol: state.menuList[state.selectSymbolIndex]?.symbol.match(/^(.+?)USDT$/i)[1],
     time: new Date().getTime(),
-    confidence: state.dataObj?.current?.confidence_score,
-    direction: state.dataObj?.summary?.trend?.direction,
+    confidence: state.dataObj?.confidence,
+    direction: state.dataObj?.direction,
     currentPrice: state.klineData?.c,
-    targetPrice:
-      state.dataObj?.current?.target_prices[`${state.dataObj?.summary?.trend?.direction}_target`],
+    targetPrice: state.dataObj?.target_price,
     endPrice: '',
     interval: state.currentTab,
     timer: null,
-    isRight:false
+    isRight: false,
   })
-  
+
   localStorage.setItem(constant.predictionRecordKey, JSON.stringify(state.recordList))
-  const toast = useToast();
-  toast.success('Save Success!');
+  const toast = useToast()
+  toast.success('Save Success!')
+  getEndPrice()
 }
 
-function filterStatus(item){
-    if(item.direction == 'bullish' && Number(item.targetPrice)<=Number(item.endPrice)){
-        return true
-    }else if(item.direction == 'bearish' && Number(item.targetPrice)>=Number(item.endPrice)){
-        return true
-    }else{
-        return false
-    }
+function filterStatus(item) {
+  if (item.direction == 'up' && Number(item.targetPrice) <= Number(item.endPrice)) {
+    return true
+  } else if (item.direction == 'down' && Number(item.targetPrice) >= Number(item.endPrice)) {
+    return true
+  } else {
+    return false
+  }
 }
 
-function calcPercent(item){
-    console.log('calcPercent',item);
-    if(item.currentPrice<Number(item.endPrice)){
-        return '+' + ((Number(item.endPrice) - item.currentPrice) / item.currentPrice).toFixed(2) * 100
-    }else if(item.currentPrice>Number(item.endPrice)){
-        return '-' + ((item.currentPrice - item.targetPrice) / item.currentPrice).toFixed(2) * 100
-    }
+function calcPercent(item) {
+  console.log('calcPercent', item)
+  if (item.currentPrice < Number(item.endPrice)) {
+    return '+' + ((Number(item.endPrice) - item.currentPrice) / item.currentPrice).toFixed(2) * 100
+  } else if (item.currentPrice > Number(item.endPrice)) {
+    return '-' + ((item.currentPrice - item.targetPrice) / item.currentPrice).toFixed(2) * 100
+  }
 }
 
 function createSocket() {
   state.spotSocket = new WebSocket('wss://stream.binance.com:443/ws')
-// state.spotSocket = new WebSocket('wss://stream.binance.com/stream')
+  // state.spotSocket = new WebSocket('wss://stream.binance.com/stream')
 
   state.spotSocket.onopen = () => {
     // console.log('onopen')
@@ -430,17 +454,17 @@ function closeBinanceSocket() {
             >
               <div class="flex flex-col items-center relative z-10">
                 <div class="text-[36px] font-[600] text-[#12121A] leading-[35px]">
-                  {{ state.dataObj?.current?.confidence_score }}%
+                  {{ state.dataObj?.confidence }}%
                 </div>
                 <div class="text-[14px] text-[#666]">Confidence</div>
               </div>
               <div
                 class="wave wave1 bg-[#0ab4598a]"
-                :style="`filter: blur(1px); top: ${90 - state.dataObj?.current?.confidence_score}%`"
+                :style="`filter: blur(1px); top: ${90 - state.dataObj?.confidence}%`"
               ></div>
               <div
                 class="wave wave2 bg-[#0AB45A]"
-                :style="`filter: blur(2px); top: ${100 - state.dataObj?.current?.confidence_score}%`"
+                :style="`filter: blur(2px); top: ${100 - state.dataObj?.confidence}%`"
               ></div>
             </div>
           </div>
@@ -454,11 +478,12 @@ function closeBinanceSocket() {
         <div class="flex-1 flex justify-center flex-col items-center">
           <div class="text-[14px] text-[#666]">Target price</div>
           <div class="text-[24px] text-[#fff]">
-            {{
+            <!-- {{
               state.dataObj?.current?.target_prices[
                 `${state.dataObj?.summary?.trend?.direction}_target`
               ]
-            }}
+            }} -->
+            {{ $formatAmount(state.dataObj?.target_price) }}
           </div>
         </div>
       </div>
@@ -469,7 +494,7 @@ function closeBinanceSocket() {
     <div class="flex-1 !p-[20px] border border-solid !border-[#FFFFFF80] rounded-[4px]">
       <div class="text-[#fff] text-[16px] font-bold">Technical Signals</div>
       <div class="max-h-[330px] overflow-y-auto">
-        <div class="flex flex-col lg:grid grid-cols-2 gap-x-[px] gap-y-[10px] !mt-[20px]">
+        <div class="flex flex-col lg:grid grid-cols-2 gap-[10px] !mt-[20px]">
           <div
             class="!px-[10px] h-[52px] rounded-[6px] border border-solid !border-[#FFFFFF80] flex items-center justify-between"
             v-for="item in state.dataObj?.current?.chinese_technical_signals"
@@ -505,15 +530,15 @@ function closeBinanceSocket() {
         <div class="w-full h-[4px] bg-[#000] !mt-[20px]"></div>
         <div class="w-full flex items-center !mt-[10px]">
           <div class="flex-1 flex items-center justify-center flex-col">
-            <div class="text-[#fff] text-[24px] font-bold">{{state.recordList.length}}</div>
+            <div class="text-[#fff] text-[24px] font-bold">{{ state.recordList.length }}</div>
             <div class="text-[#666] text-[12px] lg:text-[14px]">Total</div>
           </div>
           <div class="flex-1 flex items-center justify-center flex-col">
-            <div class="text-[#fff] text-[24px] font-bold">{{calcRigthNum}}</div>
+            <div class="text-[#fff] text-[24px] font-bold">{{ calcRigthNum }}</div>
             <div class="text-[#666] text-[12px] lg:text-[14px]">Correct</div>
           </div>
           <div class="flex-1 flex items-center justify-center flex-col">
-            <div class="text-[#fff] text-[24px] font-bold">{{calcActiveNum}}</div>
+            <div class="text-[#fff] text-[24px] font-bold">{{ calcActiveNum }}</div>
             <div class="text-[#666] text-[12px] lg:text-[14px]">Active</div>
           </div>
         </div>
@@ -568,8 +593,12 @@ function closeBinanceSocket() {
             <div class="text-[#666] text-[12px]" v-if="item.diff > 0">
               {{ Math.floor(item.diff / 60000) }} minutes to expire
             </div>
-            <div class="text-[12px]" :style="item.currentPrice<item.endPrice?'color:#E72F2F':'color:#6DDD25'" v-else>
-                {{calcPercent(item)}}
+            <div
+              class="text-[12px]"
+              :style="item.currentPrice < item.endPrice ? 'color:#E72F2F' : 'color:#6DDD25'"
+              v-else
+            >
+              {{ calcPercent(item) }}
             </div>
           </div>
         </div>

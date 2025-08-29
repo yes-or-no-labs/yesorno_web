@@ -1,11 +1,12 @@
 <script setup>
-import { computed, reactive } from 'vue'
+import { computed, onMounted, reactive } from 'vue'
 import { store } from '@/store'
 import personImg from '@/assets/img/person.png'
 import { api } from '@/apis'
 import { copyToClipboard, formatAddress } from '@/utils/uni-app'
 import dayjs from 'dayjs'
 import { useWindowResize } from '@/hooks/useWindowResize'
+import { debounce } from '@/utils/debounce'
 
 const appStore = store.useAppStore()
 
@@ -22,6 +23,12 @@ const state = reactive({
   pageNum: 1,
   inviteList: [],
   inviteTotal: 0,
+})
+
+onMounted(() => {
+  appStore.getUserInfo()
+  console.log('onMounted',userInfo.value);
+  
 })
 
 const { width } = useWindowResize()
@@ -84,15 +91,15 @@ function handleClickCopy() {
 }
 
 function openLink(item) {
-    console.log('openLink');
-    
+  console.log('openLink')
+
   if (item.action_type === 'ai_prediction') {
     const url = location.origin + `/ai_predictions`
     window.open(url, '_blank')
     setTimeout(() => {
       item.isOpen = true
     }, 1000)
-  }else if(item.action_type === 'external_link'){
+  } else if (item.action_type === 'external_link') {
     window.open(item.link_url, '_blank')
     setTimeout(() => {
       item.isOpen = true
@@ -117,6 +124,18 @@ async function claimTask(item) {
     state.btnLoading = false
   }
 }
+
+async function handleClickCheck() {
+  try {
+    if (userInfo.value?.hasCheckedIn) return
+    const res = await api.checkin()
+    if (res.success) {
+      appStore.getUserInfo()
+    }
+  } catch (error) {
+    console.error(error)
+  }
+}
 </script>
 
 <template>
@@ -134,7 +153,18 @@ async function claimTask(item) {
       />
       <div class="text-[#fff] text-[16px] lg:text-[18px]">{{ state.userName }}</div>
     </div>
-    <div class="!mt-[40px] flex items-center gap-[20px] flex-col lg:flex-row">
+    <div class="w-full flex justify-end !mt-[20px]">
+      <div
+        class="flex items-center gap-[5px] cursor-pointer"
+        @click="debounce(() => handleClickCheck())"
+      >
+        <img src="@/assets/img/check.png" class="w-[16px] h-[16px]" />
+        <div class="text-[#6DDD25] text-[12px]">
+          {{ userInfo?.hasCheckedIn ? 'Checked' : 'Check In' }}
+        </div>
+      </div>
+    </div>
+    <div class="!mt-[20px] flex items-center gap-[20px] flex-col lg:flex-row">
       <div
         class="w-full !p-[16px] border border-solid !border-[#FFFFFF80] rounded-[4px] h-[225px] flex flex-col justify-between"
       >

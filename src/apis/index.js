@@ -69,5 +69,7 @@ export const api = {
   getPointTaskList: (params) => baseHttp({url:"/v1/ai/points/tasks",method: 'GET',params}),
   getInviteList: (params) => baseHttp({url:"/v1/users/invite/users",method: 'GET',params}),
   claimPointTask: (data) => baseHttp({url:"/v1/ai/points/tasks/claim",method: 'POST',data}),
+  createPredictions: (data) => baseHttp({url:"/v1/ai/predictions/create",method: 'POST',data}),
+  checkin: (data) => baseHttp({url:"/v1/ai/predictions/checkin",method: 'POST',data}),
 }
 

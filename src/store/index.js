@@ -240,14 +240,12 @@ export const store = {
         }
       },
       async getUserInfo(code) {
-        console.log('getUserInfo',code);
-        
         const res = await api.getUserInfo({
           invite_code:code
         })
         console.log('getUserInfo',res);
         if (res.success) {
-          this.onUpdateUserInfo(res.obj.userInfo)
+          this.onUpdateUserInfo(Object.assign({hasCheckedIn:res.obj?.aiPredictionCheckIn?.hasCheckedIn}, res.obj.userInfo))
         }
       },
 
