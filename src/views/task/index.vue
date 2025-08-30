@@ -228,11 +228,10 @@ async function handleClickCheck() {
                     class="!rounded-full !h-[24px] !bg-[#0AB45A] !text-[12px] md:!text-[14px] !leading-[14px] !text-[#fff] !w-[52px] !font-[600]"
                     variant="flat"
                     @click="openLink(item)"
-                    v-show="!item.isOpen"
                   >
                     Go
                   </VBtn>
-                  <VBtn
+                  <!-- <VBtn
                     class="!rounded-full !h-[24px] !bg-[#0AB45A] !text-[12px] md:!text-[14px] !leading-[14px] !text-[#fff] !w-[52px] !font-[600]"
                     variant="flat"
                     @click="claimTask(item)"
@@ -240,7 +239,7 @@ async function handleClickCheck() {
                     :loading="state.btnLoading"
                   >
                     Claim
-                  </VBtn>
+                  </VBtn> -->
                 </div>
 
                 <VBtn
