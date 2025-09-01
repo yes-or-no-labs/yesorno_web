@@ -7,12 +7,14 @@ import { copyToClipboard, formatAddress } from '@/utils/uni-app'
 import dayjs from 'dayjs'
 import { useWindowResize } from '@/hooks/useWindowResize'
 import { debounce } from '@/utils/debounce'
-
+import { useToast } from 'vue-toastification'
 const appStore = store.useAppStore()
 
 const userInfo = computed(() => appStore.tomeState.userInfo)
 
 const curWalletAddress = computed(() => appStore.tomeState.curWalletAddress)
+
+const toast = useToast()
 
 const state = reactive({
   userName: userInfo.value?.nickname
@@ -131,6 +133,9 @@ async function handleClickCheck() {
     const res = await api.checkin()
     if (res.success) {
       appStore.getUserInfo()
+      toast.success('Check In Success')
+    }else{
+      toast.error(res.msg || 'Failed to check in')
     }
   } catch (error) {
     console.error(error)
