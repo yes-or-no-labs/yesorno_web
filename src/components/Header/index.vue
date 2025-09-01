@@ -202,7 +202,7 @@ async function getTokenBalance() {
         </div> -->
       </div>
       <div class="flex items-center gap-[45px] h-full">
-        <div class="flex items-center gap-[45px] h-full flex-1" v-show="appStore.tomeState.curWalletAddress&&appStore.tomeState.token">
+        <!-- <div class="flex items-center gap-[45px] h-full flex-1" v-show="appStore.tomeState.curWalletAddress&&appStore.tomeState.token">
           <div class="flex flex-col items-center gap-[5px]">
             <div class="text-[#fff] lg:text-[12px] text-[13px] leading-[13px] whitespace-nowrap" style="font-family: Inter">
               My Points
@@ -227,7 +227,7 @@ async function getTokenBalance() {
               ${{ $formatAmount(state.balanceOfUsdo) }}
             </div>
           </div>
-        </div>
+        </div> -->
         <div class="w-[50px] h-[50px]" v-show="appStore.tomeState.curWalletAddress&&appStore.tomeState.token">
           <v-menu transition="scale-transition" :offset="[10, 0]" >
           <template v-slot:activator="{ props }">
