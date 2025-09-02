@@ -14,4 +14,5 @@ export const constant = {
     refreshTokenKey:'1870CdXLdqc2ei8B6cfJ',
     predictionRecordKey: 'hrfBKNnuU5BWJcckrQ81',
     pointsInfoKey: 'h57zg4P3FJX27LM9YUvM',
+    updateTokenTime: 'sM9RRXCHGSnYXH34EnXM',
 }

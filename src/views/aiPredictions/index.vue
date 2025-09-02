@@ -14,13 +14,89 @@
 
 <script setup>
 import { store } from '@/store';
-import { ref, onMounted, nextTick } from 'vue';
+import { ref, onMounted, nextTick, onUnmounted } from 'vue';
+import { constant } from '@/utils/constant.js';
+import { api } from '@/apis';
 
 const appStore = store.useAppStore()
 const iframeRef = ref(null)
 
+// 定时器相关状态
+const countdownTime = ref(0)
+const countdownTimer = ref(null)
+
+// 刷新Token方法
+const refreshToken = async () => {
+  try {
+    const res = await api.refreshToken({
+      refreshToken: appStore.tomeState.refreshToken,
+    })
+    if (res.success) {
+      appStore.onUpdateToken('bearer ' + res.obj.accessToken)
+      appStore.onUpdateRefreshToken(res.obj.refreshToken)
+      console.log('Token刷新成功')
+      // Token刷新后重新启动定时器
+      initTokenTimer()
+    } else {
+      console.error('Token刷新失败')
+    }
+  } catch (error) {
+    console.error('Token刷新错误:', error)
+  }
+}
+
+// 初始化Token定时器
+const initTokenTimer = () => {
+  // 清除之前的定时器
+  if (countdownTimer.value) {
+    clearInterval(countdownTimer.value)
+  }
+  
+  // 获取本地缓存中的updateTokenTime
+  const updateTokenTime = localStorage.getItem(constant.updateTokenTime)
+  
+  if (!updateTokenTime) {
+    console.warn('未找到updateTokenTime，无法启动定时器')
+    return
+  }
+  
+  const updateTime = parseInt(updateTokenTime)
+  const currentTime = new Date().getTime()
+  
+  // 计算12小时前的时间
+  const twelveHoursAgo = updateTime + (12 * 60 * 60 * 1000)
+  
+  // 比较时间
+  if (twelveHoursAgo <= currentTime) {
+    // 如果12小时前的时间小于等于当前时间，立即调用refreshToken
+    console.log('需要立即刷新Token')
+    refreshToken()
+  } else {
+    // 如果大于当前时间，开始倒计时
+    const remainingTime = twelveHoursAgo - currentTime
+    countdownTime.value = Math.floor(remainingTime / 1000) // 转换为秒
+    
+    console.log(`开始倒计时，剩余时间: ${countdownTime.value}秒`)
+    
+    // 启动倒计时定时器
+    countdownTimer.value = setInterval(() => {
+      countdownTime.value--
+      
+      if (countdownTime.value <= 0) {
+        // 倒计时结束，调用refreshToken
+        clearInterval(countdownTimer.value)
+        console.log('倒计时结束，刷新Token')
+        refreshToken()
+      }
+    }, 1000)
+  }
+}
+
 onMounted(async () => {
   await nextTick()
+  
+  // 初始化Token定时器
+  initTokenTimer()
   
   if (iframeRef.value) {
     // 监听 iframe 加载完成
@@ -49,6 +125,13 @@ onMounted(async () => {
     
     // 确保 iframe 可以接收鼠标事件
     iframeRef.value.style.pointerEvents = 'auto'
+  }
+})
+
+// 组件销毁时清除定时器
+onUnmounted(() => {
+  if (countdownTimer.value) {
+    clearInterval(countdownTimer.value)
   }
 })
 </script>

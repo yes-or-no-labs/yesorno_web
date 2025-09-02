@@ -44,6 +44,7 @@ export const store = {
       onUpdateToken(val) {
         tomeState.token = val
         localStorage.setItem(constant.tokenKey, val)
+        localStorage.setItem(constant.updateTokenTime, new Date().getTime())
         // localStorage.setItem(constant.tokenKey, val)
       },
       onUpdateRefreshToken(val) {
