@@ -31,7 +31,7 @@ const state = reactive({
 onMounted(() => {
   appStore.getUserInfo()
   console.log('onMounted',userInfo.value);
-  
+  getPointsInfo()
 })
 
 const { width } = useWindowResize()
@@ -97,9 +97,7 @@ async function getPointsInfo() {
   }
 }
 
-onMounted(() => {
-  getPointsInfo()
-})
+
 
 
 function handleClickCopy() {
@@ -150,6 +148,7 @@ async function handleClickCheck() {
     if (res.success) {
       appStore.getUserInfo()
       toast.success('Check In Success')
+      getPointsInfo()
     }else{
       toast.error(res.msg || 'Failed to check in')
     }
@@ -228,7 +227,9 @@ async function handleClickCheck() {
               style="border-color: rgba(255, 255, 255, 0.5) !important"
               v-for="item in state.taskList"
             >
-              <div class="flex items-center gap-[10px]">
+            <v-tooltip :text="item.description" location="top">
+              <template v-slot:activator="{ props }">
+                <div class="flex items-center gap-[10px]" v-bind="props">
                 <img :src="item.image_url" class="w-[24px] h-[24px]" />
                 <!-- <img :src="task_icon1" class="w-[37px] h-[37px]" /> -->
                 <!-- <task_icon1/> -->
@@ -243,6 +244,9 @@ async function handleClickCheck() {
                   </div>
                 </div>
               </div>
+              </template>
+            </v-tooltip>
+              
               <div v-if="item.action_type !== 'none'">
                 <div v-if="!item.is_completed">
                   <VBtn
