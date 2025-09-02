@@ -2,7 +2,7 @@ export const constant = {
     tokenKey: 'javpcHqshWPsgGQQKqdN',
     usernameKey: 'PEhwqEQWnjEdbRGwXTss',
     userInfoKey: 'hyfEFaNxatgGjHDWDiAT',
-    localeKey: 'pRdZnEhGWWbvmkMaAhMa',
+    localeKey: 'kxJdCX1tHJQJM1yYFH6P',
     tabBarPagePathKey: 'EnCQAWwPsAZZGMrAmsLE',
     appConfigKey: 'lboyzgty3cfdqftgketd',
     chargeTuneKey: 'pw0gamano6fnmnefvher',

@@ -1,0 +1,21 @@
+export default {
+    task:{
+        title1:'邀请码',
+        title2:'复制链接',
+        title3:'积分',
+        title4:'任务',
+        title5:'去完成',
+        title6:'已完成',
+        title7:'加载中...',
+        title8:'没有更多了',
+        title9:'推荐',
+        title10:'邮箱/钱包',
+        title11:'加入日期',
+        title12:'类型',
+        title13:'积分',
+        title14:'邀请',
+        title15:'没有更多了',
+        title16:'噢！出错了!',
+        title17:'重试',
+    }
+} 

@@ -8,6 +8,7 @@ import dayjs from 'dayjs'
 import { useWindowResize } from '@/hooks/useWindowResize'
 import { debounce } from '@/utils/debounce'
 import { useToast } from 'vue-toastification'
+import { i18n, onChangeLocale, t } from '@/utils/i18n'
 const appStore = store.useAppStore()
 
 const userInfo = computed(() => appStore.tomeState.userInfo)
@@ -27,6 +28,7 @@ const state = reactive({
   pageNum: 1,
   inviteList: [],
   inviteTotal: 0,
+  langList:[{title:'English',value:'en_US'},{title:'中文',value:'zh_CN'}]
 })
 
 onMounted(() => {
@@ -41,6 +43,7 @@ async function getData($state) {
     const res = await api.getPointTaskList({
       pageSize: state.pageSize,
       pageNum: state.pageNum,
+      lang: i18n.global.locale.value
     })
     if (res.success) {
       for (const item of res.obj.result) {
@@ -147,6 +150,26 @@ async function handleClickCheck() {
 
 <template>
   <div class="w-[80%] mx-auto !py-[40px]">
+    <div class="w-full flex justify-end">
+      <v-menu :offset="[10, 0]">
+      <template v-slot:activator="{ props }">
+        <div class="!p-[10px] rounded-full" v-ripple>
+          <v-icon v-bind="props" icon="mdi-translate-variant" size="25" color="#0AB45A" ></v-icon>
+        </div>
+      </template>
+      <v-list>
+        <v-list-item
+          v-for="(item, index) in state.langList"
+          :key="index"
+          :value="item.value"
+          @click="onChangeLocale(item.value)"
+        >
+          <v-list-item-title>{{ item.title }}</v-list-item-title>
+        </v-list-item>
+      </v-list>
+      </v-menu>
+    </div>
+    
     <div class="flex justify-center flex-col items-center gap-[5px]">
       <img
         :src="userInfo?.avatarUrl"
@@ -175,7 +198,7 @@ async function handleClickCheck() {
       <div
         class="w-full !p-[16px] border border-solid !border-[#FFFFFF80] rounded-[4px] h-[225px] flex flex-col justify-between"
       >
-        <div class="text-[#fff] text-[16px]">Invite Code</div>
+        <div class="text-[#fff] text-[16px]">{{ t('task.title1') }}</div>
         <div class="flex justify-center">
           <div class="border border-solid !border-[#FFFFFF80] rounded-full text-[24px] !px-[16px]">
             {{ userInfo.myInviteCode }}
@@ -186,13 +209,13 @@ async function handleClickCheck() {
           variant="flat"
           @click="handleClickCopy"
         >
-          Copy Link
+        {{ t('task.title2') }}
         </VBtn>
       </div>
       <div
         class="w-full !p-[16px] border border-solid !border-[#FFFFFF80] rounded-[4px] h-[225px] flex flex-col justify-between"
       >
-        <div class="text-[#fff] text-[16px]">Points</div>
+        <div class="text-[#fff] text-[16px]">{{ t('task.title3') }}</div>
         <div class="flex items-center justify-center">
           <div
             class="border border-solid !border-[#FFFFFF80] rounded-full text-[24px] !px-[16px] flex items-center gap-[10px]"
@@ -206,7 +229,7 @@ async function handleClickCheck() {
       <div
         class="w-full !p-[16px] border border-solid !border-[#FFFFFF80] rounded-[4px] h-[225px] overflow-hidden"
       >
-        <div class="text-[#fff] text-[16px]">Quests</div>
+        <div class="text-[#fff] text-[16px]">{{ t('task.title4') }}</div>
         <div class="h-[200px] overflow-y-auto taskEl">
           <div class="flex flex-col">
             <div
@@ -227,7 +250,7 @@ async function handleClickCheck() {
                   </div>
                   <div class="text-[#666666] text-[12px] leading-[12px] !ml-[5px]">
                     <span class="text-[#0AB45A] mr-[5px]">{{ item.reward_points }}</span>
-                    Points
+                    {{ t('task.title3') }}
                   </div>
                 </div>
               </div>
@@ -241,7 +264,7 @@ async function handleClickCheck() {
                     variant="flat"
                     @click="openLink(item)"
                   >
-                    Go
+                  {{ t('task.title5') }}
                   </VBtn>
                   <!-- <VBtn
                     class="!rounded-full !h-[24px] !bg-[#0AB45A] !text-[12px] md:!text-[14px] !leading-[14px] !text-[#fff] !w-[52px] !font-[600]"
@@ -260,17 +283,17 @@ async function handleClickCheck() {
                   variant="flat"
                   v-else
                 >
-                  Completed
+                  {{ t('task.title6') }}
                 </VBtn>
               </div>
             </div>
           </div>
           <infinite-loading @infinite="getData" target="taskEl">
             <template #spinner>
-              <div class="text-center !mt-[20px]">Loading...</div>
+              <div class="text-center !mt-[20px]">{{ t('task.title7') }}</div>
             </template>
             <template #complete>
-              <div class="text-center !mt-[20px]">No more</div>
+              <div class="text-center !mt-[20px]">{{ t('task.title8') }}</div>
             </template>
           </infinite-loading>
         </div>
@@ -278,7 +301,7 @@ async function handleClickCheck() {
     </div>
     <div class="!mt-[40px] flex flex-col gap-[20px]">
       <div class="w-full flex items-center justify-between">
-        <div class="text-[#fff] text-[16px] font-bold">Referrals</div>
+        <div class="text-[#fff] text-[16px] font-bold">{{ t('task.title9') }}</div>
         <div
           class="!px-[16px] !py-[2px] border border-solid !border-[#0AB45A] rounded-full flex items-center gap-[5px]"
         >
@@ -293,16 +316,16 @@ async function handleClickCheck() {
         <!-- table header -->
         <div class="flex items-center w-full bg-[#000]">
           <div class="w-[50%] min-w-[180px] text-[14px] text-[#CECFD2] whitespace-nowrap">
-            Email/Wallet
+            {{ t('task.title10') }}
           </div>
           <div class="w-[180px] min-w-[180px] text-[14px] text-[#CECFD2] whitespace-nowrap">
-            Date Joined
+            {{ t('task.title11') }}
           </div>
           <div class="w-[180px] min-w-[180px] text-[14px] text-[#CECFD2] whitespace-nowrap">
-            Type
+            {{ t('task.title12') }}
           </div>
           <div class="w-[180px] min-w-[180px] text-[14px] text-[#CECFD2] whitespace-nowrap">
-            Points Earned
+            {{ t('task.title13') }}
           </div>
         </div>
         <!-- table body -->
@@ -321,7 +344,7 @@ async function handleClickCheck() {
             <div
               class="w-[180px] min-w-[180px] text-[14px] text-[#CECFD2] whitespace-nowrap border-b border-solid border-[#87878733] !py-[10px]"
             >
-              Invite
+              {{ t('task.title14') }}
             </div>
             <div
               class="w-[180px] min-w-[180px] text-[14px] text-[#CECFD2] whitespace-nowrap border-b border-solid border-[#87878733] !py-[10px]"
@@ -333,18 +356,18 @@ async function handleClickCheck() {
         </div>
         <infinite-loading @infinite="getInviteList" target="positionEl">
           <template #spinner>
-            <div class="text-center !mt-[20px]">Loading...</div>
+            <div class="text-center !mt-[20px]">{{ t('task.title7') }}</div>
           </template>
           <template #complete>
-            <div class="text-center !mt-[20px]">No more</div>
+            <div class="text-center !mt-[20px]">{{ t('task.title8') }}</div>
           </template>
           <template #error="{ retry }">
             <div class="text-center !mt-[100px]">
-              <div class="text-center">Oops something went wrong!</div>
+                <div class="text-center">{{ t('task.title16') }}</div>
               <v-btn
                 class="!mt-[20px] border border-solid !border-[#0AB45A] !text-[#0AB45A]"
                 @click="retry"
-                >Retry</v-btn
+                >{{ t('task.title17') }}</v-btn
               >
             </div>
           </template>

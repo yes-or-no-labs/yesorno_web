@@ -15,6 +15,7 @@ import "vue-toastification/dist/index.css";
 import InfiniteLoading from "v3-infinite-loading";
 import "v3-infinite-loading/lib/style.css";
 import { setupGlobalFilters  } from '@/utils/filters'
+import { i18n } from "@/utils/i18n";
 
 import App from './App.vue'
 import router from './router'
@@ -39,6 +40,7 @@ app.use(createPinia())
 app.use(router)
 app.use(vuetify)
 app.use(vuetifyConfig)
+app.use(i18n)
 app.use(Toast, {
   timeout: 3000,          // 默认 3s 后消失
   position: 'top-center',  // 位置：top-right | top-center | top-left | bottom-right | ...
