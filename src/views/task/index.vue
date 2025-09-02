@@ -21,6 +21,7 @@ const state = reactive({
     ? userInfo.value?.nickname
     : `User_${curWalletAddress.value?.slice(-6)}`,
   taskList: [],
+  available_points: 0,
   pageSize: 10,
   pageNum: 1,
   inviteList: [],
@@ -85,6 +86,21 @@ async function getInviteList($state) {
     $state?.error()
   }
 }
+
+async function getPointsInfo() {
+  try {
+    const res = await api.getPointsInfo()
+    console.log('getPointsInfo', res)
+    state.available_points = res.obj.available_points
+  } catch (error) {
+    console.error(error)
+  }
+}
+
+onMounted(() => {
+  getPointsInfo()
+})
+
 
 function handleClickCopy() {
   // console.log('handleClickCopy',location.origin);
@@ -196,7 +212,7 @@ async function handleClickCheck() {
             class="border border-solid !border-[#FFFFFF80] rounded-full text-[24px] !px-[16px] flex items-center gap-[10px]"
           >
             <img src="@/assets/img/point.png" class="w-[16px] h-[16px]" />
-            {{ userInfo.point }}
+            {{ state.available_points }}
           </div>
         </div>
         <div class="w-full h-[32px]"></div>

@@ -25,19 +25,23 @@ const marketList = [
   { title: 'Event Prediction', path: '/market' },
 ]
 
-const porfileList=[{
-  title: 'My Profile',
-  icon: profile_icon1,
-  path:'/profile'
-}, {
+const porfileList=[
+//   {
+//   title: 'My Profile',
+//   icon: profile_icon1,
+//   path:'/profile'
+// }, 
+{
   title: 'Setting',
   icon: settingImg,
   path:'/setting'
-},{
-  title: 'Terms of Use',
-  icon: profile_icon3,
-  path:''
-}, {
+},
+// {
+//   title: 'Terms of Use',
+//   icon: profile_icon3,
+//   path:''
+// }, 
+{
   title: 'Log Out',
   icon: profile_icon4,
 }]
@@ -135,7 +139,7 @@ async function getTokenBalance() {
         >
           
         </div> -->
-        <v-menu transition="scale-transition" :offset="[10, 0]">
+        <!-- <v-menu transition="scale-transition" :offset="[10, 0]">
           <template v-slot:activator="{ props }">
             <div
               class="text-[#fff] lg:text-[14px] text-[16px] font-[600] cursor-pointer whitespace-nowrap flex items-center"
@@ -152,7 +156,7 @@ async function getTokenBalance() {
               </v-list-item-title>
             </v-list-item>
           </v-list>
-        </v-menu>
+        </v-menu> -->
         <div
           class="text-[#fff] lg:text-[14px] text-[16px] font-[600] cursor-pointer whitespace-nowrap"
           style="font-family: Geist"
@@ -177,7 +181,7 @@ async function getTokenBalance() {
         >
           Ranking
         </div>
-        <v-menu transition="scale-transition" :offset="[10, 0]">
+        <!-- <v-menu transition="scale-transition" :offset="[10, 0]">
           <template v-slot:activator="{ props }">
             <div
               class="text-[#fff] lg:text-[14px] text-[16px] font-[600] cursor-pointer whitespace-nowrap flex items-center"
@@ -192,7 +196,7 @@ async function getTokenBalance() {
               <v-list-item-title>{{ item.title }}</v-list-item-title>
             </v-list-item>
           </v-list>
-        </v-menu>
+        </v-menu> -->
 
         <!-- <div
           class="text-[#fff] lg:text-[14px] text-[15px] leading-[15px] cursor-pointer"

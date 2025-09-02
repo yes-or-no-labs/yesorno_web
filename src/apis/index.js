@@ -71,5 +71,6 @@ export const api = {
   claimPointTask: (data) => baseHttp({url:"/v1/ai/points/tasks/claim",method: 'POST',data}),
   createPredictions: (data) => baseHttp({url:"/v1/ai/predictions/create",method: 'POST',data}),
   checkin: (data) => baseHttp({url:"/v1/ai/predictions/checkin",method: 'POST',data}),
+  getPointsInfo: (params) => baseHttp({url:"/v1/ai/points/info",method: 'GET',params}),
 }
 
