@@ -13,4 +13,5 @@ export const constant = {
     lastWalletRdnsKey:'UNQfPc8LKJ0g3Az4z4RH',
     refreshTokenKey:'1870CdXLdqc2ei8B6cfJ',
     predictionRecordKey: 'hrfBKNnuU5BWJcckrQ81',
+    pointsInfoKey: 'h57zg4P3FJX27LM9YUvM',
 }

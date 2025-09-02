@@ -21,6 +21,7 @@ export const store = {
       hasProvider: false,
       isLoading: false,
       signMessage: localStorage.getItem(constant.signMessage) || '',
+      pointsInfo: localStorage.getItem(constant.pointsInfoKey)?JSON.parse(localStorage.getItem(constant.pointsInfoKey)) : null,
     })
     const tomeStateC = {
       isLogin: computed(() => !!tomeState.token),
@@ -237,6 +238,15 @@ export const store = {
           };
         } catch (error) {
           console.error(error);
+        }
+      },
+      async getPointsInfo() {
+        try {
+          const res = await api.getPointsInfo()
+          tomeState.pointsInfo = res.obj
+          localStorage.setItem(constant.pointsInfoKey, JSON.stringify(res.obj))
+        } catch (error) {
+          console.error(error)
         }
       },
       async getUserInfo(code) {

@@ -11,6 +11,8 @@ import { useToast } from 'vue-toastification'
 const appStore = store.useAppStore()
 
 const userInfo = computed(() => appStore.tomeState.userInfo)
+const pointsInfo = computed(() => appStore.tomeState.pointsInfo)
+
 
 const curWalletAddress = computed(() => appStore.tomeState.curWalletAddress)
 
@@ -21,7 +23,6 @@ const state = reactive({
     ? userInfo.value?.nickname
     : `User_${curWalletAddress.value?.slice(-6)}`,
   taskList: [],
-  available_points: 0,
   pageSize: 10,
   pageNum: 1,
   inviteList: [],
@@ -30,8 +31,7 @@ const state = reactive({
 
 onMounted(() => {
   appStore.getUserInfo()
-  console.log('onMounted',userInfo.value);
-  getPointsInfo()
+  appStore.getPointsInfo()
 })
 
 const { width } = useWindowResize()
@@ -87,19 +87,6 @@ async function getInviteList($state) {
   }
 }
 
-async function getPointsInfo() {
-  try {
-    const res = await api.getPointsInfo()
-    console.log('getPointsInfo', res)
-    state.available_points = res.obj.available_points
-  } catch (error) {
-    console.error(error)
-  }
-}
-
-
-
-
 function handleClickCopy() {
   // console.log('handleClickCopy',location.origin);
   const url = location.origin + `/login?inviteCode=${userInfo.value.myInviteCode}`
@@ -148,7 +135,7 @@ async function handleClickCheck() {
     if (res.success) {
       appStore.getUserInfo()
       toast.success('Check In Success')
-      getPointsInfo()
+      appStore.getPointsInfo()
     }else{
       toast.error(res.msg || 'Failed to check in')
     }
@@ -211,7 +198,7 @@ async function handleClickCheck() {
             class="border border-solid !border-[#FFFFFF80] rounded-full text-[24px] !px-[16px] flex items-center gap-[10px]"
           >
             <img src="@/assets/img/point.png" class="w-[16px] h-[16px]" />
-            {{ state.available_points }}
+            {{ pointsInfo?.available_points }}
           </div>
         </div>
         <div class="w-full h-[32px]"></div>
