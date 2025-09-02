@@ -130,6 +130,7 @@ async function getSignatrue() {
         appStore.onUpdateToken('bearer '+res.obj.accessToken)
         appStore.onUpdateRefreshToken(res.obj.refreshToken)
         await appStore.getUserInfo(state.inviteCode)
+        await appStore.getPointsInfo()
         router.push('/')
       }else{
         toast.error(res.msg || 'Login failed, please try again.')
