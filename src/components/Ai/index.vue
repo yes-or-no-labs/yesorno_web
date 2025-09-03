@@ -26,6 +26,7 @@ const state = reactive({
   recordList: localStorage.getItem(constant.predictionRecordKey)
     ? JSON.parse(localStorage.getItem(constant.predictionRecordKey))
     : [],
+    
 })
 
 const props = defineProps({

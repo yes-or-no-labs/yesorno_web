@@ -2,7 +2,7 @@
     <div class="iframe-wrapper">
         <iframe 
             ref="iframeRef"
-            :src="`https://ai-dev.yesornolabs.xyz?token=${assessToken}`" 
+            :src="`https://ai-dev.yesornolabs.xyz?lang=${langMap[i18n.global.locale.value]}&token=${assessToken}`" 
             frameborder="0" 
             sandbox="allow-same-origin allow-scripts allow-popups allow-forms" 
             scrolling="yes"
@@ -17,9 +17,15 @@ import { store } from '@/store';
 import { ref, onMounted, nextTick, onUnmounted, computed } from 'vue';
 import { constant } from '@/utils/constant.js';
 import { api } from '@/apis';
+import { i18n } from '@/utils/i18n';
 
 const appStore = store.useAppStore()
 const iframeRef = ref(null)
+
+const langMap = {
+    en_US: 'en-us',
+    zh_CN: 'zh-cn',
+  }
 
 // 定时器相关状态
 const countdownTime = ref(0)
