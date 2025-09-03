@@ -25,7 +25,13 @@ const iframeRef = ref(null)
 const countdownTime = ref(0)
 const countdownTimer = ref(null)
 
-const assessToken= computed(() => appStore.tomeState.token.split(' ')[1])
+const assessToken= computed(() => {
+  if(appStore.tomeState?.token){
+    return appStore.tomeState?.token.split(' ')[1]
+  }else{
+    return ''
+  }
+})
 
 // 刷新Token方法
 const refreshToken = async () => {
