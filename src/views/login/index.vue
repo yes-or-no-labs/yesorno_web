@@ -3,6 +3,8 @@ import { computed, onMounted, reactive } from 'vue'
 import backpackImg from '@/assets/img/backpack.png'
 import hahaImg from '@/assets/img/haha.png'
 import metamaskImg from '@/assets/img/metamask.png'
+import tokenpocketImg from '@/assets/img/tokenpocket.png'
+
 import coinbaseImg from '@/assets/img/coinbase.png'
 import okxImg from '@/assets/img/okx.png'
 import phantomImg from '@/assets/img/phantom.png'
@@ -29,6 +31,11 @@ const state = reactive({
       icon: metamaskImg,
       walletRdns: 'io.metamask',
     },
+    {
+      title: 'TokenPocket',
+      icon: tokenpocketImg,
+      walletRdns: 'https://www.tokenpocket.pro/en/download/app',
+    }
     // {
     //   title: 'Coinbase Wallet',
     //   icon: coinbaseImg,
