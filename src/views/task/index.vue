@@ -14,7 +14,6 @@ const appStore = store.useAppStore()
 const userInfo = computed(() => appStore.tomeState.userInfo)
 const pointsInfo = computed(() => appStore.tomeState.pointsInfo)
 
-
 const curWalletAddress = computed(() => appStore.tomeState.curWalletAddress)
 
 const toast = useToast()
@@ -28,11 +27,14 @@ const state = reactive({
   pageNum: 1,
   inviteList: [],
   inviteTotal: 0,
-  langList:[{title:'English',value:'en_US'},{title:'中文',value:'zh_CN'}],
-  langMap:{
-    'en_US': 'en',
-    'zh_CN': 'zh',
-  }
+  langList: [
+    { title: 'English', value: 'en_US' },
+    { title: '中文', value: 'zh_CN' },
+  ],
+  langMap: {
+    en_US: 'en',
+    zh_CN: 'zh',
+  },
 })
 
 onMounted(() => {
@@ -42,19 +44,21 @@ onMounted(() => {
 
 const { width } = useWindowResize()
 
-
-watch(() => i18n.global.locale.value, (newVal) => {
-  state.pageNum = 1
-  state.taskList = []
-  getData()
-})
+watch(
+  () => i18n.global.locale.value,
+  (newVal) => {
+    state.pageNum = 1
+    state.taskList = []
+    getData()
+  },
+)
 
 async function getData($state) {
   try {
     const res = await api.getPointTaskList({
       pageSize: state.pageSize,
       pageNum: state.pageNum,
-      language: state.langMap[i18n.global.locale.value]
+      language: state.langMap[i18n.global.locale.value],
     })
     if (res.success) {
       for (const item of res.obj.result) {
@@ -84,7 +88,9 @@ async function getInviteList($state) {
     })
 
     if (res.success) {
-      state.inviteList = state.inviteList.concat(res.obj.users)
+      if (res.obj.users) {
+        state.inviteList = state.inviteList.concat(res.obj.users)
+      }
       state.inviteTotal = res.obj.total
       if (Array.isArray(res.obj.users) && res.obj?.users.length < state.pageSize) {
         $state?.complete()
@@ -150,7 +156,7 @@ async function handleClickCheck() {
       appStore.getUserInfo()
       toast.success('Check In Success')
       appStore.getPointsInfo()
-    }else{
+    } else {
       toast.error(res.msg || 'Failed to check in')
     }
   } catch (error) {
@@ -163,24 +169,24 @@ async function handleClickCheck() {
   <div class="w-[80%] mx-auto !py-[40px]">
     <div class="w-full flex justify-end">
       <v-menu :offset="[10, 0]">
-      <template v-slot:activator="{ props }">
-        <div class="!p-[10px] rounded-full" v-ripple>
-          <v-icon v-bind="props" icon="mdi-translate-variant" size="25" color="#0AB45A" ></v-icon>
-        </div>
-      </template>
-      <v-list>
-        <v-list-item
-          v-for="(item, index) in state.langList"
-          :key="index"
-          :value="item.value"
-          @click="onChangeLocale(item.value)"
-        >
-          <v-list-item-title>{{ item.title }}</v-list-item-title>
-        </v-list-item>
-      </v-list>
+        <template v-slot:activator="{ props }">
+          <div class="!p-[10px] rounded-full" v-ripple>
+            <v-icon v-bind="props" icon="mdi-translate-variant" size="25" color="#0AB45A"></v-icon>
+          </div>
+        </template>
+        <v-list>
+          <v-list-item
+            v-for="(item, index) in state.langList"
+            :key="index"
+            :value="item.value"
+            @click="onChangeLocale(item.value)"
+          >
+            <v-list-item-title>{{ item.title }}</v-list-item-title>
+          </v-list-item>
+        </v-list>
       </v-menu>
     </div>
-    
+
     <div class="flex justify-center flex-col items-center gap-[5px]">
       <img
         :src="userInfo?.avatarUrl"
@@ -220,7 +226,7 @@ async function handleClickCheck() {
           variant="flat"
           @click="handleClickCopy"
         >
-        {{ t('task.title2') }}
+          {{ t('task.title2') }}
         </VBtn>
       </div>
       <div
@@ -248,26 +254,26 @@ async function handleClickCheck() {
               style="border-color: rgba(255, 255, 255, 0.5) !important"
               v-for="item in state.taskList"
             >
-            <v-tooltip :text="item.description" location="top">
-              <template v-slot:activator="{ props }">
-                <div class="flex items-center gap-[10px]" v-bind="props">
-                <img :src="item.image_url" class="w-[24px] h-[24px]" />
-                <!-- <img :src="task_icon1" class="w-[37px] h-[37px]" /> -->
-                <!-- <task_icon1/> -->
-                <!-- <div v-html="task_icon1"></div> -->
-                <div class="flex">
-                  <div class="text-[#fff] text-[12px] leading-[12px]">
-                    {{ item.title }}
+              <v-tooltip :text="item.description" location="top">
+                <template v-slot:activator="{ props }">
+                  <div class="flex items-center gap-[10px]" v-bind="props">
+                    <img :src="item.image_url" class="w-[24px] h-[24px]" />
+                    <!-- <img :src="task_icon1" class="w-[37px] h-[37px]" /> -->
+                    <!-- <task_icon1/> -->
+                    <!-- <div v-html="task_icon1"></div> -->
+                    <div class="flex">
+                      <div class="text-[#fff] text-[12px] leading-[12px]">
+                        {{ item.title }}
+                      </div>
+                      <div class="text-[#666666] text-[12px] leading-[12px] !ml-[5px]">
+                        <span class="text-[#0AB45A] mr-[5px]">{{ item.reward_points }}</span>
+                        {{ t('task.title3') }}
+                      </div>
+                    </div>
                   </div>
-                  <div class="text-[#666666] text-[12px] leading-[12px] !ml-[5px]">
-                    <span class="text-[#0AB45A] mr-[5px]">{{ item.reward_points }}</span>
-                    {{ t('task.title3') }}
-                  </div>
-                </div>
-              </div>
-              </template>
-            </v-tooltip>
-              
+                </template>
+              </v-tooltip>
+
               <div v-if="item.action_type !== 'none'">
                 <div v-if="!item.is_completed">
                   <VBtn
@@ -275,7 +281,7 @@ async function handleClickCheck() {
                     variant="flat"
                     @click="openLink(item)"
                   >
-                  {{ t('task.title5') }}
+                    {{ t('task.title5') }}
                   </VBtn>
                   <!-- <VBtn
                     class="!rounded-full !h-[24px] !bg-[#0AB45A] !text-[12px] md:!text-[14px] !leading-[14px] !text-[#fff] !w-[52px] !font-[600]"
@@ -374,7 +380,7 @@ async function handleClickCheck() {
           </template>
           <template #error="{ retry }">
             <div class="text-center !mt-[100px]">
-                <div class="text-center">{{ t('task.title16') }}</div>
+              <div class="text-center">{{ t('task.title16') }}</div>
               <v-btn
                 class="!mt-[20px] border border-solid !border-[#0AB45A] !text-[#0AB45A]"
                 @click="retry"
