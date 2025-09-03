@@ -88,9 +88,10 @@ async function getInviteList($state) {
     })
 
     if (res.success) {
-      if (res.obj.users) {
-        state.inviteList = state.inviteList.concat(res.obj.users)
+      if (!res.obj.users) {
+        res.obj.users = []
       }
+      state.inviteList = state.inviteList.concat(res.obj.users)
       state.inviteTotal = res.obj.total
       if (Array.isArray(res.obj.users) && res.obj?.users.length < state.pageSize) {
         $state?.complete()
