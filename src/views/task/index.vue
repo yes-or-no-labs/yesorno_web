@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, reactive } from 'vue'
+import { computed, onMounted, reactive, watch } from 'vue'
 import { store } from '@/store'
 import personImg from '@/assets/img/person.png'
 import { api } from '@/apis'
@@ -28,7 +28,11 @@ const state = reactive({
   pageNum: 1,
   inviteList: [],
   inviteTotal: 0,
-  langList:[{title:'English',value:'en_US'},{title:'中文',value:'zh_CN'}]
+  langList:[{title:'English',value:'en_US'},{title:'中文',value:'zh_CN'}],
+  langMap:{
+    'en_US': 'en',
+    'zh_CN': 'zh',
+  }
 })
 
 onMounted(() => {
@@ -38,12 +42,19 @@ onMounted(() => {
 
 const { width } = useWindowResize()
 
+
+watch(() => i18n.global.locale.value, (newVal) => {
+  state.pageNum = 1
+  state.taskList = []
+  getData()
+})
+
 async function getData($state) {
   try {
     const res = await api.getPointTaskList({
       pageSize: state.pageSize,
       pageNum: state.pageNum,
-      lang: i18n.global.locale.value
+      language: state.langMap[i18n.global.locale.value]
     })
     if (res.success) {
       for (const item of res.obj.result) {

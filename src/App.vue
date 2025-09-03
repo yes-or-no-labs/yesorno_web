@@ -5,6 +5,7 @@ import { computed, onMounted, reactive } from 'vue'
 import { store } from '@/store'
 import FooterSecond from '@/components/FooterSecond/index.vue'
 import Tabbar from '@/components/Tabbar/index.vue'
+import { api } from './apis'
 
 const router = useRouter()
 
@@ -27,6 +28,12 @@ onMounted(() => {
   appStore.addEip6963AnnounceListen()
   appStore.requestEip6963Providers()
   appStore.evmConnectWallet(true)
+  api.getAccessStatsRecord({
+    method: "GET",
+    path: "/ai_predictions",
+    referer: location.href,
+    user_agent: navigator.userAgent
+  })
 })
 </script>
 

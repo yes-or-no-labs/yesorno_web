@@ -2,7 +2,7 @@
     <div class="iframe-wrapper">
         <iframe 
             ref="iframeRef"
-            :src="`https://ai-dev.yesornolabs.xyz?token=${appStore.tomeState.token}`" 
+            :src="`https://ai-dev.yesornolabs.xyz?token=${assessToken}`" 
             frameborder="0" 
             sandbox="allow-same-origin allow-scripts allow-popups allow-forms" 
             scrolling="yes"
@@ -14,7 +14,7 @@
 
 <script setup>
 import { store } from '@/store';
-import { ref, onMounted, nextTick, onUnmounted } from 'vue';
+import { ref, onMounted, nextTick, onUnmounted, computed } from 'vue';
 import { constant } from '@/utils/constant.js';
 import { api } from '@/apis';
 
@@ -24,6 +24,8 @@ const iframeRef = ref(null)
 // 定时器相关状态
 const countdownTime = ref(0)
 const countdownTimer = ref(null)
+
+const assessToken= computed(() => appStore.tomeState.token.split(' ')[1])
 
 // 刷新Token方法
 const refreshToken = async () => {

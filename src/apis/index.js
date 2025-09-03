@@ -73,5 +73,6 @@ export const api = {
   checkin: (data) => baseHttp({url:"/v1/ai/predictions/checkin",method: 'POST',data}),
   getPointsInfo: (params) => baseHttp({url:"/v1/ai/points/info",method: 'GET',params}),
   getPointsLeaderboard: (params) => baseHttp({url:"/v1/ai/points/leaderboard",method: 'GET',params}),
+  getAccessStatsRecord: (data) => baseHttp({url:"/v1/ai/access-stats/record",method: 'POST',data}),
 }
 
