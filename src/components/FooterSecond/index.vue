@@ -39,7 +39,7 @@ function handleClickLink(url) {
               src="@/assets/img/icon_tg.png"
               class="lg:w-[25px] lg:h-[20px] w-[24px] h-[18px] cursor-pointer"
               alt=""
-              @click="handleClickLink('https://t.me/yesorno_labs')"
+              @click="handleClickLink('https://t.me/YesornolabsAI')"
             />
             <img
               src="@/assets/img/icon_discord.png"
