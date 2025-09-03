@@ -1,4 +1,8 @@
-<script setup></script>
+<script setup>
+function handleClickLink(url) {
+  window.open(url, '_blank')
+}
+</script>
 
 <template>
   <div
@@ -29,16 +33,19 @@
               src="@/assets/img/icon_x.png"
               class="lg:w-[22px] lg:h-[20px] w-[18px] h-[16px] cursor-pointer"
               alt=""
+              @click="handleClickLink('https://x.com/YesorNo_Labs')"
             />
             <img
               src="@/assets/img/icon_tg.png"
               class="lg:w-[25px] lg:h-[20px] w-[24px] h-[18px] cursor-pointer"
               alt=""
+              @click="handleClickLink('https://t.me/yesorno_labs')"
             />
             <img
               src="@/assets/img/icon_discord.png"
               class="lg:w-[27px] lg:h-[20px] w-[23px] h-[16px] cursor-pointer"
               alt=""
+              @click="handleClickLink('https://discord.gg/NxuY4wd8CY')"
             />
           </div>
         </div>
