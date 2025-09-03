@@ -102,6 +102,7 @@ const optAnimation = (json, index) => {
             class="rounded-[106px] 2xl:!text-[24px] xl:!text-[20px] lg:!text-[18px] md:!text-[16px] sm:!text-[14px] !text-[12px] 2xl:!h-[67px] lg:!h-[55px] md:!h-[50px] sm:!h-[45px] h-[40px] 2xl:!px-[60px] lg:!px-[55px] md:!px-[50px] sm:!px-[40px]"
             style="background: linear-gradient(90deg, #6ddd25 0%, #0ab45a 100%)"
             @click="$router.push('/market')"
+            disabled
           >
             Launch App
           </VBtnConnect>

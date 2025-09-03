@@ -380,7 +380,7 @@ async function handleClickCheck() {
               class="w-[180px] min-w-[180px] text-[14px] text-[#CECFD2] whitespace-nowrap border-b border-solid border-[#87878733] !py-[10px]"
             >
               <!-- {{ dayjs(Number(item.eventInfo.endTime) * 1000).format('MMM D, YYYY') }} -->
-              {{ item.point }}
+              {{ item.inviteReward }}
             </div>
           </div>
         </div>
