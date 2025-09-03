@@ -17,5 +17,6 @@ export default {
         title15:'No more',
         title16:'Oops something went wrong!',
         title17:'Retry',
+        title18:'Please login first',
     }
 } 

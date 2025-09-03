@@ -38,6 +38,10 @@ const state = reactive({
 })
 
 onMounted(() => {
+  if(!appStore.tomeState.token) {
+    toast.info(t('task.title18'))
+    return
+  }
   appStore.getUserInfo()
   appStore.getPointsInfo()
 })
@@ -55,6 +59,10 @@ watch(
 
 async function getData($state) {
   try {
+    if(!appStore.tomeState.token){
+      $state?.complete()
+      return
+    }
     const res = await api.getPointTaskList({
       pageSize: state.pageSize,
       pageNum: state.pageNum,
@@ -82,6 +90,10 @@ async function getData($state) {
 
 async function getInviteList($state) {
   try {
+    if(!appStore.tomeState.token){
+      $state?.complete()
+      return
+    }
     const res = await api.getInviteList({
       pageSize: state.pageSize,
       pageNum: state.pageNum,
@@ -110,7 +122,7 @@ async function getInviteList($state) {
 
 function handleClickCopy() {
   // console.log('handleClickCopy',location.origin);
-  const url = location.origin + `/login?inviteCode=${userInfo.value.myInviteCode}`
+  const url = location.origin + `/login?inviteCode=${userInfo.value?.myInviteCode}`
   copyToClipboard(url)
 }
 
@@ -188,7 +200,7 @@ async function handleClickCheck() {
       </v-menu>
     </div>
 
-    <div class="flex justify-center flex-col items-center gap-[5px]">
+    <div class="flex justify-center flex-col items-center gap-[5px]" v-if="userInfo">
       <img
         :src="userInfo?.avatarUrl"
         class="w-[60px] h-[60px] lg:w-[120px] lg:h-[120px] rounded-[10px] object-cover"
@@ -219,7 +231,7 @@ async function handleClickCheck() {
         <div class="text-[#fff] text-[16px]">{{ t('task.title1') }}</div>
         <div class="flex justify-center">
           <div class="border border-solid !border-[#FFFFFF80] rounded-full text-[24px] !px-[16px]">
-            {{ userInfo.myInviteCode }}
+            {{ userInfo?.myInviteCode }}
           </div>
         </div>
         <VBtn

@@ -98,6 +98,8 @@ export const store = {
         tomeState.token = ''
         tomeState.username = ''
         tomeState.userInfo = {}
+        tomeState.refreshToken = ''
+        localStorage.removeItem(constant.refreshTokenKey)
         localStorage.removeItem(constant.tokenKey)
         localStorage.removeItem(constant.usernameKey)
         localStorage.removeItem(constant.userInfoKey)
