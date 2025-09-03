@@ -146,7 +146,7 @@ function tabChange(val) {
                 <div
                   class="flex-1 sm:!text-left text-center text-[#fff] text-[14px] font-[600] leading-[14px]"
                 >
-                  {{ width < 630 ? formatAddress(item.user_address) : item.user_address }}
+                  {{ formatAddress(item.user_address) }}
                 </div>
                 <div class="flex-1 text-right text-[#fff] text-[14px] font-[600] leading-[14px]">
                   {{ item.total_points }}
@@ -268,7 +268,7 @@ function tabChange(val) {
                 <div
                   class="flex-1 sm:!text-left text-center text-[#fff] text-[14px] font-[600] leading-[14px]"
                 >
-                  {{ width < 630 ? formatAddress(item.address) : item.address }}
+                  {{ formatAddress(item.address) }}
                 </div>
                 <div class="flex-1 text-right text-[#fff] text-[14px] font-[600] leading-[14px]">
                   {{ item.usdc }}
@@ -329,7 +329,7 @@ function tabChange(val) {
                 <div
                   class="flex-1 sm:!text-left text-center text-[#fff] text-[14px] font-[600] leading-[14px]"
                 >
-                  {{ width < 630 ? formatAddress(item.user_address) : item.user_address }}
+                  {{ formatAddress(item.user_address) }}
                 </div>
                 <div class="flex-1 text-right text-[#fff] text-[14px] font-[600] leading-[14px]">
                   {{ item.available_points }}
