@@ -35,17 +35,17 @@ const state = reactive({
       title: 'TokenPocket',
       icon: tokenpocketImg,
       walletRdns: 'https://www.tokenpocket.pro/en/download/app',
-    }
+    },
     // {
     //   title: 'Coinbase Wallet',
     //   icon: coinbaseImg,
     //   walletRdns: 'com.coinbase.wallet',
     // },
-    // {
-    //   title: 'OKX Wallet',
-    //   icon: okxImg,
-    //   walletRdns: 'com.okex.wallet',
-    // },
+    {
+      title: 'OKX Wallet',
+      icon: okxImg,
+      walletRdns: 'com.okex.wallet',
+    },
     // {
     //   title: 'Phantom',
     //   icon: phantomImg,
