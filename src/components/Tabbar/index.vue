@@ -20,11 +20,17 @@ const tabList = [
     name: 'Home',
     path: '/',
   },
+  // {
+  //   icon: tab2Img,
+  //   selectIcon: tab2_select,
+  //   name: 'Market',
+  //   path: '/market',
+  // },
   {
     icon: tab2Img,
     selectIcon: tab2_select,
-    name: 'Market',
-    path: '/market',
+    name: 'AI',
+    path: '/ai_predictions',
   },
   {
     icon: tab3Img,
@@ -38,11 +44,17 @@ const tabList = [
     name: 'Ranking',
     path: '/leaderboard',
   },
+  // {
+  //   icon: tab5Img,
+  //   selectIcon: tab5_select,
+  //   name: 'User',
+  //   path: '/profile',
+  // },
   {
     icon: tab5Img,
     selectIcon: tab5_select,
     name: 'User',
-    path: '/profile',
+    path: '/setting',
   },
 ]
 
