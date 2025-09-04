@@ -162,9 +162,9 @@ async function getSignatrue() {
         <div class="sm:text-[24px] text-[18px] fon-[600] text-[#fff] sm:leading-[24px] leading-[18px]" style="font-family: din">
           Sign into Your Account
         </div>
-        <div class="sm:text-[16px] text-[14px] fon-[600] text-[#9DC425] leading-[16px]" style="font-family: din">
+        <!-- <div class="sm:text-[16px] text-[14px] fon-[600] text-[#9DC425] leading-[16px]" style="font-family: din">
           Get100 $USD0as aNewUser
-        </div>
+        </div> -->
       </div>
       <div class="flex flex-col items-center gap-[16px] w-full !px-[20px]">
         <div
