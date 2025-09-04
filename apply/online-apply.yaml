@@ -102,7 +102,9 @@ spec:
             pathType: Prefix
   tls:
     - hosts:
-        - yesornolabs.xyz
         - www.yesornolabs.xyz
       secretName: yesornolabs.xyz
+    - hosts:
+        - yesornolabs.xyz
+      secretName: root.yesorno.xyz
 
