@@ -28,7 +28,7 @@ spec:
       containers:
         - image: 'ghcr.io/yes-or-no-labs/yesorno-web-pord:{{IMAGE_VERSION}}'
           imagePullPolicy: IfNotPresent
-          name: yesorno-web
+          name: yesornoa-web-prod
           ports:
             - containerPort: 80
               name: http
@@ -54,9 +54,6 @@ metadata:
   name: yesornoa-web-prod
   namespace: default
 spec:
-  clusterIP: 10.43.92.50
-  clusterIPs:
-    - 10.43.92.50
   internalTrafficPolicy: Cluster
   ipFamilies:
     - IPv4
@@ -68,10 +65,7 @@ spec:
       targetPort: 80
   selector:
     k8s.kuboard.cn/name: yesornoa-web-prod
-  sessionAffinity: ClientIP
-  sessionAffinityConfig:
-    clientIP:
-      timeoutSeconds: 10800
+  sessionAffinity: None
   type: ClusterIP
 
 ---
@@ -96,8 +90,19 @@ spec:
                   number: 80
             path: /
             pathType: Prefix
+    - host: www.yesornolabs.xyz
+      http:
+        paths:
+          - backend:
+              service:
+                name: yesornoa-web-prod
+                port:
+                  number: 80
+            path: /
+            pathType: Prefix
   tls:
     - hosts:
         - yesornolabs.xyz
+        - www.yesornolabs.xyz
       secretName: yesornolabs.xyz
 
