@@ -9,6 +9,12 @@ import animationData1 from '@/assets/animate/data1.json'
 import animationData2 from '@/assets/animate/data2.json' // 引入
 import animationData3 from '@/assets/animate/data3.json'
 import { Vue3Marquee } from 'vue3-marquee'
+import partner1 from '@/assets/img/partner1.png'
+import partner2 from '@/assets/img/partner2.png'
+import partner3 from '@/assets/img/partner3.png'
+import partner4 from '@/assets/img/partner4.png'
+import partner5 from '@/assets/img/partner5.png'
+import partner6 from '@/assets/img/partner6.png'
 
 const state = reactive({
   reasoningList: [
@@ -31,7 +37,8 @@ const state = reactive({
         'Every prediction is a chance to win. Turn your foresight into rewards as you bet on crypto, culture, politics, and more — driven by what the world believes, or is afraid to say.',
     },
   ],
-  noticeData1:[{imgurl:home_notice1},{imgurl:home_notice1},{imgurl:home_notice1},{imgurl:home_notice1},{imgurl:home_notice1}]
+  noticeData1:[{imgurl:home_notice1},{imgurl:home_notice1},{imgurl:home_notice1},{imgurl:home_notice1},{imgurl:home_notice1}],
+  partnerList:[{imgurl:partner1},{imgurl:partner2},{imgurl:partner3},{imgurl:partner4},{imgurl:partner5},{imgurl:partner6}]
 })
 
 onMounted(() => {
@@ -630,10 +637,10 @@ const optAnimation = (json, index) => {
 
       <div class="!mt-[30px] flex flex-col xl:[60px] lg:gap-[50px] gap-[30px]">
         <Vue3Marquee :pauseOnHover="true" duration="30">
-              <img src="@/assets/img/home_notice_bg1.png" class="xl:h-[36px] lg:h-[30px] h-[20px] !mr-[30px]" v-for="item in 10">
+              <img :src="item.imgurl" class="xl:h-[36px] lg:h-[30px] h-[20px] !mr-[30px]" v-for="item in state.partnerList">
       </Vue3Marquee>
       <Vue3Marquee :pauseOnHover="true" direction="reverse" duration="30">
-              <img src="@/assets/img/home_notice_bg1.png" class="xl:h-[36px] lg:h-[30px] h-[20px] !mr-[30px]" v-for="item in 10">
+              <img :src="item.imgurl" class="xl:h-[36px] lg:h-[30px] h-[20px] !mr-[30px]" v-for="item in state.partnerList">
       </Vue3Marquee>
       </div>
     </div>

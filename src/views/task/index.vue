@@ -146,7 +146,7 @@ function openLink(item) {
 async function claimTask(item) {
   try {
     state.btnLoading = true
-    const res = await api.claimPointTask({
+    const res = await api.completeTask({
       taskId: item.task_id, // Replace with the actual task ID you want to claim
     })
     if (res.success) {
@@ -292,19 +292,20 @@ async function handleClickCheck() {
                   <VBtn
                     class="!rounded-full !h-[24px] !bg-[#0AB45A] !text-[12px] md:!text-[14px] !leading-[14px] !text-[#fff] !w-[52px] !font-[600]"
                     variant="flat"
+                    v-show="!item.isOpen"
                     @click="openLink(item)"
                   >
                     {{ t('task.title5') }}
                   </VBtn>
-                  <!-- <VBtn
+                  <VBtn
                     class="!rounded-full !h-[24px] !bg-[#0AB45A] !text-[12px] md:!text-[14px] !leading-[14px] !text-[#fff] !w-[52px] !font-[600]"
                     variant="flat"
                     @click="claimTask(item)"
-                    v-show="item.isOpen"
+                    v-show="item.isOpen&&item.action_type==='external_link'"
                     :loading="state.btnLoading"
                   >
-                    Claim
-                  </VBtn> -->
+                    {{ t('task.title19') }}
+                  </VBtn>
                 </div>
 
                 <VBtn
