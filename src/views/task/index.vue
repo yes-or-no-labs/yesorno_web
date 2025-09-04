@@ -151,6 +151,7 @@ async function claimTask(item) {
     })
     if (res.success) {
       item.is_completed = true
+      appStore.getPointsInfo()
     } else {
       toast.error(res.msg || 'Failed to claim task')
     }
