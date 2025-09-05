@@ -111,6 +111,9 @@ const initTokenTimer = () => {
 
 onMounted(async () => {
   await nextTick()
+
+  console.log('onMounted');
+  
   
   // 初始化Token定时器
   initTokenTimer()
