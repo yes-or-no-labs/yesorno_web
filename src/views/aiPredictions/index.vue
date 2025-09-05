@@ -2,7 +2,7 @@
     <div class="iframe-wrapper">
         <iframe 
             ref="iframeRef"
-            :src="`https://ai-dev.yesornolabs.xyz?lang=${langMap[i18n.global.locale.value]}&token=${assessToken}`" 
+            :src="`${baseUrl}?lang=${langMap[i18n.global.locale.value]}&token=${assessToken}`" 
             frameborder="0" 
             sandbox="allow-same-origin allow-scripts allow-popups allow-forms" 
             scrolling="yes"
@@ -31,6 +31,8 @@ const langMap = {
 const countdownTime = ref(0)
 const countdownTimer = ref(null)
 
+const baseUrl = import.meta.env.VITE_APP_AI_URL
+
 const assessToken= computed(() => {
   if(appStore.tomeState?.token){
     return appStore.tomeState?.token.split(' ')[1]
@@ -41,6 +43,7 @@ const assessToken= computed(() => {
 
 // 刷新Token方法
 const refreshToken = async () => {
+  if(!appStore.tomeState.refreshToken) return
   try {
     const res = await api.refreshToken({
       refreshToken: appStore.tomeState.refreshToken,
