@@ -1,5 +1,5 @@
 <template>
-    <div class="w-[302px] rounded-[6px] border border-solid border-[#666]">
+    <div class="w-[302px] rounded-[6px] border border-solid !border-[#0AB45A]">
             <div class="!px-[10px] !py-[15px] flex items-center justify-between">
               <div class="flex items-center gap-[5px]">
                 <img src="@/assets/img/player.png" class="w-[15px] h-[15px]" />
@@ -275,7 +275,7 @@ const startPriceUpdates = () => {
     // 设置定时器每30秒更新一次
     const updateInterval = setInterval(() => {
         getChainlinkBTCPrice().catch(console.error)
-    }, 2000) 
+    }, 5000) 
     
     // 组件卸载时清理定时器
     onUnmounted(() => {

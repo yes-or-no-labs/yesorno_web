@@ -402,11 +402,12 @@ function handleClickMenu(index) {
         @swiper="onSwiper"
       >
         <swiper-slide v-for="item in state.roundsList" :key="item.roundId">
-          <item_started :item="item" v-if="item.status == 'started'"></item_started>
+          <item_started :item="item" :timeCount="state.timeCount" v-if="item.status == 'started'"></item_started>
           <item_timeout :item="item" v-if="item.status == 'timeout'"></item_timeout>
           <item_locked
             :item="item"
             :blockInfo="state.blockInfo"
+            :timeCount="state.timeCount"
             v-if="item.status == 'locked'"
           ></item_locked>
           <item_later :item="item" v-if="item.status == 'later'"></item_later>

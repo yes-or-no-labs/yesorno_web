@@ -82,6 +82,7 @@
               class="!rounded-[10px] !h-[40px] !bg-[#0AB45A] !text-[12px] md:!text-[14px] lg:!text-[16px] !leading-[14px] !text-[#fff] !font-[600]"
               variant="flat"
               @click="handleClickBtn(1)"
+              :disabled="props.timeCount == 0"
             >
               Enter UP
             </VBtn>
@@ -89,6 +90,7 @@
               class="!rounded-[10px] !h-[40px] !bg-[#E72F2F] !text-[12px] md:!text-[14px] lg:!text-[16px] !leading-[14px] !text-[#fff] !font-[600]"
               variant="flat"
               @click="handleClickBtn(2)"
+              :disabled="props.timeCount == 0"
             >
               Enter DOWN
             </VBtn>
@@ -156,7 +158,7 @@
           <div class="flex items-center gap-[5px]">
             <img
               src="@/assets/img/back.png"
-              class="w-[12px] h-[12px]"
+              class="w-[12px] h-[12px] cursor-pointer"
               @click="state.isFlipped = !state.isFlipped"
             />
             <div class="text-[#fff] text-[14px]">Set Position</div>
@@ -196,7 +198,7 @@
               <div class="text-[12px] text-[#fff]">MON</div>
             </div>
           </div>
-          <div class="border border-solid !border-[#666] rounded-[6px] !mt-[20px]">
+          <div class="border border-solid !border-[#666] rounded-[6px] !mt-[15px]">
             <v-number-input
               control-variant="hidden"
               density="compact"
@@ -214,7 +216,8 @@
             >
             </v-number-input>
           </div>
-          <div class="!mt-[20px]">
+          <div class="text-[12px] text-[#fff] text-right w-full" v-if="state.isFlipped">Balance: {{ state.balanceOfMon }} MON</div>
+          <div class="!mt-[15px]">
             <v-slider
               color="#0AB45A"
               v-model="state.buyNum"
@@ -252,7 +255,7 @@
               v-else 
               @click="handleClickConfirm"
               :loading="state.isProcessing"
-              :disabled="state.isProcessing || !state.buyNum || state.buyNum <= 0"
+              :disabled="state.isProcessing || !state.buyNum || state.buyNum <= 0 || props.timeCount == 0||state.buyNum > state.balanceOfMon||state.balanceOfMon == 0"
             > 
             Confirm
             </VBtnConnect>
@@ -281,7 +284,10 @@ const props = defineProps({
   },
   contract:{
     type: Object,
-  }
+  },
+  timeCount:{
+    type: Number,
+  },
 })
 
 const state = reactive({
@@ -319,30 +325,30 @@ function enableSwiper() {
     props.swiperInstance.enable() // 重新启用 Swiper
   }
 }
-watch(
-  () => [props.item],
-  () => {
-    if (state.timer) {
-      clearInterval(state.timer)
-    }
-    // const now = state.blockInfo?.timestamp
-    const now = Math.floor(new Date().getTime() / 1000)
-    // console.log('started',props.item.lockTimestamp,now);
-    if (props.item.lockTimestamp < now) {
-      state.timeCount = 0
-      return
-    }
+// watch(
+//   () => [props.item],
+//   () => {
+//     if (state.timer) {
+//       clearInterval(state.timer)
+//     }
+//     // const now = state.blockInfo?.timestamp
+//     const now = Math.floor(new Date().getTime() / 1000)
+//     // console.log('started',props.item.lockTimestamp,now);
+//     if (props.item.lockTimestamp < now) {
+//       state.timeCount = 0
+//       return
+//     }
 
-    const diff = props.item.lockTimestamp - now
-    state.timeCount = diff
-    state.timer = setInterval(() => {
-      state.timeCount--
-      if (state.timeCount == 0) {
-        clearInterval(state.timer)
-      }
-    }, 1000)
-  },
-)
+//     const diff = props.item.lockTimestamp - now
+//     state.timeCount = diff
+//     state.timer = setInterval(() => {
+//       state.timeCount--
+//       if (state.timeCount == 0) {
+//         clearInterval(state.timer)
+//       }
+//     }, 1000)
+//   },
+// )
 
 function handleClickPercent(percent){
     state.buyNum = Number(truncateDecimals(state.balanceOfMon * percent))
@@ -362,7 +368,7 @@ function initErc20Contract() {
 
 async function handleClickConfirm() {
   // 防止重复点击
-  if (state.isProcessing) {
+  if (state.isProcessing || props.timeCount == 0) {
     return
   }
   
