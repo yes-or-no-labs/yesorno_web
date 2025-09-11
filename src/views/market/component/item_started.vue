@@ -75,7 +75,7 @@
             <div class="w-full flex items-center justify-between">
               <div class="text-[14px] text-[#fff]">Prize Pool:</div>
               <div class="text-[14px] text-[#fff]">
-                {{ props.item?.totalBearAmount + props.item?.totalBullAmount }} MON
+                {{ appStore.formatUnits(props.item?.totalBearAmount + props.item?.totalBullAmount) }} MON
               </div>
             </div>
             <VBtn
@@ -164,7 +164,8 @@
           <VBtn
             class="!rounded-[32px] !h-[32px] !bg-[#0AB45A] !p-[5px] !text-[12px] md:!text-[14px] !leading-[14px] !text-[#fff] !font-[600]"
             variant="flat"
-            v-if="state.directive == 1"
+            v-show="state.directive == 1"
+            @click="state.directive = 2"
           >
             <div class="flex items-center gap-[5px]">
               <img src="@/assets/img/arrow_up.png" mode="scaleToFill" class="w-[12px] h-[12px]" />
@@ -174,7 +175,8 @@
           <VBtn
             class="!rounded-[32px] !h-[32px] !bg-[#E72F2F] !py-[5px] !text-[12px] md:!text-[14px] !leading-[14px] !text-[#fff] !font-[600]"
             variant="flat"
-            v-else
+            v-show="state.directive == 2"
+            @click="state.directive = 1"
           >
             <div class="flex items-center gap-[5px]">
               <img
@@ -245,7 +247,15 @@
             >
               Connect Wallet
             </VBtnConnect>
-            <VBtnConnect class="rounded-[106px]" v-else> Confirm </VBtnConnect>
+            <VBtnConnect 
+              class="rounded-[106px]" 
+              v-else 
+              @click="handleClickConfirm"
+              :loading="state.isProcessing"
+              :disabled="state.isProcessing || !state.buyNum || state.buyNum <= 0"
+            > 
+            Confirm
+            </VBtnConnect>
           </div>
         </div>
       </div>
@@ -260,12 +270,16 @@ import Erc20ABi from '@/abi/erc_20.json'
 import network from '@/utils/network'
 import { ethers } from 'ethers'
 import { truncateDecimals } from '@/utils'
+import { useToast } from 'vue-toastification'
 
 const props = defineProps({
   item: {
     type: Object,
   },
   swiperInstance:{
+    type: Object,
+  },
+  contract:{
     type: Object,
   }
 })
@@ -279,10 +293,13 @@ const state = reactive({
   precent: 10,
   balanceOfMon: 0,
   tokenContract: null,
-  percentList:[{title:'10%',value:0.1},{title:'25%',value:0.25},{title:'50%',value:0.5},{title:'75%',value:0.75},{title:'MAX',value:1}]
+  percentList:[{title:'10%',value:0.1},{title:'25%',value:0.25},{title:'50%',value:0.5},{title:'75%',value:0.75},{title:'MAX',value:1}],
+  isProcessing: false // 添加处理状态，用于按钮loading
 })
 
 const appStore = store.useAppStore()
+
+const toast = useToast()
 
 onMounted(() => {
   getTokenBalance()
@@ -341,6 +358,103 @@ function initErc20Contract() {
     network[import.meta.env.VITE_APP_CHAIN].MON,
     Erc20ABi,
   )
+}
+
+async function handleClickConfirm() {
+  // 防止重复点击
+  if (state.isProcessing) {
+    return
+  }
+  
+  try {
+    state.isProcessing = true
+    console.log('handleClickConfirm')
+    
+    if (!props.contract) {
+      toast.error('合约未初始化')
+      return
+    }
+    
+    if (!state.buyNum || state.buyNum <= 0) {
+      toast.error('请输入有效的转账金额')
+      return
+    }
+    console.log('转账金额:', state.buyNum, 'MON')
+    
+      // 调用合约方法并发送原生币
+      let res = null
+      const valueInWei = appStore.parseUnits(state.buyNum.toString())
+      
+      console.log('调用合约方法，发送金额:', {
+        buyNum: state.buyNum,
+        valueInWei: valueInWei.toString(),
+        directive: state.directive,
+        assetId: props.item.assetId,
+        roundId: props.item.roundId
+      })
+      
+      // toast.info('正在调用合约，请在钱包中确认...')
+      
+      if(state.directive == 1){
+        // 调用 betBull 方法并发送 MON
+        res = await props.contract.betBull(props.item.assetId, props.item.roundId, {
+          value: valueInWei
+        })
+      } else {
+        // 调用 betBear 方法并发送 MON  
+        res = await props.contract.betBear(props.item.assetId, props.item.roundId, {
+          value: valueInWei
+        })
+      }
+    
+    // console.log('合约调用成功，交易哈希:', res.hash)
+    // toast.info('交易已发送，等待确认...')
+    
+    // 等待交易确认
+    const receipt = await res.wait()
+    console.log('交易确认成功:', receipt)
+    
+    if (receipt.status === 1) {
+      toast.success(`Successful betting!`)
+      console.log('✅ 合约调用成功:', {
+        txHash: receipt.hash,
+        blockNumber: receipt.blockNumber,
+        gasUsed: receipt.gasUsed.toString()
+      })
+      
+      // 更新余额
+      await getTokenBalance()
+      state.buyNum = null
+    } else {
+      throw new Error('交易失败')
+    }
+    
+  } catch (error) {
+    console.error('操作失败:', error)
+    
+    // 处理常见错误类型
+    let errorMessage = '操作失败，请重试'
+    
+    if (error.code === 'ACTION_REJECTED') {
+      errorMessage = '用户取消了交易'
+    } else if (error.code === 'INSUFFICIENT_FUNDS') {
+      errorMessage = '账户余额不足，请检查余额'
+    } else if (error.code === 'NETWORK_ERROR') {
+      errorMessage = '网络连接错误，请检查网络设置'
+    } else if (error.message?.includes('gas')) {
+      errorMessage = 'Gas 费用相关错误，请重试'
+    } else if (error.message?.includes('user rejected')) {
+      errorMessage = '用户拒绝了交易'
+    } else if (error.message?.includes('insufficient funds')) {
+      errorMessage = '余额不足'
+    } else if (error.message) {
+      errorMessage = error.message
+    }
+    
+    toast.error(errorMessage)
+  } finally {
+    state.isProcessing = false
+  }
 }
 
 async function getTokenBalance() {

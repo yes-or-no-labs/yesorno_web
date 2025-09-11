@@ -74,8 +74,8 @@
                     class="!px-[10px] h-[26px] flex items-center gap-[10px] rounded-[2px]"
                     style="background: linear-gradient(90deg, #6ddd25 0%, #0ab45a 100%)"
                   >
-                    <img src="@/assets/img/arrow_up.png" class="w-[10px] h-[10px]" />
-                    <div class="text-[#fff] text-[12px]">$-1.9798</div>
+                  <img src="@/assets/img/arrow_up.png" class="w-[10px] h-[10px]" :class="endPriceCom - lockPriceCom < 0 ? 'rotate-180' : ''" />
+                  <div class="text-[#fff] text-[12px]">${{ $formatAmount(endPriceCom - lockPriceCom) }}</div>
                   </div>
                 </div>
                 <div class="!mt-[10px] w-full flex items-center justify-between">
@@ -84,7 +84,7 @@
                 </div>
                 <div class="!mt-[10px] w-full flex items-center justify-between">
                   <div class="text-[12px] text-[#fff]">Prize Pool:</div>
-                  <div class="text-[12px] text-[#fff]">{{ props.item?.totalBearAmount + props.item?.totalBullAmount }} MON</div>
+                  <div class="text-[12px] text-[#fff]">{{ appStore.formatUnits(props.item?.totalBearAmount + props.item?.totalBullAmount) }} MON</div>
                 </div>
               </div>
               <div class="relative flex justify-center items-center w-[240px] h-[65px] mx-auto">
@@ -152,12 +152,15 @@
 
 <script setup>
 import { computed } from 'vue'
+import { store } from '@/store'
 
 const props = defineProps({
     item:{
         type:Object,
     }
 })
+
+const appStore = store.useAppStore()
 
 const lockPriceCom = computed(()=>{
     if(!props.item?.lockPrice) return 0

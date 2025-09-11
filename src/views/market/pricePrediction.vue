@@ -262,28 +262,6 @@ function handleClickMenu(index) {
   state.selectSymbolIndex = index
   getRounds()
 }
-
-async function getPrice() {
-  const ABI = [
-    'function latestRoundData() external view returns (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound)',
-  ]
-  // 1. 连接以太坊主网（通过Infura或Alchemy）
-  const provider = new ethers.providers.JsonRpcProvider('你的Infura或Alchemy API端点URL')
-  const contractAddress = state.menuList[state.selectSymbolIndex]?.contractAddress
-  // 2. 创建合约实例
-  const priceFeed = new ethers.Contract(contractAddress, ABI, provider)
-
-  try {
-    // 3. 调用合约函数获取最新数据
-    const data = await priceFeed.latestRoundData()
-
-    // 4. 处理数据：`answer` 是价格，但需要除以 10^8 得到真实价格
-    // this.price = (data.answer / 100000000).toFixed(2);
-    console.log('BTC/USD Price:', data.answer)
-  } catch (error) {
-    console.error('Error fetching price:', error)
-  }
-}
 </script>
 
 <template>
@@ -567,7 +545,7 @@ async function getPrice() {
       >
         <swiper-slide v-for="item in state.roundsList" :key="item.roundId">
           <item_timeout :item="item" v-if="item.status == 'timeout'"></item_timeout>
-          <item_started :swiperInstance="swiperInstance" :item="item" v-if="item.status == 'started'"></item_started>
+          <item_started :swiperInstance="swiperInstance" :contract="state.priceMarketContract" :item="item" v-if="item.status == 'started'"></item_started>
           <item_locked
             :item="item"
             :blockInfo="state.blockInfo"

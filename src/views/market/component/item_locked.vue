@@ -69,23 +69,30 @@
               </div>
               <div class="rounded-[6px] border border-solid !border-[#6DDD25] !p-[16px]">
                 <div class="text-[#fff] text-[12px]">LAST PRICE</div>
+                
                 <div class="flex-1 flex items-center justify-between !mt-[5px]">
-                  <div class="text-[24px] text-[#fff]">${{ $formatAmount(endPriceCom) }}</div>
+                  <v-tooltip text="Chainlink Oracle 的最新价格" location="top">
+                  <template v-slot:activator="{ props }">
+                    <div v-bind="props" class="text-[24px] leading-[24px] text-[#fff] border-dotted border-b !border-[#fff]" v-number-roll="{ value: currentPriceCom, prefix: '$' }"></div>
+                  </template>
+                </v-tooltip>
+                  
                   <div
                     class="!px-[10px] h-[26px] flex items-center gap-[10px] rounded-[2px]"
                     style="background: linear-gradient(90deg, #6ddd25 0%, #0ab45a 100%)"
                   >
-                    <img src="@/assets/img/arrow_up.png" class="w-[10px] h-[10px]" />
-                    <div class="text-[#fff] text-[12px]">$-1.9798</div>
+                    <img src="@/assets/img/arrow_up.png" class="w-[10px] h-[10px]" :class="currentPriceCom - lockPriceCom < 0 ? 'rotate-180' : ''" />
+                    <div class="text-[#fff] text-[12px]">${{ $formatAmount(currentPriceCom - lockPriceCom) }}</div>
                   </div>
                 </div>
+                
                 <div class="!mt-[10px] w-full flex items-center justify-between">
                   <div class="text-[12px] text-[#fff]">Locked Price:</div>
                   <div class="text-[12px] text-[#fff]">${{ $formatAmount(lockPriceCom) }}</div>
                 </div>
                 <div class="!mt-[10px] w-full flex items-center justify-between">
                   <div class="text-[12px] text-[#fff]">Prize Pool:</div>
-                  <div class="text-[12px] text-[#fff]">{{ props.item?.totalBearAmount + props.item?.totalBullAmount }} MON</div>
+                  <div class="text-[12px] text-[#fff]">{{ appStore.formatUnits(props.item?.totalBearAmount + props.item?.totalBullAmount) }} MON</div>
                 </div>
               </div>
               <div class="relative flex justify-center items-center w-[240px] h-[65px] mx-auto">
@@ -152,7 +159,9 @@
 
 <script setup>
 import { store } from '@/store';
-import { computed, onMounted, reactive, watch } from 'vue';
+import { computed, onMounted, onUnmounted, reactive, watch, ref } from 'vue';
+import { ethers } from 'ethers';
+import chainlinkAbi from '@/abi/chainlink_price_feed.json';
 
 const props = defineProps({
     item:{
@@ -163,12 +172,124 @@ const props = defineProps({
     }
 })
 
-
 const state = reactive({
     timeCount:0,
-    timer:null
+    timer:null,
+    btcPrice: 0,
+    isLoadingPrice: false,
+    lastPriceUpdate: null
 })
+
 const appStore = store.useAppStore()
+
+// ChainLink预言机配置
+const CHAINLINK_BTC_ORACLE_ADDRESS = '0xF46B02AF0b4Dc3fFd8B49a616fa399E77b58637F'
+
+/**
+ * 获取ChainLink预言机BTC实时价格
+ * @returns {Promise<number>} BTC价格
+ */
+const getChainlinkBTCPrice = async () => {
+    try {
+        state.isLoadingPrice = true
+        
+        // 获取provider
+        // const provider = appStore.mStateSimple?.ethersBrowserProvider
+        const provider = new ethers.BrowserProvider(appStore.mStateSimple.metamaskProvider)
+        if (!provider) {
+            // 如果没有连接钱包，使用默认的JSON RPC provider
+            const rpcUrl = import.meta.env.VITE_APP_RPC_URL || 'https://rpc.ankr.com/eth'
+            const fallbackProvider = new ethers.JsonRpcProvider(rpcUrl)
+            
+            // 创建合约实例
+            const priceFeedContract = new ethers.Contract(
+                CHAINLINK_BTC_ORACLE_ADDRESS,
+                chainlinkAbi,
+                fallbackProvider
+            )
+            
+            // 获取最新价格数据
+            const roundData = await priceFeedContract.latestRoundData()
+            const decimals = await priceFeedContract.decimals()
+            
+            // 转换价格（ChainLink返回的价格需要除以10^decimals）
+            const price = Number(roundData.answer) / Math.pow(10, Number(decimals))
+            
+            state.btcPrice = price
+            state.lastPriceUpdate = new Date()
+            
+            console.log('ChainLink BTC Price:', price, 'USD')
+            console.log('Round Data:', {
+                roundId: roundData.roundId.toString(),
+                answer: roundData.answer.toString(),
+                startedAt: new Date(Number(roundData.startedAt) * 1000),
+                updatedAt: new Date(Number(roundData.updatedAt) * 1000),
+                answeredInRound: roundData.answeredInRound.toString()
+            })
+            
+            return price
+        } else {
+            // 使用用户连接的钱包provider
+            const priceFeedContract = new ethers.Contract(
+                CHAINLINK_BTC_ORACLE_ADDRESS,
+                chainlinkAbi,
+                provider
+            )
+
+            console.log('priceFeedContract',priceFeedContract);
+            
+            
+            const roundData = await priceFeedContract.latestRoundData()
+            const decimals = await priceFeedContract.decimals()
+            
+            const price = Number(roundData.answer) / Math.pow(10, Number(decimals))
+            
+            state.btcPrice = price
+            state.lastPriceUpdate = new Date()
+            
+            console.log('ChainLink BTC Price:', price, 'USD')
+            return price
+        }
+        
+    } catch (error) {
+        console.error('获取ChainLink BTC价格失败:', error)
+        
+        // 如果是网络错误或合约调用失败，可以提供一个备用方案
+        if (error.code === 'NETWORK_ERROR' || error.code === 'CALL_EXCEPTION') {
+            console.warn('ChainLink调用失败，可能需要检查网络连接或合约地址')
+        }
+        
+        throw error
+    } finally {
+        state.isLoadingPrice = false
+    }
+}
+
+/**
+ * 定期更新BTC价格（每30秒更新一次）
+ */
+const startPriceUpdates = () => {
+    // 立即获取一次价格
+    getChainlinkBTCPrice().catch(console.error)
+    
+    // 设置定时器每30秒更新一次
+    const updateInterval = setInterval(() => {
+        getChainlinkBTCPrice().catch(console.error)
+    }, 2000) 
+    
+    // 组件卸载时清理定时器
+    onUnmounted(() => {
+        clearInterval(updateInterval)
+    })
+    
+    return updateInterval
+}
+
+
+// 组件挂载时启动价格更新
+onMounted(() => {
+    startPriceUpdates()
+})
 
 watch(()=>props.item,()=>{
     // const now = props.blockInfo?.timestamp
@@ -192,6 +313,14 @@ watch(()=>props.item,()=>{
 const lockPriceCom = computed(()=>{
     if(!props.item?.lockPrice) return 0
     return props.item?.lockPrice / Math.pow(10,props.item?.decimals)
+})
+
+const currentPriceCom = computed(()=>{
+    if(!state.btcPrice) {
+      return lockPriceCom.value
+    }else{
+      return state.btcPrice
+    }
 })
 
 const endPriceCom = computed(()=>{

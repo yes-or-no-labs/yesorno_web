@@ -16,6 +16,7 @@ import InfiniteLoading from "v3-infinite-loading";
 import "v3-infinite-loading/lib/style.css";
 import { setupGlobalFilters  } from '@/utils/filters'
 import { i18n } from "@/utils/i18n";
+import { directives as customDirectives } from '@/utils/directives';
 
 import App from './App.vue'
 import router from './router'
@@ -36,6 +37,12 @@ const vuetify = createVuetify({
 })
 
 setupGlobalFilters(app)
+
+// 注册自定义指令
+Object.keys(customDirectives).forEach(key => {
+  app.directive(key, customDirectives[key])
+})
+
 app.use(createPinia())
 app.use(router)
 app.use(vuetify)

@@ -141,7 +141,7 @@ async function getTokenBalance() {
         >
           
         </div> -->
-        <!-- <v-menu transition="scale-transition" :offset="[10, 0]">
+        <v-menu transition="scale-transition" :offset="[10, 0]">
           <template v-slot:activator="{ props }">
             <div
               class="text-[#fff] lg:text-[14px] text-[16px] font-[600] cursor-pointer whitespace-nowrap flex items-center"
@@ -158,7 +158,7 @@ async function getTokenBalance() {
               </v-list-item-title>
             </v-list-item>
           </v-list>
-        </v-menu> -->
+        </v-menu>
         <div
           class="text-[#fff] lg:text-[14px] text-[16px] font-[600] cursor-pointer whitespace-nowrap"
           style="font-family: Geist"
