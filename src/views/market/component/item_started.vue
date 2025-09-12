@@ -4,7 +4,7 @@
       class="w-[302px] h-[368px] rounded-[6px] border border-solid border-[#666] card relative"
       :class="{ flipped: state.isFlipped }"
     >
-      <div class="absolute w-full h-full" style="backface-visibility: hidden">
+      <div class="absolute w-full h-full z-10" style="backface-visibility: hidden" :style="{ 'pointer-events': state.isFlipped ? 'none' : 'auto' }">
         <div
           class="!px-[10px] !py-[15px] flex items-center justify-between rounded-t-[6px]"
           style="background: linear-gradient(90deg, #6ddd25 0%, #0ab45a 100%)"
@@ -151,8 +151,9 @@
         </div>
       </div>
       <div
-        class="absolute w-full h-full"
+        class="absolute w-full h-full z-20"
         style="backface-visibility: hidden; transform: rotateY(180deg)"
+        :style="{ 'pointer-events': state.isFlipped ? 'auto' : 'none' }"
       >
         <div class="!p-[10px] flex items-center justify-between rounded-t-[6px] bg-[#666]">
           <div class="flex items-center gap-[5px]">
@@ -198,7 +199,7 @@
               <div class="text-[12px] text-[#fff]">MON</div>
             </div>
           </div>
-          <div class="border border-solid !border-[#666] rounded-[6px] !mt-[15px]">
+          <div class="border border-solid !border-[#666] rounded-[6px] !mt-[15px] !relative !z-[140]" style="position: relative; z-index: 140;">
             <v-number-input
               control-variant="hidden"
               density="compact"
@@ -217,7 +218,7 @@
             </v-number-input>
           </div>
           <div class="text-[12px] text-[#fff] text-right w-full" v-if="state.isFlipped">Balance: {{ state.balanceOfMon }} MON</div>
-          <div class="!mt-[15px]">
+          <div class="!mt-[15px] !relative !z-[150]" style="position: relative; z-index: 150;">
             <v-slider
               color="#0AB45A"
               v-model="state.buyNum"
@@ -232,10 +233,11 @@
               @touchend="enableSwiper"
             ></v-slider>
           </div>
-          <div class="!mt-[20px] w-full flex flex-col gap-[20px]">
+          <div class="!mt-[20px] w-full flex flex-col gap-[20px] !relative !z-[200]" style="position: relative; z-index: 200;">
             <div class="flex items-center gap-[5px]">
               <div
-                class="flex-1 cursor-pointer !py-[5px] rounded-[2px] bg-[#FFFFFF1A] flex items-center justify-center text-[#6DDD25] text-[12px]"
+                class="flex-1 cursor-pointer !py-[5px] rounded-[2px] bg-[#FFFFFF1A] flex items-center justify-center text-[#6DDD25] text-[12px] !relative !z-[250]"
+                style="position: relative; z-index: 250; pointer-events: auto;"
                 @click="handleClickPercent(item.value)"
                 v-for="item in state.percentList"
                 :key="item.value"
@@ -244,14 +246,16 @@
               </div>
             </div>
             <VBtnConnect
-              class="rounded-[106px]"
+              class="rounded-[106px] !relative !z-[300]"
+              style="position: relative; z-index: 300; pointer-events: auto;"
               v-if="!appStore.tomeState.curWalletAddress || !appStore.tomeState.token"
               @click="$router.push('/login')"
             >
               Connect Wallet
             </VBtnConnect>
             <VBtnConnect 
-              class="rounded-[106px]" 
+              class="rounded-[106px] !relative !z-[300]"
+              style="position: relative; z-index: 300; pointer-events: auto;"
               v-else 
               @click="handleClickConfirm"
               :loading="state.isProcessing"
