@@ -75,5 +75,7 @@ export const api = {
   getPointsLeaderboard: (params) => baseHttp({url:"/v1/ai/points/leaderboard",method: 'GET',params}),
   getAccessStatsRecord: (data) => baseHttp({url:"/v1/ai/access-stats/record",method: 'POST',data}),
   completeTask: (data) => baseHttp({url:`/v1/ai/points/tasks/complete`,method: 'POST',data}),
+  getPredictionHistory: (params) => baseHttp({url:"/v1/price_prediction/user_bets",method: 'GET',params}),
+  
 }
 

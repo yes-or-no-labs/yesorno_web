@@ -218,14 +218,14 @@ const getChainlinkBTCPrice = async () => {
             state.btcPrice = price
             state.lastPriceUpdate = new Date()
             
-            console.log('ChainLink BTC Price:', price, 'USD')
-            console.log('Round Data:', {
-                roundId: roundData.roundId.toString(),
-                answer: roundData.answer.toString(),
-                startedAt: new Date(Number(roundData.startedAt) * 1000),
-                updatedAt: new Date(Number(roundData.updatedAt) * 1000),
-                answeredInRound: roundData.answeredInRound.toString()
-            })
+            // console.log('ChainLink BTC Price:', price, 'USD')
+            // console.log('Round Data:', {
+            //     roundId: roundData.roundId.toString(),
+            //     answer: roundData.answer.toString(),
+            //     startedAt: new Date(Number(roundData.startedAt) * 1000),
+            //     updatedAt: new Date(Number(roundData.updatedAt) * 1000),
+            //     answeredInRound: roundData.answeredInRound.toString()
+            // })
             
             return price
         } else {
@@ -236,7 +236,7 @@ const getChainlinkBTCPrice = async () => {
                 provider
             )
 
-            console.log('priceFeedContract',priceFeedContract);
+            // console.log('priceFeedContract',priceFeedContract);
             
             
             const roundData = await priceFeedContract.latestRoundData()
@@ -247,7 +247,7 @@ const getChainlinkBTCPrice = async () => {
             state.btcPrice = price
             state.lastPriceUpdate = new Date()
             
-            console.log('ChainLink BTC Price:', price, 'USD')
+            // console.log('ChainLink BTC Price:', price, 'USD')
             return price
         }
         

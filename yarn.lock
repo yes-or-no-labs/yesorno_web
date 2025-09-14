@@ -4002,6 +4002,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"number-precision@npm:^1.6.0":
+  version: 1.6.0
+  resolution: "number-precision@npm:1.6.0"
+  checksum: 10c0/fbd3f16430b517b6acea20010fb6226fcc02ebea8d5cbfe2bf3fbd423e1c9eb7b632674153821bd3204081127029e4f12f450f5779e26a7df526629d26774fc9
+  languageName: node
+  linkType: hard
+
 "numeral@npm:^2.0.6":
   version: 2.0.6
   resolution: "numeral@npm:2.0.6"
@@ -4321,6 +4328,7 @@ __metadata:
     globals: "npm:^16.0.0"
     lodash: "npm:^4.17.21"
     lottie-web: "npm:^5.13.0"
+    number-precision: "npm:^1.6.0"
     numeral: "npm:^2.0.6"
     pdf-lib: "npm:^1.17.1"
     pinia: "npm:^3.0.1"

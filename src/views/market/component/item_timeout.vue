@@ -69,6 +69,9 @@
         <VBtn
           class="!rounded-[10px] !h-[40px] !bg-[#0AB45A] !text-[12px] md:!text-[14px] lg:!text-[16px] !leading-[14px] !text-[#fff] !font-[600]"
           variant="flat"
+          :loading="state.isProcessing"
+          :disabled="state.isProcessing"
+          @click="handleClickClaim"
         >
           Claim
         </VBtn>
@@ -130,12 +133,19 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, reactive } from 'vue'
 
 const props = defineProps({
   item: {
     type: Object,
   },
+  contract:{
+    type: Object,
+  },
+})
+
+const state = reactive({
+  isProcessing: false,
 })
 
 const lockPriceCom = computed(() => {
@@ -147,4 +157,21 @@ const endPriceCom = computed(() => {
   if (!props.item?.endPrice) return 0
   return props.item?.endPrice / Math.pow(10, props.item?.decimals)
 })
+
+async function handleClickClaim() {
+  try {
+    state.isProcessing = true
+    console.log('handleClickClaim')
+    if (!props.contract) {
+      toast.error('合约未初始化')
+      return
+    }
+    const res = await props.contract.claim(props.item.assetId, props.item.roundId)
+    console.log('handleClickClaim', res)
+  } catch (error) {
+    console.error('handleClickClaim', error)
+  } finally {
+    state.isProcessing = false
+  }
+}
 </script>

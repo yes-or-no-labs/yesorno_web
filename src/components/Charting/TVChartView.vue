@@ -60,7 +60,9 @@ let chartWidget
 // })
 
 onUnmounted(() => {
-  closeBinanceSocket()
+  if(state.spotSocket){
+    closeBinanceSocket()
+  }
   if (state.chartWidget !== null) {
     state.chartWidget.remove()
     state.chartWidget = null
@@ -241,7 +243,7 @@ function createSocket(symbolInfo,onRealtimeCallback) {
 }
 
 function closeBinanceSocket() {
-  state.spotSocket.send(
+  state.spotSocket?.send(
     JSON.stringify({
       method: 'UNSUBSCRIBE',
       params: [`${props.symbol.toLocaleLowerCase()}@kline_${Resolutions[state.curInterval]}`],

@@ -4,7 +4,11 @@
       class="w-[302px] h-[368px] rounded-[6px] border border-solid border-[#666] card relative"
       :class="{ flipped: state.isFlipped }"
     >
-      <div class="absolute w-full h-full z-10" style="backface-visibility: hidden" :style="{ 'pointer-events': state.isFlipped ? 'none' : 'auto' }">
+      <div
+        class="absolute w-full h-full z-10"
+        style="backface-visibility: hidden"
+        :style="{ 'pointer-events': state.isFlipped ? 'none' : 'auto' }"
+      >
         <div
           class="!px-[10px] !py-[15px] flex items-center justify-between rounded-t-[6px]"
           style="background: linear-gradient(90deg, #6ddd25 0%, #0ab45a 100%)"
@@ -75,7 +79,10 @@
             <div class="w-full flex items-center justify-between">
               <div class="text-[14px] text-[#fff]">Prize Pool:</div>
               <div class="text-[14px] text-[#fff]">
-                {{ appStore.formatUnits(props.item?.totalBearAmount + props.item?.totalBullAmount) }} MON
+                {{
+                  appStore.formatUnits(props.item?.totalBearAmount + props.item?.totalBullAmount)
+                }}
+                MON
               </div>
             </div>
             <VBtn
@@ -83,6 +90,7 @@
               variant="flat"
               @click="handleClickBtn(1)"
               :disabled="props.timeCount == 0"
+              v-if="!props.item?.hasUserBet"
             >
               Enter UP
             </VBtn>
@@ -91,8 +99,17 @@
               variant="flat"
               @click="handleClickBtn(2)"
               :disabled="props.timeCount == 0"
+              v-if="!props.item?.hasUserBet"
             >
               Enter DOWN
+            </VBtn>
+            <VBtn
+              class="!rounded-[10px] !h-[40px] !bg-[#0AB45A] !text-[12px] md:!text-[14px] lg:!text-[16px] !leading-[14px] !text-[#fff] !font-[600]"
+              variant="flat"
+              :disabled="true"
+              v-else
+            >
+              Entered
             </VBtn>
           </div>
           <div class="relative flex justify-center items-center w-[240px] h-[65px] mx-auto">
@@ -199,7 +216,10 @@
               <div class="text-[12px] text-[#fff]">MON</div>
             </div>
           </div>
-          <div class="border border-solid !border-[#666] rounded-[6px] !mt-[15px] !relative !z-[140]" style="position: relative; z-index: 140;">
+          <div
+            class="border border-solid !border-[#666] rounded-[6px] !mt-[15px] !relative !z-[140]"
+            style="position: relative; z-index: 140"
+          >
             <v-number-input
               control-variant="hidden"
               density="compact"
@@ -217,8 +237,10 @@
             >
             </v-number-input>
           </div>
-          <div class="text-[12px] text-[#fff] text-right w-full" v-if="state.isFlipped">Balance: {{ state.balanceOfMon }} MON</div>
-          <div class="!mt-[15px] !relative !z-[150]" style="position: relative; z-index: 150;">
+          <div class="text-[12px] text-[#fff] text-right w-full" v-if="state.isFlipped">
+            Balance: {{ state.balanceOfMon }} MON
+          </div>
+          <div class="!mt-[15px] !relative !z-[150]" style="position: relative; z-index: 150">
             <v-slider
               color="#0AB45A"
               v-model="state.buyNum"
@@ -233,11 +255,14 @@
               @touchend="enableSwiper"
             ></v-slider>
           </div>
-          <div class="!mt-[20px] w-full flex flex-col gap-[20px] !relative !z-[200]" style="position: relative; z-index: 200;">
+          <div
+            class="!mt-[20px] w-full flex flex-col gap-[20px] !relative !z-[200]"
+            style="position: relative; z-index: 200"
+          >
             <div class="flex items-center gap-[5px]">
               <div
                 class="flex-1 cursor-pointer !py-[5px] rounded-[2px] bg-[#FFFFFF1A] flex items-center justify-center text-[#6DDD25] text-[12px] !relative !z-[250]"
-                style="position: relative; z-index: 250; pointer-events: auto;"
+                style="position: relative; z-index: 250; pointer-events: auto"
                 @click="handleClickPercent(item.value)"
                 v-for="item in state.percentList"
                 :key="item.value"
@@ -247,21 +272,28 @@
             </div>
             <VBtnConnect
               class="rounded-[106px] !relative !z-[300]"
-              style="position: relative; z-index: 300; pointer-events: auto;"
+              style="position: relative; z-index: 300; pointer-events: auto"
               v-if="!appStore.tomeState.curWalletAddress || !appStore.tomeState.token"
               @click="$router.push('/login')"
             >
               Connect Wallet
             </VBtnConnect>
-            <VBtnConnect 
+            <VBtnConnect
               class="rounded-[106px] !relative !z-[300]"
-              style="position: relative; z-index: 300; pointer-events: auto;"
-              v-else 
+              style="position: relative; z-index: 300; pointer-events: auto"
+              v-else
               @click="handleClickConfirm"
               :loading="state.isProcessing"
-              :disabled="state.isProcessing || !state.buyNum || state.buyNum <= 0 || props.timeCount == 0||state.buyNum > state.balanceOfMon||state.balanceOfMon == 0"
-            > 
-            Confirm
+              :disabled="
+                state.isProcessing ||
+                !state.buyNum ||
+                state.buyNum <= 0 ||
+                props.timeCount == 0 ||
+                state.buyNum > state.balanceOfMon ||
+                state.balanceOfMon == 0
+              "
+            >
+              Confirm
             </VBtnConnect>
           </div>
         </div>
@@ -283,13 +315,13 @@ const props = defineProps({
   item: {
     type: Object,
   },
-  swiperInstance:{
+  swiperInstance: {
     type: Object,
   },
-  contract:{
+  contract: {
     type: Object,
   },
-  timeCount:{
+  timeCount: {
     type: Number,
   },
 })
@@ -303,8 +335,14 @@ const state = reactive({
   precent: 10,
   balanceOfMon: 0,
   tokenContract: null,
-  percentList:[{title:'10%',value:0.1},{title:'25%',value:0.25},{title:'50%',value:0.5},{title:'75%',value:0.75},{title:'MAX',value:1}],
-  isProcessing: false // 添加处理状态，用于按钮loading
+  percentList: [
+    { title: '10%', value: 0.1 },
+    { title: '25%', value: 0.25 },
+    { title: '50%', value: 0.5 },
+    { title: '75%', value: 0.75 },
+    { title: 'MAX', value: 1 },
+  ],
+  isProcessing: false, // 添加处理状态，用于按钮loading
 })
 
 const appStore = store.useAppStore()
@@ -316,15 +354,15 @@ onMounted(() => {
 })
 
 function disableSwiper() {
-    console.log('disableSwiper',props.swiperInstance);
-    
+  console.log('disableSwiper', props.swiperInstance)
+
   if (props.swiperInstance) {
     props.swiperInstance.disable() // 禁用 Swiper
   }
 }
 function enableSwiper() {
-    console.log('enableSwiper');
-    
+  console.log('enableSwiper')
+
   if (props.swiperInstance) {
     props.swiperInstance.enable() // 重新启用 Swiper
   }
@@ -354,8 +392,8 @@ function enableSwiper() {
 //   },
 // )
 
-function handleClickPercent(percent){
-    state.buyNum = Number(truncateDecimals(state.balanceOfMon * percent))
+function handleClickPercent(percent) {
+  state.buyNum = Number(truncateDecimals(state.balanceOfMon * percent))
 }
 
 function handleClickBtn(e) {
@@ -375,76 +413,75 @@ async function handleClickConfirm() {
   if (state.isProcessing || props.timeCount == 0) {
     return
   }
-  
+
   try {
     state.isProcessing = true
     console.log('handleClickConfirm')
-    
+
     if (!props.contract) {
       toast.error('合约未初始化')
       return
     }
-    
+
     if (!state.buyNum || state.buyNum <= 0) {
       toast.error('请输入有效的转账金额')
       return
     }
     console.log('转账金额:', state.buyNum, 'MON')
-    
-      // 调用合约方法并发送原生币
-      let res = null
-      const valueInWei = appStore.parseUnits(state.buyNum.toString())
-      
-      console.log('调用合约方法，发送金额:', {
-        buyNum: state.buyNum,
-        valueInWei: valueInWei.toString(),
-        directive: state.directive,
-        assetId: props.item.assetId,
-        roundId: props.item.roundId
+
+    // 调用合约方法并发送原生币
+    let res = null
+    const valueInWei = appStore.parseUnits(state.buyNum.toString())
+
+    console.log('调用合约方法，发送金额:', {
+      buyNum: state.buyNum,
+      valueInWei: valueInWei.toString(),
+      directive: state.directive,
+      assetId: props.item.assetId,
+      roundId: props.item.roundId,
+    })
+
+    // toast.info('正在调用合约，请在钱包中确认...')
+
+    if (state.directive == 1) {
+      // 调用 betBull 方法并发送 MON
+      res = await props.contract.betBull(props.item.assetId, props.item.roundId, {
+        value: valueInWei,
       })
-      
-      // toast.info('正在调用合约，请在钱包中确认...')
-      
-      if(state.directive == 1){
-        // 调用 betBull 方法并发送 MON
-        res = await props.contract.betBull(props.item.assetId, props.item.roundId, {
-          value: valueInWei
-        })
-      } else {
-        // 调用 betBear 方法并发送 MON  
-        res = await props.contract.betBear(props.item.assetId, props.item.roundId, {
-          value: valueInWei
-        })
-      }
-    
+    } else {
+      // 调用 betBear 方法并发送 MON
+      res = await props.contract.betBear(props.item.assetId, props.item.roundId, {
+        value: valueInWei,
+      })
+    }
+
     // console.log('合约调用成功，交易哈希:', res.hash)
     // toast.info('交易已发送，等待确认...')
-    
+
     // 等待交易确认
     const receipt = await res.wait()
     console.log('交易确认成功:', receipt)
-    
+
     if (receipt.status === 1) {
       toast.success(`Successful betting!`)
       console.log('✅ 合约调用成功:', {
         txHash: receipt.hash,
         blockNumber: receipt.blockNumber,
-        gasUsed: receipt.gasUsed.toString()
+        gasUsed: receipt.gasUsed.toString(),
       })
-      
+
       // 更新余额
       await getTokenBalance()
       state.buyNum = null
     } else {
       throw new Error('交易失败')
     }
-    
   } catch (error) {
     console.error('操作失败:', error)
-    
+
     // 处理常见错误类型
     let errorMessage = '操作失败，请重试'
-    
+
     if (error.code === 'ACTION_REJECTED') {
       errorMessage = '用户取消了交易'
     } else if (error.code === 'INSUFFICIENT_FUNDS') {
@@ -460,7 +497,7 @@ async function handleClickConfirm() {
     } else if (error.message) {
       errorMessage = error.message
     }
-    
+
     toast.error(errorMessage)
   } finally {
     state.isProcessing = false
