@@ -65,7 +65,7 @@
           >
             UP
           </div>
-          <div class="text-[12px] text-[#fff]">2.61x Payout</div>
+          <div class="text-[12px] text-[#fff]">{{upPayoutCom}}x Payout</div>
         </div>
       </div>
       <div class="rounded-[6px] border border-solid !border-[#6DDD25] !p-[16px]">
@@ -170,7 +170,7 @@
           </defs>
         </svg>
         <div class="relative z-10 flex flex-col items-center justify-center w-full">
-          <div class="text-[12px] text-[#fff]">2.61x Payout</div>
+          <div class="text-[12px] text-[#fff]">{{downPayoutCom}}x Payout</div>
           <div
             class="text-[16px]"
             :style="`color:${props.item?.lockPriceCom < props.item?.endPriceCom ? '#fff' : '#E72F2F'}`"
@@ -186,6 +186,7 @@
 <script setup>
 import { computed, reactive } from 'vue'
 import { store } from '@/store'
+import NP from 'number-precision'
 
 const props = defineProps({
   item: {
@@ -201,6 +202,16 @@ const state = reactive({
 })
 
 const appStore = store.useAppStore()
+
+const upPayoutCom = computed(()=>{
+    if(!props.item.totalBearAmount || !props.item.totalBullAmount) return 0
+    return NP.divide(props.item.totalBearAmount + props.item.totalBullAmount, props.item.totalBullAmount)
+})
+
+const downPayoutCom = computed(()=>{
+    if(!props.item.totalBearAmount || !props.item.totalBullAmount) return 0
+    return NP.divide(props.item.totalBearAmount + props.item.totalBullAmount, props.item.totalBearAmount)
+})
 
 const lockPriceCom = computed(() => {
   if (!props.item?.lockPrice) return 0

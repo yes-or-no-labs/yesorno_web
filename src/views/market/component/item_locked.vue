@@ -64,7 +64,7 @@
                 </svg>
                 <div class="relative z-10 flex flex-col items-center justify-center w-full">
                   <div class="text-[16px] text-[#0AB45A]">UP</div>
-                  <div class="text-[12px] text-[#fff]">2.61x Payout</div>
+                  <div class="text-[12px] text-[#fff]">{{upPayoutCom}}x Payout</div>
                 </div>
               </div>
               <div class="rounded-[6px] border border-solid !border-[#6DDD25] !p-[16px]">
@@ -149,7 +149,7 @@
                   </defs>
                 </svg>
                 <div class="relative z-10 flex flex-col items-center justify-center w-full">
-                  <div class="text-[12px] text-[#fff]">2.61x Payout</div>
+                  <div class="text-[12px] text-[#fff]">{{downPayoutCom}}x Payout</div>
                   <div class="text-[16px] text-[#E72F2F]">DOWN</div>
                 </div>
               </div>
@@ -162,6 +162,7 @@ import { store } from '@/store';
 import { computed, onMounted, onUnmounted, reactive, watch, ref } from 'vue';
 import { ethers } from 'ethers';
 import chainlinkAbi from '@/abi/chainlink_price_feed.json';
+import NP from 'number-precision'
 
 const props = defineProps({
     item:{
@@ -184,6 +185,17 @@ const appStore = store.useAppStore()
 
 // ChainLink预言机配置
 const CHAINLINK_BTC_ORACLE_ADDRESS = '0xF46B02AF0b4Dc3fFd8B49a616fa399E77b58637F'
+
+const upPayoutCom = computed(()=>{
+    if(!props.item.totalBearAmount || !props.item.totalBullAmount) return 0
+    return NP.divide(props.item.totalBearAmount + props.item.totalBullAmount, props.item.totalBullAmount)
+})
+
+const downPayoutCom = computed(()=>{
+  if(!props.item.totalBearAmount || !props.item.totalBullAmount) return 0
+    return NP.divide(props.item.totalBearAmount + props.item.totalBullAmount, props.item.totalBearAmount)
+})
+
 
 /**
  * 获取ChainLink预言机BTC实时价格

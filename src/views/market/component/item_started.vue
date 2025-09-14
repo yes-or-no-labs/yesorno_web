@@ -70,7 +70,7 @@
             </svg>
             <div class="relative z-10 flex flex-col items-center justify-center w-full">
               <div class="text-[16px] text-[#0AB45A]">UP</div>
-              <div class="text-[12px] text-[#fff]">2.61x Payout</div>
+              <div class="text-[12px] text-[#fff]">{{upPayoutCom}}x Payout</div>
             </div>
           </div>
           <div
@@ -161,7 +161,7 @@
               </defs>
             </svg>
             <div class="relative z-10 flex flex-col items-center justify-center w-full">
-              <div class="text-[12px] text-[#fff]">2.61x Payout</div>
+              <div class="text-[12px] text-[#fff]">{{downPayoutCom}}x Payout</div>
               <div class="text-[16px] text-[#E72F2F]">DOWN</div>
             </div>
           </div>
@@ -304,12 +304,13 @@
 
 <script setup>
 import { store } from '@/store'
-import { onMounted, reactive, watch } from 'vue'
+import { onMounted, reactive, watch, computed } from 'vue'
 import Erc20ABi from '@/abi/erc_20.json'
 import network from '@/utils/network'
 import { ethers } from 'ethers'
 import { truncateDecimals } from '@/utils'
 import { useToast } from 'vue-toastification'
+import NP from 'number-precision'
 
 const props = defineProps({
   item: {
@@ -367,6 +368,16 @@ function enableSwiper() {
     props.swiperInstance.enable() // 重新启用 Swiper
   }
 }
+
+const upPayoutCom = computed(()=>{
+    if(!props.item.totalBearAmount || !props.item.totalBullAmount) return 0
+    return NP.divide(props.item.totalBearAmount + props.item.totalBullAmount, props.item.totalBullAmount)
+})
+
+const downPayoutCom = computed(()=>{
+  if(!props.item.totalBearAmount || !props.item.totalBullAmount) return 0
+    return NP.divide(props.item.totalBearAmount + props.item.totalBullAmount, props.item.totalBearAmount)
+})
 // watch(
 //   () => [props.item],
 //   () => {
