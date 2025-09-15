@@ -183,6 +183,7 @@ const state = reactive({
 
 const appStore = store.useAppStore()
 
+
 // ChainLink预言机配置
 const CHAINLINK_BTC_ORACLE_ADDRESS = '0xF46B02AF0b4Dc3fFd8B49a616fa399E77b58637F'
 
@@ -334,6 +335,9 @@ const currentPriceCom = computed(()=>{
       return state.btcPrice
     }
 })
+
+defineExpose({currentPriceCom})
+
 
 const endPriceCom = computed(()=>{
     if(!props.item?.endPrice) return 0

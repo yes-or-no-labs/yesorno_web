@@ -104,6 +104,8 @@ const swiperInstance = ref(null)
 
 const router = useRouter()
 
+const itemLockedRef = ref(null)
+
 const currenRoutePath = computed(() => {
   // console.log('currenRoutePath', router.currentRoute.value)
 
@@ -174,7 +176,7 @@ async function getPredictionHistory() {
   })
   console.log('getPredictionHistory', res)
   if(res.success){
-    state.betHistoryList = res.obj
+    state.betHistoryList = res.obj.result
   }
 }
 
@@ -463,6 +465,7 @@ function handleClickMenu(index) {
               :item="item"
               :blockInfo="state.blockInfo"
               :timeCount="state.timeCount"
+              ref="itemLockedRef"
               v-if="item.status == 'locked'"
             ></item_locked>
             <item_later :item="item" v-if="item.status == 'later'"></item_later>
@@ -644,7 +647,8 @@ function handleClickMenu(index) {
                 </v-list>
               </v-menu>
               <div class="text-[#6DDD25] text-[24px] font-[600]">
-                ${{ $formatAmount(state.currentPrice) }}
+                <!-- ${{ $formatAmount(state.currentPrice) }} -->
+                 {{ $formatAmount(itemLockedRef?itemLockedRef[0]?.currentPriceCom:0) }}
               </div>
             </div>
           </div>
