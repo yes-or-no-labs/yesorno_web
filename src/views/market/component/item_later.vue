@@ -159,6 +159,7 @@ watch(()=>[props.item],()=>{
             state.timeCount = 0
             return
         }
+        console.log('props.item.lockTimestamp',props.item.lockTimestamp);
         
         const diff = props.item.lockTimestamp - now
         state.timeCount = diff

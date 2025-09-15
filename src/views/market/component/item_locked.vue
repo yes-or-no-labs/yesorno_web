@@ -20,7 +20,7 @@
                   <g filter="url(#filter0_i)">
                     <path
                       d="M10.0001 49.2757L10.0003 64H234L234 49.2753C234 42.5136 229.749 36.4819 223.381 34.2077L138.48 3.8859C127.823 0.0796983 116.177 0.0796931 105.519 3.8859L20.6188 34.2076C14.2508 36.4819 10.0001 42.5138 10.0001 49.2757Z"
-                      fill="#0AB45A33"
+                      :fill="lockPriceCom < currentPriceCom ? '#0AB45A' : '#0AB45A33'"
                     ></path>
                   </g>
                   <defs>
@@ -63,15 +63,15 @@
                   </defs>
                 </svg>
                 <div class="relative z-10 flex flex-col items-center justify-center w-full">
-                  <div class="text-[16px] text-[#0AB45A]">UP</div>
+                  <div class="text-[16px]" :style="`color:${lockPriceCom < currentPriceCom ? '#fff' : '#0AB45A'}`">UP</div>
                   <div class="text-[12px] text-[#fff]">{{upPayoutCom}}x Payout</div>
                 </div>
               </div>
-              <div class="rounded-[6px] border border-solid !border-[#6DDD25] !p-[16px]">
+              <div class="rounded-[6px] border border-solid !border-[#6DDD25] !p-[16px]" v-if="props.timeCount > 0">
                 <div class="text-[#fff] text-[12px]">LAST PRICE</div>
                 
                 <div class="flex-1 flex items-center justify-between !mt-[5px]">
-                  <v-tooltip text="Chainlink Oracle 的最新价格" location="top">
+                  <v-tooltip text="Last price from Chainlink Oracle" location="top">
                   <template v-slot:activator="{ props }">
                     <div v-bind="props" class="text-[24px] leading-[24px] text-[#fff] border-dotted border-b !border-[#fff]" v-number-roll="{ value: currentPriceCom, prefix: '$' }"></div>
                   </template>
@@ -95,6 +95,13 @@
                   <div class="text-[12px] text-[#fff]">{{ appStore.formatUnits(props.item?.totalBearAmount + props.item?.totalBullAmount) }} MON</div>
                 </div>
               </div>
+              <div class="rounded-[6px] border border-solid !border-[#6DDD25] !p-[16px] h-[150px] flex items-center justify-center flex-col" v-else>
+                <div class="flex flex-col gap-[50px] relative">
+                  <Loading/>
+                  <div class="w-full h-[50px]"></div>
+                  <div class="text-[#fff] text-[16px]">Calculating</div>
+                </div>
+              </div>
               <div class="relative flex justify-center items-center w-[240px] h-[65px] mx-auto">
                 <svg
                   height="65px"
@@ -106,7 +113,7 @@
                   <g filter="url(#filter0_i)">
                     <path
                       d="M10.0001 15.7243L10.0003 1H234L234 15.7247C234 22.4864 229.749 28.5181 223.381 30.7923L138.48 61.1141C127.823 64.9203 116.177 64.9203 105.519 61.1141L20.6188 30.7924C14.2508 28.5181 10.0001 22.4862 10.0001 15.7243Z"
-                      fill="#E72F2F33"
+                      :fill="lockPriceCom < currentPriceCom ? '#E72F2F33' : '#E72F2F'"
                     ></path>
                   </g>
                   <defs>
@@ -150,7 +157,7 @@
                 </svg>
                 <div class="relative z-10 flex flex-col items-center justify-center w-full">
                   <div class="text-[12px] text-[#fff]">{{downPayoutCom}}x Payout</div>
-                  <div class="text-[16px] text-[#E72F2F]">DOWN</div>
+                  <div class="text-[16px]" :style="`color:${lockPriceCom < currentPriceCom ? '#E72F2F' : '#fff'}`">DOWN</div>
                 </div>
               </div>
             </div>
@@ -163,6 +170,7 @@ import { computed, onMounted, onUnmounted, reactive, watch, ref } from 'vue';
 import { ethers } from 'ethers';
 import chainlinkAbi from '@/abi/chainlink_price_feed.json';
 import NP from 'number-precision'
+import Loading from '@/components/Loading/index.vue'
 
 const props = defineProps({
     item:{
@@ -170,6 +178,9 @@ const props = defineProps({
     },
     blockInfo:{
         type:Object,
+    },
+    timeCount:{
+      type:Number,
     }
 })
 

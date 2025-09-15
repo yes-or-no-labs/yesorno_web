@@ -89,7 +89,7 @@
               class="!rounded-[10px] !h-[40px] !bg-[#0AB45A] !text-[12px] md:!text-[14px] lg:!text-[16px] !leading-[14px] !text-[#fff] !font-[600]"
               variant="flat"
               @click="handleClickBtn(1)"
-              :disabled="props.timeCount == 0"
+              :disabled="props.timeCount <= 0"
               v-if="!props.item?.hasUserBet"
             >
               Enter UP
@@ -98,7 +98,7 @@
               class="!rounded-[10px] !h-[40px] !bg-[#E72F2F] !text-[12px] md:!text-[14px] lg:!text-[16px] !leading-[14px] !text-[#fff] !font-[600]"
               variant="flat"
               @click="handleClickBtn(2)"
-              :disabled="props.timeCount == 0"
+              :disabled="props.timeCount <= 0"
               v-if="!props.item?.hasUserBet"
             >
               Enter DOWN
@@ -421,7 +421,7 @@ function initErc20Contract() {
 
 async function handleClickConfirm() {
   // 防止重复点击
-  if (state.isProcessing || props.timeCount == 0) {
+  if (state.isProcessing || props.timeCount <= 0) {
     return
   }
 

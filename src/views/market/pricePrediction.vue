@@ -64,8 +64,10 @@ const state = reactive({
     { title: 'PNL', value: '2' },
   ],
   typeOfHistory: '',
-  betHistoryList:[],
-  isProcessing:false
+  betHistoryList: [],
+  isProcessing: false,
+  pageSize: 10,
+  pageNum: 1,
 })
 
 const segmentedRef = ref(null)
@@ -90,15 +92,21 @@ onUnmounted(() => {
   }
 })
 
-watch(()=>state.showDrawer,()=>{
-  if(state.showDrawer){
-    getPredictionHistory()
-  }
-})
+watch(
+  () => state.showDrawer,
+  () => {
+    if (state.showDrawer) {
+      getPredictionHistory(null, true)
+    }
+  },
+)
 
-watch(()=>state.typeOfHistory,()=>{
-  getPredictionHistory()
-})
+watch(
+  () => state.typeOfHistory,
+  () => {
+    getPredictionHistory(null, true)
+  },
+)
 
 const swiperInstance = ref(null)
 
@@ -168,15 +176,37 @@ function getCurrentPrice(e) {
   state.currentPrice = e.price
 }
 
-async function getPredictionHistory() {
-  const res = await api.getPredictionHistory({
-    chainId: import.meta.env.VITE_APP_CHAIN,
-    userAddress: appStore.tomeState.curWalletAddress,
-    claimed:state.typeOfHistory
-  })
-  console.log('getPredictionHistory', res)
-  if(res.success){
-    state.betHistoryList = res.obj.result
+async function getPredictionHistory($state, isRefresh) {
+  try {
+    if (isRefresh) state.pageNum = 1
+    const res = await api.getPredictionHistory({
+      chainId: import.meta.env.VITE_APP_CHAIN,
+      userAddress: appStore.tomeState.curWalletAddress,
+      claimed: state.typeOfHistory,
+      pageSize: state.pageSize,
+      pageNum: state.pageNum,
+    })
+    console.log('getPredictionHistory', res)
+    if (res.success) {
+      if (isRefresh) {
+        state.betHistoryList = res.obj.result
+      } else {
+        state.betHistoryList = state.betHistoryList.concat(res.obj.result)
+      }
+      state.pageNum++
+      if (Array.isArray(res.obj.result) && res.obj?.result.length < state.pageSize) {
+        $state?.complete()
+      } else {
+        console.log('loaded', $state)
+
+        $state?.loaded()
+        state.pageNum++
+      }
+    } else {
+      $state?.error()
+    }
+  } catch (error) {
+    $state?.error()
   }
 }
 
@@ -187,7 +217,7 @@ async function handleClickClaim(item) {
     console.log('handleClickClaim', res)
     await res.wait()
     toast.success('Claim Success')
-    getPredictionHistory()
+    getPredictionHistory(null, true)
   } catch (error) {
     console.error('handleClickClaim', error)
   } finally {
@@ -304,11 +334,21 @@ function filterPerview() {
 }
 
 function handleClickChange(e) {
-  console.log('handleClickChange',e);
+  console.log('handleClickChange', e)
   state.currentTab = e
 
   // (e) => (state.currentTab = e)
 }
+
+watch(
+  () => width.value,
+  () => {
+    if (swiperInstance.value) {
+      swiperInstance.value.update()
+      swiperInstance.value.updateSlides()
+    }
+  },
+)
 
 function handleClickMenu(index) {
   state.selectSymbolIndex = index
@@ -473,7 +513,11 @@ function handleClickMenu(index) {
           </swiper-slide>
         </swiper>
       </div>
-      <div class="sm:hidden flex" v-show="state.currentTab == 2" style="height: calc(100vh - 172px)">
+      <div
+        class="sm:hidden flex"
+        v-show="state.currentTab == 2"
+        style="height: calc(100vh - 172px)"
+      >
         <tvChart
           @currentPrice="getCurrentPrice"
           :symbol="state.menuList[state.selectSymbolIndex]?.symbol"
@@ -500,113 +544,174 @@ function handleClickMenu(index) {
                 alt=""
               />
             </div> -->
-            
           </div>
           <div class="w-full h-[16px]"></div>
           <v-tabs
-              v-model="state.currentFirstTab"
-              fixed-tabs
-              align-tabs="center"
-              color="#0AB45A"
-              height="60"
+            v-model="state.currentFirstTab"
+            fixed-tabs
+            align-tabs="center"
+            color="#0AB45A"
+            height="60"
+          >
+            <v-tab :value="item.value" v-for="item in state.tabList1" style="font-size: 16px">
+              <span>{{ item.title }}</span></v-tab
             >
-              <v-tab :value="item.value" v-for="item in state.tabList1" style="font-size: 16px">
-                <span>{{ item.title }}</span></v-tab
-              >
-            </v-tabs>
-            <div class="!mt-[16px]" v-show="state.currentFirstTab == '1'">
-              <v-radio-group inline v-model="state.typeOfHistory" hideDetails color="#6DDD25">
-                <v-radio label="All" value=""></v-radio>
-                <v-radio label="Collected" :value="true"></v-radio>
-                <v-radio label="Uncollected" :value="false"></v-radio>
-              </v-radio-group>
-            </div>
+          </v-tabs>
+          <div class="!mt-[16px]" v-show="state.currentFirstTab == '1'">
+            <v-radio-group inline v-model="state.typeOfHistory" hideDetails color="#6DDD25">
+              <v-radio label="All" value=""></v-radio>
+              <v-radio label="Collected" :value="true"></v-radio>
+              <v-radio label="Uncollected" :value="false"></v-radio>
+            </v-radio-group>
+          </div>
         </div>
         <v-tabs-window v-model="state.currentFirstTab">
-              <v-tabs-window-item value="1">
-                <div class="w-full !px-[10px] !py-[16px]" >
-                  <div class="w-full flex items-center justify-between ">
-                  <div class="text-[#fff] text-[16px] font-[600]">Your History</div>
-                  <div class="flex items-center gap-[5px]">
-                    <div class="text-[#6DDD25] text-[16px] font-[600]">WIN</div>
-                    <img src="@/assets/img/price_icon4.png" class="w-[24px] h-[24px] cursor-pointer" alt="" />
-                  </div>
+          <v-tabs-window-item value="1">
+            <div class="w-full !px-[10px] !py-[16px]">
+              <div class="w-full flex items-center justify-between">
+                <div class="text-[#fff] text-[16px] font-[600]">Your History</div>
+                <div class="flex items-center gap-[5px]">
+                  <div class="text-[#6DDD25] text-[16px] font-[600]">WIN</div>
+                  <img
+                    src="@/assets/img/price_icon4.png"
+                    class="w-[24px] h-[24px] cursor-pointer"
+                    alt=""
+                  />
                 </div>
-                <div class="w-full flex flex-col gap-[16px] !mt-[30px] overflow-y-auto" style="height: calc(100vh - 400px);">
-                  <div class="w-full !p-[16px] rounded-[6px] border border-solid border-[#666]" v-for="item in state.betHistoryList" :key="item.roundId">
-                    <VBtnConnect
-                      class="rounded-[106px] !h-[42px] !w-full !font-bold"
-                      v-if="!item.claimed&&item.isWinner"
-                      :loading="item.isProcessing"
-                      :disabled="item.isProcessing"
-                      @click="handleClickClaim(item)"
-                    >
-                      Collect Winnings
-                    </VBtnConnect>
-                    <div class="w-full !py-[30px] flex flex-col gap-[16px] border-b border-solid border-[#666]">
-                      <div class="flex items-center justify-between w-full">
-                        <div class="text-[#fff] text-[16px] font-[600]">Your direction:</div>
-                        <div class="text-[#fff] !px-[5px] py-[6px] flex justify-center items-center bg-[#0AB45A] gap-[5px]" :class="item.position=='bull'?'bg-[#0AB45A]':'bg-[#E72F2F]'">
-                          <img src="@/assets/img/arrow_up.png" mode="scaleToFill" class="w-[10px] h-[10px]" :class="item.position=='bull'?'':'rotate-180'" />
-                          <div class="text-[#fff] text-[12px] font-[600]">{{item.position=='bull'?'UP':'DOWN'}}</div>
+              </div>
+              <div
+                class="w-full flex flex-col gap-[16px] !mt-[30px] overflow-y-auto historyEl"
+                style="height: calc(100vh - 400px)"
+              >
+                <div
+                  class="w-full !p-[16px] rounded-[6px] border border-solid border-[#666]"
+                  v-for="item in state.betHistoryList"
+                  :key="item.roundId"
+                >
+                  <VBtnConnect
+                    class="rounded-[106px] !h-[42px] !w-full !font-bold"
+                    v-if="!item.claimed && item.isWinner"
+                    :loading="item.isProcessing"
+                    :disabled="item.isProcessing"
+                    @click="handleClickClaim(item)"
+                  >
+                    Collect Winnings
+                  </VBtnConnect>
+                  <div
+                    class="w-full !py-[30px] flex flex-col gap-[16px] border-b border-solid border-[#666]"
+                  >
+                    <div class="flex items-center justify-between w-full">
+                      <div class="text-[#fff] text-[16px] font-[600]">Your direction:</div>
+                      <div
+                        class="text-[#fff] !px-[5px] py-[6px] flex justify-center items-center bg-[#0AB45A] gap-[5px]"
+                        :class="item.position == 'bull' ? 'bg-[#0AB45A]' : 'bg-[#E72F2F]'"
+                      >
+                        <img
+                          src="@/assets/img/arrow_up.png"
+                          mode="scaleToFill"
+                          class="w-[10px] h-[10px]"
+                          :class="item.position == 'bull' ? '' : 'rotate-180'"
+                        />
+                        <div class="text-[#fff] text-[12px] font-[600]">
+                          {{ item.position == 'bull' ? 'UP' : 'DOWN' }}
                         </div>
                       </div>
-                      <div class="flex items-center justify-between w-full">
-                        <div class="text-[#fff] text-[16px] font-[600]">Your position:</div>
-                        <div class="text-[#fff] text-[16px] font-[600]">{{ appStore.formatUnits(item.amount) }} MON</div>
-                      </div>
-                      <div class="flex items-center justify-between w-full" v-if="item.isWinner">
-                        <div class="text-[#fff] text-[16px] font-[600]">Your winnings:</div>
-                        <div class="text-[#0AB45A] text-[16px] font-[600]"><span v-show="Number(appStore.formatUnits(item.claimableAmount)) > Number(appStore.formatUnits(item.amount))">+</span>{{ NP.minus(Number(appStore.formatUnits(item.claimableAmount)),Number(appStore.formatUnits(item.amount))) }} MON</div>
-                      </div>
-                      <div class="flex items-center justify-between w-full" v-else>
-                        <div class="text-[#fff] text-[16px] font-[600]">Your loss:</div>
-                        <div class="text-[#E72F2F] text-[16px] font-[600]">-{{ appStore.formatUnits(item.amount) }} MON</div>
+                    </div>
+                    <div class="flex items-center justify-between w-full">
+                      <div class="text-[#fff] text-[16px] font-[600]">Your position:</div>
+                      <div class="text-[#fff] text-[16px] font-[600]">
+                        {{ appStore.formatUnits(item.amount) }} MON
                       </div>
                     </div>
-                    <div class="!pt-[16px] w-full flex justify-between items-center">
-                      <div class="text-[#fff] text-[16px] font-[600]">Amount to collect:</div>
-                      <div class="text-[#fff] text-[16px] font-[600]">{{ item.isWinner?Number(appStore.formatUnits(item.claimableAmount)):0 }} MON</div>
-                    </div>
-                  </div>
-                  <div class="w-full h-full flex items-center justify-center text-[18px] text-[#94969c] font-bold" v-show="state.betHistoryList.length == 0">No data yet</div>
-                </div>
-                </div>
-                
-              </v-tabs-window-item>
-              <v-tabs-window-item value="2">
-                <div class="!px-[10px] !py-[16px] border-b border-solid border-[#666]">
-                  <div class="text-[#fff] text-[16px] font-bold">Your History</div>
-                  <div class="!mt-[30px] flex items-center gap-[30px]">
-                    <v-progress-circular
-                      :model-value="50"
-                      :size="126"
-                      :width="10"
-                      bg-color="#fff"
-                      color="#6DDD25"
-                    >
-                      <div
-                        class="text-[#6DDD25] text-[16px] font-bold absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex flex-col gap-[5px] items-center"
-                      >
-                        <div class="text-[#fff] text-[16px]">Won</div>
-                        <div class="text-[#6DDD25] text-[16px] font-bold">0/0</div>
-                        <div class="text-[#A7A7A7] text-[16px]">50%</div>
+                    <div class="flex items-center justify-between w-full" v-if="item.isWinner">
+                      <div class="text-[#fff] text-[16px] font-[600]">Your winnings:</div>
+                      <div class="text-[#0AB45A] text-[16px] font-[600]">
+                        <span
+                          v-show="
+                            Number(appStore.formatUnits(item.claimableAmount)) >
+                            Number(appStore.formatUnits(item.amount))
+                          "
+                          >+</span
+                        >{{
+                          NP.minus(
+                            Number(appStore.formatUnits(item.claimableAmount)),
+                            Number(appStore.formatUnits(item.amount)),
+                          )
+                        }}
+                        MON
                       </div>
-                    </v-progress-circular>
-                    <div class="flex flex-col gap-[5px]">
-                      <div class="text-[#fff] text-[16px] font-bold">Net results</div>
-                      <div class="text-[#E72F2F] text-[16px] font-bold">0 BNB</div>
-                      <div class="text-[#A7A7A7] text-[16px]">~$0.00</div>
+                    </div>
+                    <div class="flex items-center justify-between w-full" v-else>
+                      <div class="text-[#fff] text-[16px] font-[600]">Your loss:</div>
+                      <div class="text-[#E72F2F] text-[16px] font-[600]">
+                        -{{ appStore.formatUnits(item.amount) }} MON
+                      </div>
                     </div>
                   </div>
-                  <div class="!mt-[16px] flex flex-col">
-                    <div class="text-[#fff] text-[16px] font-bold">Average return /round</div>
-                    <div class="text-[#fff] text-[16px] font-bold">0 BNB</div>
-                    <div class="text-[#A7A7A7] text-[16px]">~$0.00</div>
+                  <div class="!pt-[16px] w-full flex justify-between items-center">
+                    <div class="text-[#fff] text-[16px] font-[600]">Amount to collect:</div>
+                    <div class="text-[#fff] text-[16px] font-[600]">
+                      {{ item.isWinner ? Number(appStore.formatUnits(item.claimableAmount)) : 0 }}
+                      MON
+                    </div>
                   </div>
                 </div>
-              </v-tabs-window-item>
-            </v-tabs-window>
+                <div
+                  class="w-full h-full flex items-center justify-center text-[18px] text-[#94969c] font-bold"
+                  v-show="state.betHistoryList.length == 0"
+                >
+                  No data yet
+                </div>
+
+                <infinite-loading @infinite="getPredictionHistory" target="historyEl">
+                  <template #spinner>
+                    <div class="text-center !mt-[20px]">Loading...</div>
+                  </template>
+                  <template #complete>
+                    <div class="text-center !mt-[20px]">No more</div>
+                  </template>
+                </infinite-loading>
+              </div>
+            </div>
+          </v-tabs-window-item>
+          <v-tabs-window-item value="2">
+            <div class="!px-[10px] !py-[16px] border-b border-solid border-[#666]">
+              <div class="text-[#fff] text-[16px] font-bold">Your History</div>
+              <div class="!mt-[30px] flex items-center gap-[30px]">
+                <v-progress-circular
+                  :model-value="50"
+                  :size="126"
+                  :width="10"
+                  bg-color="#fff"
+                  color="#6DDD25"
+                >
+                  <div
+                    class="text-[#6DDD25] text-[16px] font-bold absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex flex-col gap-[5px] items-center"
+                  >
+                    <div class="text-[#fff] text-[16px]">Won</div>
+                    <div class="text-[#6DDD25] text-[16px] font-bold">0/0</div>
+                    <div class="text-[#A7A7A7] text-[16px]">50%</div>
+                  </div>
+                </v-progress-circular>
+                <div class="flex flex-col gap-[5px]">
+                  <div class="text-[#fff] text-[16px] font-bold">Net results</div>
+                  <div class="text-[#E72F2F] text-[16px] font-bold">0 BNB</div>
+                  <div class="text-[#A7A7A7] text-[16px]">~$0.00</div>
+                </div>
+              </div>
+              <div class="!mt-[16px] flex flex-col">
+                <div class="text-[#fff] text-[16px] font-bold">Average return /round</div>
+                <div class="text-[#fff] text-[16px] font-bold">0 BNB</div>
+                <!-- <div class="text-[#A7A7A7] text-[16px]">~$0.00</div> -->
+              </div>
+              <div class="!mt-[16px] flex flex-col">
+                <div class="text-[#fff] text-[16px] font-bold">Average position entered /round</div>
+                <div class="text-[#fff] text-[16px] font-bold">0 BNB</div>
+                <!-- <div class="text-[#A7A7A7] text-[16px]">~$0.00</div> -->
+              </div>
+            </div>
+          </v-tabs-window-item>
+        </v-tabs-window>
       </div>
       <!-- <div class="sm:hidden flex" v-if="state.currentTab == 3" style="height: calc(100vh - 172px)">
       <AiComponent
@@ -648,7 +753,7 @@ function handleClickMenu(index) {
               </v-menu>
               <div class="text-[#6DDD25] text-[24px] font-[600]">
                 <!-- ${{ $formatAmount(state.currentPrice) }} -->
-                 {{ $formatAmount(itemLockedRef?itemLockedRef[0]?.currentPriceCom:0) }}
+                {{ $formatAmount(itemLockedRef ? itemLockedRef[0]?.currentPriceCom : 0) }}
               </div>
             </div>
           </div>
@@ -743,11 +848,13 @@ function handleClickMenu(index) {
               :swiperInstance="swiperInstance"
               :contract="state.priceMarketContract"
               :item="item"
+              :timeCount="state.timeCount"
               v-if="item.status == 'started'"
             ></item_started>
             <item_locked
               :item="item"
               :blockInfo="state.blockInfo"
+              :timeCount="state.timeCount"
               v-if="item.status == 'locked'"
             ></item_locked>
             <item_later :item="item" v-if="item.status == 'later'"></item_later>
@@ -840,7 +947,10 @@ function handleClickMenu(index) {
         >
           <div class="w-full flex justify-between items-center">
             <div class="text-[#fff] text-[16px] font-[600]">History</div>
-            <div class="text-[16px] font-[600] text-[#6DDD25] flex items-center gap-[5px] cursor-pointer" @click="state.showDrawer = false">
+            <div
+              class="text-[16px] font-[600] text-[#6DDD25] flex items-center gap-[5px] cursor-pointer"
+              @click="state.showDrawer = false"
+            >
               <div>Close</div>
               <img
                 src="@/assets/img/arrow_right.png"
@@ -848,113 +958,187 @@ function handleClickMenu(index) {
                 alt=""
               />
             </div>
-            
           </div>
           <div class="w-full h-[16px]"></div>
           <v-tabs
-              v-model="state.currentFirstTab"
-              fixed-tabs
-              align-tabs="center"
-              color="#0AB45A"
-              height="60"
+            v-model="state.currentFirstTab"
+            fixed-tabs
+            align-tabs="center"
+            color="#0AB45A"
+            height="60"
+          >
+            <v-tab :value="item.value" v-for="item in state.tabList1" style="font-size: 16px">
+              <span>{{ item.title }}</span></v-tab
             >
-              <v-tab :value="item.value" v-for="item in state.tabList1" style="font-size: 16px">
-                <span>{{ item.title }}</span></v-tab
-              >
-            </v-tabs>
-            <div class="!mt-[16px]" v-show="state.currentFirstTab == '1'">
-              <v-radio-group inline v-model="state.typeOfHistory" hideDetails color="#6DDD25">
-                <v-radio label="All" value=""></v-radio>
-                <v-radio label="Collected" :value="true"></v-radio>
-                <v-radio label="Uncollected" :value="false"></v-radio>
-              </v-radio-group>
-            </div>
+          </v-tabs>
+          <div class="!mt-[16px]" v-show="state.currentFirstTab == '1'">
+            <v-radio-group inline v-model="state.typeOfHistory" hideDetails color="#6DDD25">
+              <v-radio label="All" value=""></v-radio>
+              <v-radio label="Collected" :value="true"></v-radio>
+              <v-radio label="Uncollected" :value="false"></v-radio>
+            </v-radio-group>
+          </div>
         </div>
         <v-tabs-window v-model="state.currentFirstTab">
-              <v-tabs-window-item value="1">
-                <div class="w-full !px-[10px] !py-[16px]" >
-                  <div class="w-full flex items-center justify-between ">
-                  <div class="text-[#fff] text-[16px] font-[600]">Your History</div>
-                  <div class="flex items-center gap-[5px]">
-                    <div class="text-[#6DDD25] text-[16px] font-[600]">WIN</div>
-                    <img src="@/assets/img/price_icon4.png" class="w-[24px] h-[24px] cursor-pointer" alt="" />
-                  </div>
+          <v-tabs-window-item value="1">
+            <div class="w-full !px-[10px] !py-[16px]">
+              <div class="w-full flex items-center justify-between">
+                <div class="text-[#fff] text-[16px] font-[600]">Your History</div>
+                <div class="flex items-center gap-[5px]">
+                  <div class="text-[#6DDD25] text-[16px] font-[600]">WIN</div>
+                  <img
+                    src="@/assets/img/price_icon4.png"
+                    class="w-[24px] h-[24px] cursor-pointer"
+                    alt=""
+                  />
                 </div>
-                <div class="w-full flex flex-col gap-[16px] !mt-[30px] overflow-y-auto" style="height: calc(100vh - 275px);">
-                  <div class="w-full !p-[16px] rounded-[6px] border border-solid border-[#666]" v-for="item in state.betHistoryList" :key="item.roundId">
-                    <VBtnConnect
-                      class="rounded-[106px] !h-[42px] !w-full !font-bold"
-                      v-if="!item.claimed&&item.isWinner"
-                      :loading="item.isProcessing"
-                      :disabled="item.isProcessing"
-                      @click="handleClickClaim(item)"
-                    >
-                      Collect Winnings
-                    </VBtnConnect>
-                    <div class="w-full !py-[30px] flex flex-col gap-[16px] border-b border-solid border-[#666]">
-                      <div class="flex items-center justify-between w-full">
-                        <div class="text-[#fff] text-[16px] font-[600]">Your direction:</div>
-                        <div class="text-[#fff] !px-[5px] py-[6px] flex justify-center items-center bg-[#0AB45A] gap-[5px]" :class="item.position=='bull'?'bg-[#0AB45A]':'bg-[#E72F2F]'">
-                          <img src="@/assets/img/arrow_up.png" mode="scaleToFill" class="w-[10px] h-[10px]" :class="item.position=='bull'?'':'rotate-180'" />
-                          <div class="text-[#fff] text-[12px] font-[600]">{{item.position=='bull'?'UP':'DOWN'}}</div>
+              </div>
+              <div
+                class="w-full flex flex-col gap-[16px] !mt-[30px] overflow-y-auto"
+                style="height: calc(100vh - 275px)"
+              >
+                <div
+                  class="w-full !p-[16px] rounded-[6px] border border-solid border-[#666]"
+                  v-for="item in state.betHistoryList"
+                  :key="item.roundId"
+                >
+                  <VBtnConnect
+                    class="rounded-[106px] !h-[42px] !w-full !font-bold"
+                    v-if="!item.claimed && item.isWinner"
+                    :loading="item.isProcessing"
+                    :disabled="item.isProcessing"
+                    @click="handleClickClaim(item)"
+                  >
+                    Collect Winnings
+                  </VBtnConnect>
+                  <div
+                    class="w-full !py-[30px] flex flex-col gap-[16px] border-b border-solid border-[#666]"
+                  >
+                    <div class="flex items-center justify-between w-full">
+                      <div class="text-[#fff] text-[16px] font-[600]">Your direction:</div>
+                      <div
+                        class="text-[#fff] !px-[5px] py-[6px] flex justify-center items-center bg-[#0AB45A] gap-[5px]"
+                        :class="item.position == 'bull' ? 'bg-[#0AB45A]' : 'bg-[#E72F2F]'"
+                      >
+                        <img
+                          src="@/assets/img/arrow_up.png"
+                          mode="scaleToFill"
+                          class="w-[10px] h-[10px]"
+                          :class="item.position == 'bull' ? '' : 'rotate-180'"
+                        />
+                        <div class="text-[#fff] text-[12px] font-[600]">
+                          {{ item.position == 'bull' ? 'UP' : 'DOWN' }}
                         </div>
                       </div>
-                      <div class="flex items-center justify-between w-full">
-                        <div class="text-[#fff] text-[16px] font-[600]">Your position:</div>
-                        <div class="text-[#fff] text-[16px] font-[600]">{{ appStore.formatUnits(item.amount) }} MON</div>
-                      </div>
-                      <div class="flex items-center justify-between w-full" v-if="item.isWinner">
-                        <div class="text-[#fff] text-[16px] font-[600]">Your winnings:</div>
-                        <div class="text-[#0AB45A] text-[16px] font-[600]"><span v-show="Number(appStore.formatUnits(item.claimableAmount)) > Number(appStore.formatUnits(item.amount))">+</span>{{ NP.minus(Number(appStore.formatUnits(item.claimableAmount)),Number(appStore.formatUnits(item.amount))) }} MON</div>
-                      </div>
-                      <div class="flex items-center justify-between w-full" v-else>
-                        <div class="text-[#fff] text-[16px] font-[600]">Your loss:</div>
-                        <div class="text-[#E72F2F] text-[16px] font-[600]">-{{ appStore.formatUnits(item.amount) }} MON</div>
+                    </div>
+                    <div class="flex items-center justify-between w-full">
+                      <div class="text-[#fff] text-[16px] font-[600]">Your position:</div>
+                      <div class="text-[#fff] text-[16px] font-[600]">
+                        {{ appStore.formatUnits(item.amount) }} MON
                       </div>
                     </div>
-                    <div class="!pt-[16px] w-full flex justify-between items-center">
-                      <div class="text-[#fff] text-[16px] font-[600]">Amount to collect:</div>
-                      <div class="text-[#fff] text-[16px] font-[600]">{{ item.isWinner?Number(appStore.formatUnits(item.claimableAmount)):0 }} MON</div>
-                    </div>
-                  </div>
-                  <div class="w-full h-full flex items-center justify-center text-[18px] text-[#94969c] font-bold" v-show="state.betHistoryList.length == 0">No data yet</div>
-                </div>
-                </div>
-                
-              </v-tabs-window-item>
-              <v-tabs-window-item value="2">
-                <div class="!px-[10px] !py-[16px] border-b border-solid border-[#666]">
-                  <div class="text-[#fff] text-[16px] font-bold">Your History</div>
-                  <div class="!mt-[30px] flex items-center gap-[30px]">
-                    <v-progress-circular
-                      :model-value="50"
-                      :size="126"
-                      :width="10"
-                      bg-color="#fff"
-                      color="#6DDD25"
-                    >
-                      <div
-                        class="text-[#6DDD25] text-[16px] font-bold absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex flex-col gap-[5px] items-center"
-                      >
-                        <div class="text-[#fff] text-[16px]">Won</div>
-                        <div class="text-[#6DDD25] text-[16px] font-bold">0/0</div>
-                        <div class="text-[#A7A7A7] text-[16px]">50%</div>
+                    <div class="flex items-center justify-between w-full" v-if="item.isWinner">
+                      <div class="text-[#fff] text-[16px] font-[600]">Your winnings:</div>
+                      <div class="text-[#0AB45A] text-[16px] font-[600]">
+                        <span
+                          v-show="
+                            Number(appStore.formatUnits(item.claimableAmount)) >
+                            Number(appStore.formatUnits(item.amount))
+                          "
+                          >+</span
+                        >{{
+                          NP.minus(
+                            Number(appStore.formatUnits(item.claimableAmount)),
+                            Number(appStore.formatUnits(item.amount)),
+                          )
+                        }}
+                        MON
                       </div>
-                    </v-progress-circular>
-                    <div class="flex flex-col gap-[5px]">
-                      <div class="text-[#fff] text-[16px] font-bold">Net results</div>
-                      <div class="text-[#E72F2F] text-[16px] font-bold">0 BNB</div>
-                      <div class="text-[#A7A7A7] text-[16px]">~$0.00</div>
+                    </div>
+                    <div class="flex items-center justify-between w-full" v-else>
+                      <div class="text-[#fff] text-[16px] font-[600]">Your loss:</div>
+                      <div class="text-[#E72F2F] text-[16px] font-[600]">
+                        -{{ appStore.formatUnits(item.amount) }} MON
+                      </div>
                     </div>
                   </div>
-                  <div class="!mt-[16px] flex flex-col">
-                    <div class="text-[#fff] text-[16px] font-bold">Average return /round</div>
-                    <div class="text-[#fff] text-[16px] font-bold">0 BNB</div>
-                    <div class="text-[#A7A7A7] text-[16px]">~$0.00</div>
+                  <div class="!pt-[16px] w-full flex justify-between items-center">
+                    <div class="text-[#fff] text-[16px] font-[600]">Amount to collect:</div>
+                    <div class="text-[#fff] text-[16px] font-[600]">
+                      {{ item.isWinner ? Number(appStore.formatUnits(item.claimableAmount)) : 0 }}
+                      MON
+                    </div>
                   </div>
                 </div>
-              </v-tabs-window-item>
-            </v-tabs-window>
+                <div
+                  class="w-full h-full flex items-center justify-center text-[18px] text-[#94969c] font-bold"
+                  v-show="state.betHistoryList.length == 0"
+                >
+                  No data yet
+                </div>
+              </div>
+            </div>
+          </v-tabs-window-item>
+          <v-tabs-window-item value="2">
+            <div class="!px-[10px] !py-[16px] border-b border-solid border-[#666]">
+              <div class="text-[#fff] text-[16px] font-bold">Your History</div>
+              <div class="!mt-[30px] flex items-center gap-[30px]">
+                <v-progress-circular
+                  :model-value="50"
+                  :size="126"
+                  :width="10"
+                  bg-color="#fff"
+                  color="#6DDD25"
+                >
+                  <div
+                    class="text-[#6DDD25] text-[16px] font-bold absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex flex-col gap-[5px] items-center"
+                  >
+                    <div class="text-[#fff] text-[16px]">Won</div>
+                    <div class="text-[#6DDD25] text-[16px] font-bold">0/0</div>
+                    <div class="text-[#A7A7A7] text-[16px]">50%</div>
+                  </div>
+                </v-progress-circular>
+                <div class="flex flex-col gap-[5px]">
+                  <div class="text-[#fff] text-[16px] font-bold">Net results</div>
+                  <div class="text-[#E72F2F] text-[16px] font-bold">0 BNB</div>
+                  <!-- <div class="text-[#A7A7A7] text-[16px]">~$0.00</div> -->
+                </div>
+              </div>
+              <div class="!mt-[16px] flex flex-col">
+                <div class="text-[#fff] text-[16px] font-bold">Average return /round</div>
+                <div class="text-[#fff] text-[16px] font-bold">0 BNB</div>
+                <!-- <div class="text-[#A7A7A7] text-[16px]">~$0.00</div> -->
+              </div>
+              <div class="!mt-[16px] flex flex-col">
+                <div class="text-[#fff] text-[16px] font-bold">Average position entered /round</div>
+                <div class="text-[#fff] text-[16px] font-bold">0 BNB</div>
+                <!-- <div class="text-[#A7A7A7] text-[16px]">~$0.00</div> -->
+              </div>
+            </div>
+            <div class="!px-[10px] !py-[16px] border-b border-solid border-[#666]">
+              <div class="text-[#fff] text-[16px] font-bold">Won</div>
+              <div class="grid grid-cols-2 !mt-[10px]">
+                <div class="w-full flex flex-col">
+                  <div class="text-[#0AB45A] text-[16px] font-bold">0 rounds</div>
+                  <div class="text-[#A7A7A7] text-[16px]">0%</div>
+                </div>
+                <div class="w-full flex flex-col">
+                  <div class="text-[#0AB45A] text-[16px] font-bold">+0 BNB</div>
+                </div>
+              </div>
+              <div class="text-[#fff] text-[16px] font-bold !mt-[16px]">Entered</div>
+              <div class="grid grid-cols-2 !mt-[10px]">
+                <div class="w-full flex flex-col">
+                  <div class="text-[#fff] text-[16px] font-bold">0 rounds</div>
+                  <div class="text-[#A7A7A7] text-[16px]">total</div>
+                </div>
+                <div class="w-full flex flex-col">
+                  <div class="text-[#fff] text-[16px] font-bold">0 BNB</div>
+                </div>
+              </div>
+            </div>
+          </v-tabs-window-item>
+        </v-tabs-window>
       </v-navigation-drawer>
     </div>
   </v-layout>
@@ -965,7 +1149,7 @@ function handleClickMenu(index) {
   display: flex;
   align-items: center;
 }
-:deep(.v-selection-control-group--inline){
+:deep(.v-selection-control-group--inline) {
   gap: 10px;
 }
 </style>

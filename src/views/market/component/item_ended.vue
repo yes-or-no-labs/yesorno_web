@@ -21,7 +21,7 @@
           <g filter="url(#filter0_i)">
             <path
               d="M10.0001 49.2757L10.0003 64H234L234 49.2753C234 42.5136 229.749 36.4819 223.381 34.2077L138.48 3.8859C127.823 0.0796983 116.177 0.0796931 105.519 3.8859L20.6188 34.2076C14.2508 36.4819 10.0001 42.5138 10.0001 49.2757Z"
-              :fill="props.item?.lockPriceCom < props.item?.endPriceCom ? '#0AB45A33' : '#0AB45A'"
+              :fill="lockPriceCom < endPriceCom ? '#0AB45A' : '#0AB45A33'"
             ></path>
           </g>
           <defs>
@@ -61,7 +61,7 @@
         <div class="relative z-10 flex flex-col items-center justify-center w-full">
           <div
             class="text-[16px]"
-            :style="`color:${props.item?.lockPriceCom < props.item?.endPriceCom ? '#0AB45A' : '#fff'}`"
+            :style="`color:${lockPriceCom < endPriceCom ? '#fff' : '#0AB45A'}`"
           >
             UP
           </div>
@@ -131,8 +131,7 @@
           <g filter="url(#filter0_i)">
             <path
               d="M10.0001 15.7243L10.0003 1H234L234 15.7247C234 22.4864 229.749 28.5181 223.381 30.7923L138.48 61.1141C127.823 64.9203 116.177 64.9203 105.519 61.1141L20.6188 30.7924C14.2508 28.5181 10.0001 22.4862 10.0001 15.7243Z"
-              fill="#E72F2F33"
-              :fill="props.item?.lockPriceCom < props.item?.endPriceCom ? '#E72F2F' : '#E72F2F33'"
+              :fill="lockPriceCom < endPriceCom ? '#E72F2F33' : '#E72F2F'"
             ></path>
           </g>
           <defs>
@@ -173,7 +172,7 @@
           <div class="text-[12px] text-[#fff]">{{downPayoutCom}}x Payout</div>
           <div
             class="text-[16px]"
-            :style="`color:${props.item?.lockPriceCom < props.item?.endPriceCom ? '#fff' : '#E72F2F'}`"
+            :style="`color:${lockPriceCom < endPriceCom ? '#E72F2F' : '#fff'}`"
           >
             DOWN
           </div>
