@@ -4,6 +4,7 @@ import Header from '@/components/Header/index.vue'
 import { computed, onMounted, reactive } from 'vue'
 import { store } from '@/store'
 import FooterSecond from '@/components/FooterSecond/index.vue'
+import Footer from '@/components/Footer/index.vue'
 import Tabbar from '@/components/Tabbar/index.vue'
 import { api } from './apis'
 
@@ -43,7 +44,7 @@ onMounted(() => {
     <div class="max-w-[1440px] mx-auto">
       <RouterView />
     </div>
-    <FooterSecond v-if="currenRoutePath !== '/login'" />
+    <Footer v-if="currenRoutePath !== '/login'" />
     <Tabbar/>
   </div>
 </template>
