@@ -68,6 +68,7 @@ const state = reactive({
   isProcessing: false,
   pageSize: 10,
   pageNum: 1,
+  pnlInfo:{}
 })
 
 const segmentedRef = ref(null)
@@ -97,6 +98,7 @@ watch(
   () => {
     if (state.showDrawer) {
       getPredictionHistory(null, true)
+      getPredictionPnl()
     }
   },
 )
@@ -222,6 +224,17 @@ async function handleClickClaim(item) {
     console.error('handleClickClaim', error)
   } finally {
     item.isProcessing = false
+  }
+}
+
+async function getPredictionPnl() {
+  const res = await api.getPredictionPnl({
+    chainId: import.meta.env.VITE_APP_CHAIN,
+    userAddress: appStore.tomeState.curWalletAddress,
+  })
+  console.log('getPredictionPnl', res)
+  if(res.success){
+    state.pnlInfo = res.obj
   }
 }
 
@@ -354,6 +367,10 @@ function handleClickMenu(index) {
   state.selectSymbolIndex = index
   getRounds()
 }
+
+const averageReturn = computed(() => {
+  return ((Number(appStore.formatUnits(state.pnlInfo?.totalWonAmount)) - Number(appStore.formatUnits(state.pnlInfo?.totalLostAmount))) / state.pnlInfo?.totalRounds).toFixed(2) * 100
+})
 </script>
 
 <template>
@@ -435,7 +452,7 @@ function handleClickMenu(index) {
               @click="swiperInstance.slideNext()"
             />
           </div>
-          <div class="flex items-center gap-[16px]">
+          <div class="flex items-center gap-[30px]">
             <div
               class="h-[42px] rounded-full !pl-[20px] !pr-[40px] flex items-center gap-[10px] relative"
               style="background: linear-gradient(90deg, #6ddd25 0%, #0ab45a 100%)"
@@ -448,7 +465,7 @@ function handleClickMenu(index) {
                 draggable="false"
               />
             </div>
-            <div
+            <!-- <div
               class="w-[42px] h-[42px] rounded-full flex items-center justify-center cursor-pointer select-none"
               style="background: linear-gradient(90deg, #6ddd25 0%, #0ab45a 100%)"
               v-ripple
@@ -471,7 +488,7 @@ function handleClickMenu(index) {
                 draggable="false"
                 alt=""
               />
-            </div>
+            </div> -->
             <div
               class="w-[42px] h-[42px] rounded-full flex items-center justify-center cursor-pointer select-none"
               style="background: linear-gradient(90deg, #6ddd25 0%, #0ab45a 100%)"
@@ -679,9 +696,10 @@ function handleClickMenu(index) {
               <div class="text-[#fff] text-[16px] font-bold">Your History</div>
               <div class="!mt-[30px] flex items-center gap-[30px]">
                 <v-progress-circular
-                  :model-value="50"
+                  :model-value="state.pnlInfo?.totalWonRounds/state.pnlInfo?.totalRounds * 100"
                   :size="126"
                   :width="10"
+                  :max="state.pnlInfo?.totalRounds"
                   bg-color="#fff"
                   color="#6DDD25"
                 >
@@ -689,25 +707,42 @@ function handleClickMenu(index) {
                     class="text-[#6DDD25] text-[16px] font-bold absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex flex-col gap-[5px] items-center"
                   >
                     <div class="text-[#fff] text-[16px]">Won</div>
-                    <div class="text-[#6DDD25] text-[16px] font-bold">0/0</div>
-                    <div class="text-[#A7A7A7] text-[16px]">50%</div>
+                    <div class="text-[#6DDD25] text-[16px] font-bold">{{state.pnlInfo?.totalWonRounds}}/{{ state.pnlInfo?.totalRounds }}</div>
+                    <div class="text-[#A7A7A7] text-[16px]">{{state.pnlInfo?.winRate.toFixed(2) * 100}}%</div>
                   </div>
                 </v-progress-circular>
                 <div class="flex flex-col gap-[5px]">
                   <div class="text-[#fff] text-[16px] font-bold">Net results</div>
-                  <div class="text-[#E72F2F] text-[16px] font-bold">0 BNB</div>
-                  <div class="text-[#A7A7A7] text-[16px]">~$0.00</div>
+                  <div class="text-[#E72F2F] text-[16px] font-bold">{{ $formatAmount(Number(appStore.formatUnits(state.pnlInfo?.totalWonAmount)) - Number(appStore.formatUnits(state.pnlInfo?.totalLostAmount))) }} MON</div>
+                  <!-- <div class="text-[#A7A7A7] text-[16px]">~$0.00</div> -->
                 </div>
               </div>
               <div class="!mt-[16px] flex flex-col">
                 <div class="text-[#fff] text-[16px] font-bold">Average return /round</div>
-                <div class="text-[#fff] text-[16px] font-bold">0 BNB</div>
+                <div class="text-[#fff] text-[16px] font-bold">{{ averageReturn }}%</div>
                 <!-- <div class="text-[#A7A7A7] text-[16px]">~$0.00</div> -->
               </div>
-              <div class="!mt-[16px] flex flex-col">
-                <div class="text-[#fff] text-[16px] font-bold">Average position entered /round</div>
-                <div class="text-[#fff] text-[16px] font-bold">0 BNB</div>
-                <!-- <div class="text-[#A7A7A7] text-[16px]">~$0.00</div> -->
+            </div>
+            <div class="!px-[10px] !py-[16px]">
+              <div class="text-[#fff] text-[16px] font-bold">Won</div>
+              <div class="grid grid-cols-2 !mt-[10px]">
+                <div class="w-full flex flex-col">
+                  <div class="text-[#0AB45A] text-[16px] font-bold">{{ state.pnlInfo?.totalWonRounds }} rounds</div>
+                  <div class="text-[#A7A7A7] text-[16px]">{{state.pnlInfo?.winRate.toFixed(2) * 100}}%</div>
+                </div>
+                <div class="w-full flex flex-col">
+                  <div class="text-[#0AB45A] text-[16px] font-bold">+{{ appStore.formatUnits(state.pnlInfo?.totalWonAmount) }} MON</div>
+                </div>
+              </div>
+              <div class="text-[#fff] text-[16px] font-bold !mt-[16px]">Entered</div>
+              <div class="grid grid-cols-2 !mt-[10px]">
+                <div class="w-full flex flex-col">
+                  <div class="text-[#fff] text-[16px] font-bold">{{ state.pnlInfo?.totalRounds }} rounds</div>
+                  <div class="text-[#A7A7A7] text-[16px]">total</div>
+                </div>
+                <div class="w-full flex flex-col">
+                  <div class="text-[#fff] text-[16px] font-bold">{{ appStore.formatUnits(state.pnlInfo?.totalBetAmount) }} MON</div>
+                </div>
               </div>
             </div>
           </v-tabs-window-item>
@@ -778,7 +813,7 @@ function handleClickMenu(index) {
               @click="swiperInstance.slideNext()"
             />
           </div>
-          <div class="flex items-center gap-[16px]">
+          <div class="flex items-center gap-[30px]">
             <div
               class="h-[42px] rounded-full !pl-[20px] !pr-[40px] flex items-center gap-[10px] relative"
               style="background: linear-gradient(90deg, #6ddd25 0%, #0ab45a 100%)"
@@ -791,7 +826,7 @@ function handleClickMenu(index) {
                 draggable="false"
               />
             </div>
-            <div
+            <!-- <div
               class="w-[42px] h-[42px] rounded-full flex items-center justify-center cursor-pointer select-none"
               style="background: linear-gradient(90deg, #6ddd25 0%, #0ab45a 100%)"
               v-ripple
@@ -814,7 +849,7 @@ function handleClickMenu(index) {
                 draggable="false"
                 alt=""
               />
-            </div>
+            </div> -->
             <div
               class="w-[42px] h-[42px] rounded-full flex items-center justify-center cursor-pointer select-none"
               style="background: linear-gradient(90deg, #6ddd25 0%, #0ab45a 100%)"
@@ -1084,9 +1119,10 @@ function handleClickMenu(index) {
               <div class="text-[#fff] text-[16px] font-bold">Your History</div>
               <div class="!mt-[30px] flex items-center gap-[30px]">
                 <v-progress-circular
-                  :model-value="50"
+                  :model-value="state.pnlInfo?.totalWonRounds/state.pnlInfo?.totalRounds * 100"
                   :size="126"
                   :width="10"
+                  :max="state.pnlInfo?.totalRounds"
                   bg-color="#fff"
                   color="#6DDD25"
                 >
@@ -1094,46 +1130,41 @@ function handleClickMenu(index) {
                     class="text-[#6DDD25] text-[16px] font-bold absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex flex-col gap-[5px] items-center"
                   >
                     <div class="text-[#fff] text-[16px]">Won</div>
-                    <div class="text-[#6DDD25] text-[16px] font-bold">0/0</div>
-                    <div class="text-[#A7A7A7] text-[16px]">50%</div>
+                    <div class="text-[#6DDD25] text-[16px] font-bold">{{state.pnlInfo?.totalWonRounds}}/{{ state.pnlInfo?.totalRounds }}</div>
+                    <div class="text-[#A7A7A7] text-[16px]">{{state.pnlInfo?.winRate.toFixed(2) * 100}}%</div>
                   </div>
                 </v-progress-circular>
                 <div class="flex flex-col gap-[5px]">
                   <div class="text-[#fff] text-[16px] font-bold">Net results</div>
-                  <div class="text-[#E72F2F] text-[16px] font-bold">0 BNB</div>
+                  <div class="text-[#E72F2F] text-[16px] font-bold">{{ $formatAmount(Number(appStore.formatUnits(state.pnlInfo?.totalWonAmount)) - Number(appStore.formatUnits(state.pnlInfo?.totalLostAmount))) }} MON</div>
                   <!-- <div class="text-[#A7A7A7] text-[16px]">~$0.00</div> -->
                 </div>
               </div>
               <div class="!mt-[16px] flex flex-col">
                 <div class="text-[#fff] text-[16px] font-bold">Average return /round</div>
-                <div class="text-[#fff] text-[16px] font-bold">0 BNB</div>
-                <!-- <div class="text-[#A7A7A7] text-[16px]">~$0.00</div> -->
-              </div>
-              <div class="!mt-[16px] flex flex-col">
-                <div class="text-[#fff] text-[16px] font-bold">Average position entered /round</div>
-                <div class="text-[#fff] text-[16px] font-bold">0 BNB</div>
+                <div class="text-[#fff] text-[16px] font-bold">{{ averageReturn }}%</div>
                 <!-- <div class="text-[#A7A7A7] text-[16px]">~$0.00</div> -->
               </div>
             </div>
-            <div class="!px-[10px] !py-[16px] border-b border-solid border-[#666]">
+            <div class="!px-[10px] !py-[16px]">
               <div class="text-[#fff] text-[16px] font-bold">Won</div>
               <div class="grid grid-cols-2 !mt-[10px]">
                 <div class="w-full flex flex-col">
-                  <div class="text-[#0AB45A] text-[16px] font-bold">0 rounds</div>
-                  <div class="text-[#A7A7A7] text-[16px]">0%</div>
+                  <div class="text-[#0AB45A] text-[16px] font-bold">{{ state.pnlInfo?.totalWonRounds }} rounds</div>
+                  <div class="text-[#A7A7A7] text-[16px]">{{state.pnlInfo?.winRate.toFixed(2) * 100}}%</div>
                 </div>
                 <div class="w-full flex flex-col">
-                  <div class="text-[#0AB45A] text-[16px] font-bold">+0 BNB</div>
+                  <div class="text-[#0AB45A] text-[16px] font-bold">+{{ appStore.formatUnits(state.pnlInfo?.totalWonAmount) }} MON</div>
                 </div>
               </div>
               <div class="text-[#fff] text-[16px] font-bold !mt-[16px]">Entered</div>
               <div class="grid grid-cols-2 !mt-[10px]">
                 <div class="w-full flex flex-col">
-                  <div class="text-[#fff] text-[16px] font-bold">0 rounds</div>
+                  <div class="text-[#fff] text-[16px] font-bold">{{ state.pnlInfo?.totalRounds }} rounds</div>
                   <div class="text-[#A7A7A7] text-[16px]">total</div>
                 </div>
                 <div class="w-full flex flex-col">
-                  <div class="text-[#fff] text-[16px] font-bold">0 BNB</div>
+                  <div class="text-[#fff] text-[16px] font-bold">{{ appStore.formatUnits(state.pnlInfo?.totalBetAmount) }} MON</div>
                 </div>
               </div>
             </div>
