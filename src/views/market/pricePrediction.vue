@@ -302,6 +302,7 @@ async function getRounds() {
     chainId: import.meta.env.VITE_APP_CHAIN,
     contractAddress: network[import.meta.env.VITE_APP_CHAIN].priceMarketContract,
     pageSize: 5,
+    userAddress: appStore.tomeState.curWalletAddress,
   })
   // console.log('getRounds', res)
   for (const item of res.obj.result) {
