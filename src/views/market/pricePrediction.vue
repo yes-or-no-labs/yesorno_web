@@ -516,9 +516,11 @@ const averageReturn = computed(() => {
             <item_started
               :item="item"
               :timeCount="state.timeCount"
+              :contract="state.priceMarketContract"
+              :initControlContract="initControlContract"
               v-if="item.status == 'started'"
             ></item_started>
-            <item_timeout :item="item" v-if="item.status == 'timeout'"></item_timeout>
+            <item_timeout :item="item" :contract="state.priceMarketContract" v-if="item.status == 'timeout'" :initControlContract="initControlContract"></item_timeout>
             <item_locked
               :item="item"
               :blockInfo="state.blockInfo"
@@ -527,7 +529,7 @@ const averageReturn = computed(() => {
               v-if="item.status == 'locked'"
             ></item_locked>
             <item_later :item="item" v-if="item.status == 'later'"></item_later>
-            <item_ended :item="item" v-if="item.status == 'ended'"></item_ended>
+            <item_ended :item="item" v-if="item.status == 'ended'" :contract="state.priceMarketContract" :initControlContract="initControlContract"></item_ended>
           </swiper-slide>
         </swiper>
       </div>
@@ -879,12 +881,14 @@ const averageReturn = computed(() => {
               :item="item"
               v-if="item.status == 'timeout'"
               :contract="state.priceMarketContract"
+              :initControlContract="initControlContract"
             ></item_timeout>
             <item_started
               :swiperInstance="swiperInstance"
               :contract="state.priceMarketContract"
               :item="item"
               :timeCount="state.timeCount"
+              :initControlContract="initControlContract"
               v-if="item.status == 'started'"
             ></item_started>
             <item_locked
@@ -898,6 +902,7 @@ const averageReturn = computed(() => {
               :item="item"
               :contract="state.priceMarketContract"
               v-if="item.status == 'ended'"
+              :initControlContract="initControlContract"
             ></item_ended>
           </swiper-slide>
         </swiper>

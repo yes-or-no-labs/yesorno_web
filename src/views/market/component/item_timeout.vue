@@ -142,6 +142,9 @@ const props = defineProps({
   contract:{
     type: Object,
   },
+  initControlContract:{
+    type:Function,
+  }
 })
 
 const state = reactive({
@@ -163,8 +166,7 @@ async function handleClickClaim() {
     state.isProcessing = true
     console.log('handleClickClaim')
     if (!props.contract) {
-      toast.error('合约未初始化')
-      return
+      await props.initControlContract()
     }
     const res = await props.contract.claim(props.item.assetId, props.item.roundId)
     console.log('handleClickClaim', res)

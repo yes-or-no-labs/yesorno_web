@@ -226,10 +226,9 @@ async function handleClickClaim() {
   try {
     state.isProcessing = true
     console.log('handleClickClaim')
-    // if (!props.contract) {
-    //   toast.error('合约未初始化')
-    //   return
-    // }
+    if (!props.contract) {
+      await props.initControlContract()
+    }
     const res = await props.contract.claim(props.item.assetId, [props.item.roundId])
     console.log('handleClickClaim', res)
     toast.success('Claim Success')

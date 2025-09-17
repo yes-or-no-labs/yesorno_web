@@ -325,6 +325,9 @@ const props = defineProps({
   timeCount: {
     type: Number,
   },
+  initControlContract:{
+    type:Function,
+  }
 })
 
 const state = reactive({
@@ -430,8 +433,9 @@ async function handleClickConfirm() {
     console.log('handleClickConfirm')
 
     if (!props.contract) {
-      toast.error('合约未初始化')
-      return
+      await props.initControlContract()
+      // toast.error('合约未初始化')
+      // return
     }
 
     if (!state.buyNum || state.buyNum <= 0) {
