@@ -289,6 +289,7 @@ async function getAssetEvents() {
         if (item.symbol) {
           const arr = item.symbol.split('/')
           item.symbol = arr[0] + arr[1] + 'T'
+          // item.symbol = item.symbol.replace('USDT', '')
           state.menuList.push(item)
         }
       }
@@ -412,7 +413,7 @@ const averageReturn = computed(() => {
                     class="text-[#fff] lg:text-[14px] text-[16px] font-[600] cursor-pointer whitespace-nowrap flex items-center"
                     v-bind="props"
                   >
-                    <div>{{ state.menuList[state.selectSymbolIndex]?.symbol }}</div>
+                    <div>{{ state.menuList[state.selectSymbolIndex]?.symbol.replace('USDT', '') }}</div>
                     <v-icon icon="mdi-menu-down" />
                   </div>
                 </template>
@@ -781,7 +782,7 @@ const averageReturn = computed(() => {
                     class="text-[#fff] lg:text-[14px] text-[16px] font-[600] cursor-pointer whitespace-nowrap flex items-center"
                     v-bind="props"
                   >
-                    <div>{{ state.menuList[state.selectSymbolIndex]?.symbol }}</div>
+                    <div>{{ state.menuList[state.selectSymbolIndex]?.symbol.replace('USDT', '') }}</div>
                     <v-icon icon="mdi-menu-down" />
                   </div>
                 </template>
@@ -792,7 +793,7 @@ const averageReturn = computed(() => {
                     :value="index"
                     @click="state.selectSymbolIndex = index"
                   >
-                    <v-list-item-title>{{ item.symbol }}</v-list-item-title>
+                    <v-list-item-title>{{ item.symbol.replace('USDT', '') }}</v-list-item-title>
                   </v-list-item>
                 </v-list>
               </v-menu>
