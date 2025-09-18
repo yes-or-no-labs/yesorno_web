@@ -305,6 +305,7 @@ async function getRounds() {
     userAddress: appStore.tomeState.curWalletAddress,
   })
   // console.log('getRounds', res)
+  const firstRound = state.roundsList.length == 0
   for (const item of res.obj.result) {
     if (item.status == 'started') {
       res.obj.result.push({
@@ -321,24 +322,9 @@ async function getRounds() {
   }
 
   state.roundsList = res.obj.result.sort((a, b) => a.roundId - b.roundId)
-  // const round = await state.priceMarketContract.rounds(state.menuList[state.selectSymbolIndex].id,state.menuList[state.selectSymbolIndex].currentEpoch);
-  // console.log('getRounds',round);
-  // state.roundsList.push({
-  //   epoch:Number(round[0]), // 轮次编号
-  //   startTimestamp:Number(round[1]), // 开始时间戳
-  //   lockTimestamp:Number(round[2]), // 锁定时间戳
-  //   closeTimestamp:Number(round[3]), // 结束时间戳
-  //   lockPrice:Number(round[4]), // 锁定价格
-  //   closePrice:Number(round[5]),  // 结算价格
-  //   lockOracleId:Number(round[6]),  // 锁定时预言机轮次ID
-  //   closeOracleId:Number(round[7]), // 结算时预言机轮次ID
-  //   totalAmount:Number(round[8]), //总投注金额
-  //   bullAmount:Number(round[9]),  // 看涨总金额
-  //   bearAmount:Number(round[10]), // 看跌总金额
-  //   rewardBaseCalAmount:Number(round[11]),  //奖励基础计算金额
-  //   rewardAmount:Number(round[12]), // 总奖励金额
-  //   oracleCalled:round[13], // 是否已调用预言机
-  // })
+  if(firstRound){
+    centerSwiperToSlide(3, 300)
+  }
 }
 
 const { width } = useWindowResize()
@@ -357,12 +343,26 @@ function handleClickChange(e) {
 watch(
   () => width.value,
   () => {
+    // 窗口大小变化后重新居中显示第4个slide
+    centerSwiperToSlide(3, 300)
+  },
+)
+
+// 统一的居中显示函数
+function centerSwiperToSlide(slideIndex = 3, animationSpeed = 300) {
+  if (!swiperInstance.value) return
+  
+  const targetIndex = Math.min(slideIndex, Math.max(0, state.roundsList.length - 1))
+  
+  setTimeout(() => {
     if (swiperInstance.value) {
       swiperInstance.value.update()
       swiperInstance.value.updateSlides()
+      swiperInstance.value.slideTo(targetIndex, animationSpeed)
+      console.log(`Swiper 已居中到第${targetIndex + 1}个slide`)
     }
-  },
-)
+  }, 50)
+}
 
 function handleClickMenu(index) {
   state.selectSymbolIndex = index
@@ -509,6 +509,9 @@ const averageReturn = computed(() => {
           :spaceBetween="16"
           :freeMode="true"
           :modules="[FreeMode]"
+          :centeredSlides="true"
+          :initialSlide="3"
+          :slideToClickedSlide="true"
           class="w-full"
           @swiper="onSwiper"
         >
@@ -873,6 +876,9 @@ const averageReturn = computed(() => {
           :spaceBetween="16"
           :freeMode="true"
           :modules="[FreeMode]"
+          :centeredSlides="true"
+          :initialSlide="3"
+          :slideToClickedSlide="true"
           class="w-full"
           @swiper="onSwiper"
         >
@@ -1186,6 +1192,26 @@ const averageReturn = computed(() => {
   display: flex;
   align-items: center;
 }
+
+/* 居中显示优化样式 */
+:deep(.swiper-slide) {
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  opacity: 0.7;
+  transform: scale(0.95);
+}
+
+:deep(.swiper-slide-active) {
+  opacity: 1;
+  transform: scale(1);
+  z-index: 10;
+}
+
+:deep(.swiper-slide-prev),
+:deep(.swiper-slide-next) {
+  opacity: 0.8;
+  transform: scale(0.98);
+}
+
 :deep(.v-selection-control-group--inline) {
   gap: 10px;
 }
