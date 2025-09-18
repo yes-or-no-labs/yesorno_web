@@ -68,7 +68,8 @@ const state = reactive({
   isProcessing: false,
   pageSize: 10,
   pageNum: 1,
-  pnlInfo:{}
+  pnlInfo:{},
+  isShowKline:false
 })
 
 const segmentedRef = ref(null)
@@ -875,7 +876,8 @@ const averageReturn = computed(() => {
             </div>
           </div>
         </div>
-        <swiper
+        <div class="w-full h-[70%] flex items-center">
+          <swiper
           :slidesPerView="width > 1440 ? 1440 / 318 : width / 318"
           :spaceBetween="16"
           :freeMode="true"
@@ -916,10 +918,13 @@ const averageReturn = computed(() => {
             ></item_ended>
           </swiper-slide>
         </swiper>
+        </div>
+        
       </div>
-      <div class="sm:flex-1 hidden bg-[#011B0C] sm:flex flex-col">
+      <div class="hidden bg-[#011B0C] sm:flex flex-col" :class="state.isShowKline ? 'sm:flex-1' : ''">
         <div
-          class="w-full h-[42px] bg-[#011B0C] flex items-center justify-center relative cursor-row-resize"
+          class="w-full h-[42px] bg-[#011B0C] flex items-center justify-center relative cursor-pointer"
+          @click="state.isShowKline = !state.isShowKline"
         >
           <div
             class="w-[96px] h-[6px] rounded-[3px]"
@@ -943,7 +948,7 @@ const averageReturn = computed(() => {
             </div>
           </div>
         </div>
-        <div class="flex-1 flex" v-show="state.curTabIndex == 0">
+        <div class="flex-1 flex" v-show="state.isShowKline">
           <tvChart
             @currentPrice="getCurrentPrice"
             :symbol="state.menuList[state.selectSymbolIndex]?.symbol"

@@ -7,6 +7,7 @@ import { constant } from '@/utils/constant.js'
 import * as uniapp from '@/utils/uni-app'
 import { defineStore } from 'pinia'
 import { api } from '@/apis'
+import { truncateDecimals } from '@/utils'
 
 export const store = {
   useAppStore: defineStore('appStore', () => {
@@ -22,6 +23,7 @@ export const store = {
       isLoading: false,
       signMessage: localStorage.getItem(constant.signMessage) || '',
       pointsInfo: localStorage.getItem(constant.pointsInfoKey)?JSON.parse(localStorage.getItem(constant.pointsInfoKey)) : null,
+      balanceOfMain: 0,
     })
     const tomeStateC = {
       isLogin: computed(() => !!tomeState.token),
@@ -370,6 +372,13 @@ export const store = {
           utilEthereum.onRemoveWalletListener(provider, this.onDisConnectClick)
           console.log(`++++++[${new Date().toISOString()}] 移除监听 evm 的链和账号改变监听`)
         }
+      },
+      async getTokenBalance() {
+        if (!mStateSimple.metamaskProvider) return
+        const provider = new ethers.BrowserProvider(mStateSimple.metamaskProvider)
+        const balance = await provider.getBalance(tomeState.curWalletAddress)
+        tomeState.balanceOfMain = truncateDecimals(this.formatUnits(balance))
+        console.log('balanceOfMon', tomeState.balanceOfMain)
       },
       // 断开钱包链接
       async onDisConnectClick() {

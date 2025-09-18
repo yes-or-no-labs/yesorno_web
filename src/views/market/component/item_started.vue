@@ -230,7 +230,7 @@
               bgColor="transparent"
               :reverse="true"
               :min="0"
-              :max="state.balanceOfMon"
+              :max="balanceOfMon"
               precision="2"
               rounded="6"
               :autofocus="true"
@@ -239,7 +239,7 @@
             </v-number-input>
           </div>
           <div class="text-[12px] text-[#fff] text-right w-full" v-if="state.isFlipped">
-            Balance: {{ state.balanceOfMon }} MON
+            Balance: {{ balanceOfMon }} MON
           </div>
           <div class="!mt-[15px] !relative !z-[150]" style="position: relative; z-index: 150">
             <v-slider
@@ -249,7 +249,7 @@
               track-color="#333741"
               thumb-size="13"
               :readonly="false"
-              :max="state.balanceOfMon"
+              :max="balanceOfMon"
               @mouseenter="disableSwiper"
               @mouseleave="enableSwiper"
               @touchstart="disableSwiper"
@@ -290,8 +290,8 @@
                 !state.buyNum ||
                 state.buyNum <= 0 ||
                 props.timeCount == 0 ||
-                state.buyNum > state.balanceOfMon ||
-                state.balanceOfMon == 0
+                state.buyNum > balanceOfMon ||
+                balanceOfMon == 0
               "
             >
               Confirm
@@ -338,7 +338,6 @@ const state = reactive({
   directive: 1, //下注方向 1位买张2为买跌
   buyNum: null,
   precent: 10,
-  balanceOfMon: 0,
   tokenContract: null,
   percentList: [
     { title: '10%', value: 0.1 },
@@ -355,7 +354,7 @@ const appStore = store.useAppStore()
 const toast = useToast()
 
 onMounted(() => {
-  getTokenBalance()
+  appStore.getTokenBalance()
 })
 
 function disableSwiper() {
@@ -382,6 +381,11 @@ const downPayoutCom = computed(()=>{
   if(!props.item.totalBearAmount || !props.item.totalBullAmount) return 0
     return NP.divide(props.item.totalBearAmount + props.item.totalBullAmount, props.item.totalBearAmount)
 })
+
+const balanceOfMon = computed(()=>{
+  return appStore.tomeState.balanceOfMain
+})
+
 // watch(
 //   () => [props.item],
 //   () => {
@@ -408,7 +412,7 @@ const downPayoutCom = computed(()=>{
 // )
 
 function handleClickPercent(percent) {
-  state.buyNum = Number(truncateDecimals(state.balanceOfMon * percent))
+  state.buyNum = Number(truncateDecimals(balanceOfMon.value * percent))
 }
 
 function handleClickBtn(e) {
@@ -487,7 +491,7 @@ async function handleClickConfirm() {
       })
 
       // 更新余额
-      await getTokenBalance()
+      await appStore.getTokenBalance()
       state.buyNum = null
     } else {
       throw new Error('交易失败')
@@ -520,13 +524,13 @@ async function handleClickConfirm() {
   }
 }
 
-async function getTokenBalance() {
-  if (!appStore.mStateSimple.metamaskProvider) return
-  const provider = new ethers.BrowserProvider(appStore.mStateSimple.metamaskProvider)
-  const balance = await provider.getBalance(appStore.tomeState.curWalletAddress)
-  state.balanceOfMon = truncateDecimals(appStore.formatUnits(balance))
-  console.log('balanceOfMon', state.balanceOfMon)
-}
+// async function getTokenBalance() {
+//   if (!appStore.mStateSimple.metamaskProvider) return
+//   const provider = new ethers.BrowserProvider(appStore.mStateSimple.metamaskProvider)
+//   const balance = await provider.getBalance(appStore.tomeState.curWalletAddress)
+//   state.balanceOfMon = truncateDecimals(appStore.formatUnits(balance))
+//   console.log('balanceOfMon', state.balanceOfMon)
+// }
 </script>
 
 <style lang="scss" scoped>
