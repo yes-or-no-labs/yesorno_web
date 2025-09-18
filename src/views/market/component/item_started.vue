@@ -80,7 +80,8 @@
               <div class="text-[14px] text-[#fff]">Prize Pool:</div>
               <div class="text-[14px] text-[#fff]">
                 {{
-                  appStore.formatUnits(props.item?.totalBearAmount + props.item?.totalBullAmount)
+                  $formatAmount(appStore.formatUnits(props.item?.totalBearAmount + props.item?.totalBullAmount))
+                  
                 }}
                 MON
               </div>

@@ -79,7 +79,7 @@
                   
                   <div
                     class="!px-[10px] h-[26px] flex items-center gap-[10px] rounded-[2px]"
-                    :class="currentPriceCom - lockPriceCom < 0 ? 'bg-[#0AB45A]' : 'bg-[#E72F2F]'"
+                    :class="currentPriceCom - lockPriceCom < 0 ? 'bg-[#E72F2F]' : 'bg-[#0AB45A]'"
                   >
                     <img src="@/assets/img/arrow_up.png" class="w-[10px] h-[10px]" :class="currentPriceCom - lockPriceCom < 0 ? 'rotate-180' : ''" />
                     <div class="text-[#fff] text-[12px]">${{ $formatAmount(currentPriceCom - lockPriceCom) }}</div>
@@ -92,7 +92,7 @@
                 </div>
                 <div class="!mt-[10px] w-full flex items-center justify-between">
                   <div class="text-[12px] text-[#fff]">Prize Pool:</div>
-                  <div class="text-[12px] text-[#fff]">{{ appStore.formatUnits(props.item?.totalBearAmount + props.item?.totalBullAmount) }} MON</div>
+                  <div class="text-[12px] text-[#fff]">{{ $formatAmount(appStore.formatUnits(props.item?.totalBearAmount + props.item?.totalBullAmount)) }} MON</div>
                 </div>
               </div>
               <div class="rounded-[6px] border border-solid !border-[#6DDD25] !p-[16px] h-[150px] flex items-center justify-center flex-col" v-else>

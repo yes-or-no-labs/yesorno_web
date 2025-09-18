@@ -402,7 +402,7 @@ const averageReturn = computed(() => {
             <div
               class="w-[48px] h-[48px] rounded-[4px] bg-[#FFFFFF1A] flex items-center justify-center"
             >
-              <img src="@/assets/img/bsc.png" class="w-[28px] h-[28px]" />
+              <img src="@/assets/img/btc.png" class="w-[28px] h-[28px]" />
             </div>
             <div class="flex-col gap-[10px]">
               <v-menu transition="scale-transition" :offset="[10, 0]">
@@ -427,7 +427,8 @@ const averageReturn = computed(() => {
                 </v-list>
               </v-menu>
               <div class="text-[#6DDD25] text-[24px] font-[600]">
-                ${{ $formatAmount(state.currentPrice) }}
+                <!-- ${{ $formatAmount(state.currentPrice) }} -->
+                {{ $formatAmount(itemLockedRef ? itemLockedRef[0]?.currentPriceCom : 0) }}
               </div>
             </div>
           </div>
@@ -492,6 +493,7 @@ const averageReturn = computed(() => {
             </div> -->
             <div
               class="w-[42px] h-[42px] rounded-full flex items-center justify-center cursor-pointer select-none"
+              v-if="appStore.tomeState.curWalletAddress && appStore.tomeState.token"
               style="background: linear-gradient(90deg, #6ddd25 0%, #0ab45a 100%)"
               @click="state.showDrawer = true"
             >
@@ -643,7 +645,7 @@ const averageReturn = computed(() => {
                     <div class="flex items-center justify-between w-full">
                       <div class="text-[#fff] text-[16px] font-[600]">Your position:</div>
                       <div class="text-[#fff] text-[16px] font-[600]">
-                        {{ appStore.formatUnits(item.amount) }} MON
+                        {{ $formatAmount(appStore.formatUnits(item.amount)) }} MON
                       </div>
                     </div>
                     <div class="flex items-center justify-between w-full" v-if="item.isWinner">
@@ -656,10 +658,11 @@ const averageReturn = computed(() => {
                           "
                           >+</span
                         >{{
+                          $formatAmount(
                           NP.minus(
                             Number(appStore.formatUnits(item.claimableAmount)),
                             Number(appStore.formatUnits(item.amount)),
-                          )
+                          ))
                         }}
                         MON
                       </div>
@@ -667,14 +670,14 @@ const averageReturn = computed(() => {
                     <div class="flex items-center justify-between w-full" v-else>
                       <div class="text-[#fff] text-[16px] font-[600]">Your loss:</div>
                       <div class="text-[#E72F2F] text-[16px] font-[600]">
-                        -{{ appStore.formatUnits(item.amount) }} MON
+                        -{{ $formatAmount(appStore.formatUnits(item.amount)) }} MON
                       </div>
                     </div>
                   </div>
                   <div class="!pt-[16px] w-full flex justify-between items-center">
                     <div class="text-[#fff] text-[16px] font-[600]">Amount to collect:</div>
                     <div class="text-[#fff] text-[16px] font-[600]">
-                      {{ item.isWinner ? Number(appStore.formatUnits(item.claimableAmount)) : 0 }}
+                      {{ item.isWinner ? $formatAmount(Number(appStore.formatUnits(item.claimableAmount))) : 0 }}
                       MON
                     </div>
                   </div>
@@ -714,7 +717,7 @@ const averageReturn = computed(() => {
                   >
                     <div class="text-[#fff] text-[16px]">Won</div>
                     <div class="text-[#6DDD25] text-[16px] font-bold">{{state.pnlInfo?.totalWonRounds}}/{{ state.pnlInfo?.totalRounds }}</div>
-                    <div class="text-[#A7A7A7] text-[16px]">{{state.pnlInfo?.winRate.toFixed(2) * 100}}%</div>
+                    <div class="text-[#A7A7A7] text-[16px]">{{Number(state.pnlInfo?.winRate).toFixed(2) * 100}}%</div>
                   </div>
                 </v-progress-circular>
                 <div class="flex flex-col gap-[5px]">
@@ -734,7 +737,7 @@ const averageReturn = computed(() => {
               <div class="grid grid-cols-2 !mt-[10px]">
                 <div class="w-full flex flex-col">
                   <div class="text-[#0AB45A] text-[16px] font-bold">{{ state.pnlInfo?.totalWonRounds }} rounds</div>
-                  <div class="text-[#A7A7A7] text-[16px]">{{state.pnlInfo?.winRate.toFixed(2) * 100}}%</div>
+                  <div class="text-[#A7A7A7] text-[16px]">{{Number(state.pnlInfo?.winRate).toFixed(2) * 100}}%</div>
                 </div>
                 <div class="w-full flex flex-col">
                   <div class="text-[#0AB45A] text-[16px] font-bold">+{{ appStore.formatUnits(state.pnlInfo?.totalWonAmount) }} MON</div>
@@ -768,7 +771,7 @@ const averageReturn = computed(() => {
             <div
               class="w-[48px] h-[48px] rounded-[4px] bg-[#FFFFFF1A] flex items-center justify-center"
             >
-              <img src="@/assets/img/bsc.png" class="w-[28px] h-[28px]" />
+              <img src="@/assets/img/btc.png" class="w-[28px] h-[28px]" />
             </div>
             <div class="flex-col gap-[10px] min-w-[120px]">
               <v-menu transition="scale-transition" :offset="[10, 0]">
@@ -860,6 +863,7 @@ const averageReturn = computed(() => {
               class="w-[42px] h-[42px] rounded-full flex items-center justify-center cursor-pointer select-none"
               style="background: linear-gradient(90deg, #6ddd25 0%, #0ab45a 100%)"
               v-ripple
+              v-if="appStore.tomeState.curWalletAddress && appStore.tomeState.token"
               @click="state.showDrawer = true"
             >
               <img
@@ -980,16 +984,12 @@ const averageReturn = computed(() => {
         temporary
         location="right"
         :width="384"
-        color="#032210"
+        color="#202321"
       >
         <div
           class="w-full !px-[10px] !py-[16px]"
           style="
-            background: linear-gradient(
-              90deg,
-              rgba(109, 221, 37, 0.1) 0%,
-              rgba(10, 180, 90, 0.1) 100%
-            );
+            background: linear-gradient(90deg, #6DDD25 0%, #0AB45A 100%);
           "
         >
           <div class="w-full flex justify-between items-center">
@@ -1011,7 +1011,7 @@ const averageReturn = computed(() => {
             v-model="state.currentFirstTab"
             fixed-tabs
             align-tabs="center"
-            color="#0AB45A"
+            color="#fff"
             height="60"
           >
             <v-tab :value="item.value" v-for="item in state.tabList1" style="font-size: 16px">
@@ -1019,7 +1019,7 @@ const averageReturn = computed(() => {
             >
           </v-tabs>
           <div class="!mt-[16px]" v-show="state.currentFirstTab == '1'">
-            <v-radio-group inline v-model="state.typeOfHistory" hideDetails color="#6DDD25">
+            <v-radio-group inline v-model="state.typeOfHistory" hideDetails color="#fff">
               <v-radio label="All" value=""></v-radio>
               <v-radio label="Collected" :value="true"></v-radio>
               <v-radio label="Uncollected" :value="false"></v-radio>
@@ -1081,7 +1081,7 @@ const averageReturn = computed(() => {
                     <div class="flex items-center justify-between w-full">
                       <div class="text-[#fff] text-[16px] font-[600]">Your position:</div>
                       <div class="text-[#fff] text-[16px] font-[600]">
-                        {{ appStore.formatUnits(item.amount) }} MON
+                        {{ $formatAmount(appStore.formatUnits(item.amount)) }} MON
                       </div>
                     </div>
                     <div class="flex items-center justify-between w-full" v-if="item.isWinner">
@@ -1094,10 +1094,10 @@ const averageReturn = computed(() => {
                           "
                           >+</span
                         >{{
-                          NP.minus(
+                          $formatAmount(NP.minus(
                             Number(appStore.formatUnits(item.claimableAmount)),
                             Number(appStore.formatUnits(item.amount)),
-                          )
+                          ))
                         }}
                         MON
                       </div>
@@ -1105,14 +1105,14 @@ const averageReturn = computed(() => {
                     <div class="flex items-center justify-between w-full" v-else>
                       <div class="text-[#fff] text-[16px] font-[600]">Your loss:</div>
                       <div class="text-[#E72F2F] text-[16px] font-[600]">
-                        -{{ appStore.formatUnits(item.amount) }} MON
+                        -{{ $formatAmount(appStore.formatUnits(item.amount)) }} MON
                       </div>
                     </div>
                   </div>
                   <div class="!pt-[16px] w-full flex justify-between items-center">
                     <div class="text-[#fff] text-[16px] font-[600]">Amount to collect:</div>
                     <div class="text-[#fff] text-[16px] font-[600]">
-                      {{ item.isWinner ? Number(appStore.formatUnits(item.claimableAmount)) : 0 }}
+                      {{ item.isWinner ? $formatAmount(Number(appStore.formatUnits(item.claimableAmount))) : 0 }}
                       MON
                     </div>
                   </div>
@@ -1143,7 +1143,7 @@ const averageReturn = computed(() => {
                   >
                     <div class="text-[#fff] text-[16px]">Won</div>
                     <div class="text-[#6DDD25] text-[16px] font-bold">{{state.pnlInfo?.totalWonRounds}}/{{ state.pnlInfo?.totalRounds }}</div>
-                    <div class="text-[#A7A7A7] text-[16px]">{{state.pnlInfo?.winRate.toFixed(2) * 100}}%</div>
+                    <div class="text-[#A7A7A7] text-[16px]">{{Number(state.pnlInfo?.winRate).toFixed(2) * 100}}%</div>
                   </div>
                 </v-progress-circular>
                 <div class="flex flex-col gap-[5px]">
@@ -1163,10 +1163,10 @@ const averageReturn = computed(() => {
               <div class="grid grid-cols-2 !mt-[10px]">
                 <div class="w-full flex flex-col">
                   <div class="text-[#0AB45A] text-[16px] font-bold">{{ state.pnlInfo?.totalWonRounds }} rounds</div>
-                  <div class="text-[#A7A7A7] text-[16px]">{{state.pnlInfo?.winRate.toFixed(2) * 100}}%</div>
+                  <div class="text-[#A7A7A7] text-[16px]">{{Number(state.pnlInfo?.winRate).toFixed(2) * 100}}%</div>
                 </div>
                 <div class="w-full flex flex-col">
-                  <div class="text-[#0AB45A] text-[16px] font-bold">+{{ appStore.formatUnits(state.pnlInfo?.totalWonAmount) }} MON</div>
+                  <div class="text-[#0AB45A] text-[16px] font-bold">+{{ $formatAmount(appStore.formatUnits(state.pnlInfo?.totalWonAmount)) }} MON</div>
                 </div>
               </div>
               <div class="text-[#fff] text-[16px] font-bold !mt-[16px]">Entered</div>
@@ -1176,7 +1176,7 @@ const averageReturn = computed(() => {
                   <div class="text-[#A7A7A7] text-[16px]">total</div>
                 </div>
                 <div class="w-full flex flex-col">
-                  <div class="text-[#fff] text-[16px] font-bold">{{ appStore.formatUnits(state.pnlInfo?.totalBetAmount) }} MON</div>
+                  <div class="text-[#fff] text-[16px] font-bold">{{$formatAmount(appStore.formatUnits(state.pnlInfo?.totalBetAmount)) }} MON</div>
                 </div>
               </div>
             </div>

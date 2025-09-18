@@ -74,7 +74,7 @@
           <div class="text-[24px] text-[#fff]">${{ $formatAmount(endPriceCom) }}</div>
           <div
             class="!px-[10px] h-[26px] flex items-center gap-[10px] rounded-[2px]"
-            :class="endPriceCom - lockPriceCom < 0 ? 'bg-[#0AB45A]' : 'bg-[#E72F2F]'"
+            :class="endPriceCom - lockPriceCom < 0 ? 'bg-[#E72F2F]' : 'bg-[#0AB45A]'"
           >
             <img
               src="@/assets/img/arrow_up.png"
