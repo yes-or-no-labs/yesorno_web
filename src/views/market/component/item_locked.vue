@@ -171,6 +171,7 @@ import { ethers } from 'ethers';
 import chainlinkAbi from '@/abi/chainlink_price_feed.json';
 import NP from 'number-precision'
 import Loading from '@/components/Loading/index.vue'
+import { truncateDecimals } from '@/utils';
 
 const props = defineProps({
     item:{
@@ -200,12 +201,12 @@ const CHAINLINK_BTC_ORACLE_ADDRESS = '0xF46B02AF0b4Dc3fFd8B49a616fa399E77b58637F
 
 const upPayoutCom = computed(()=>{
     if(!props.item.totalBearAmount || !props.item.totalBullAmount) return 0
-    return NP.divide(props.item.totalBearAmount + props.item.totalBullAmount, props.item.totalBullAmount)
+    return truncateDecimals(NP.divide(props.item.totalBearAmount + props.item.totalBullAmount, props.item.totalBullAmount))
 })
 
 const downPayoutCom = computed(()=>{
   if(!props.item.totalBearAmount || !props.item.totalBullAmount) return 0
-    return NP.divide(props.item.totalBearAmount + props.item.totalBullAmount, props.item.totalBearAmount)
+    return truncateDecimals(NP.divide(props.item.totalBearAmount + props.item.totalBullAmount, props.item.totalBearAmount))
 })
 
 

@@ -374,12 +374,12 @@ function enableSwiper() {
 
 const upPayoutCom = computed(()=>{
     if(!props.item.totalBearAmount || !props.item.totalBullAmount) return 0
-    return NP.divide(props.item.totalBearAmount + props.item.totalBullAmount, props.item.totalBullAmount)
+    return truncateDecimals(NP.divide(props.item.totalBearAmount + props.item.totalBullAmount, props.item.totalBullAmount))
 })
 
 const downPayoutCom = computed(()=>{
   if(!props.item.totalBearAmount || !props.item.totalBullAmount) return 0
-    return NP.divide(props.item.totalBearAmount + props.item.totalBullAmount, props.item.totalBearAmount)
+    return truncateDecimals(NP.divide(props.item.totalBearAmount + props.item.totalBullAmount, props.item.totalBearAmount))
 })
 
 const balanceOfMon = computed(()=>{
