@@ -186,6 +186,7 @@
 import { computed, reactive } from 'vue'
 import { store } from '@/store'
 import NP from 'number-precision'
+import { truncateDecimals } from '@/utils'
 
 const props = defineProps({
   item: {
@@ -204,12 +205,12 @@ const appStore = store.useAppStore()
 
 const upPayoutCom = computed(()=>{
     if(!props.item.totalBearAmount || !props.item.totalBullAmount) return 0
-    return NP.divide(props.item.totalBearAmount + props.item.totalBullAmount, props.item.totalBullAmount)
+    return truncateDecimals(NP.divide(props.item.totalBearAmount + props.item.totalBullAmount, props.item.totalBullAmount))
 })
 
 const downPayoutCom = computed(()=>{
     if(!props.item.totalBearAmount || !props.item.totalBullAmount) return 0
-    return NP.divide(props.item.totalBearAmount + props.item.totalBullAmount, props.item.totalBearAmount)
+    return truncateDecimals(NP.divide(props.item.totalBearAmount + props.item.totalBullAmount, props.item.totalBearAmount))
 })
 
 const lockPriceCom = computed(() => {
