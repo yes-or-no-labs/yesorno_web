@@ -92,11 +92,12 @@ async function handleClickCreateComment() {
   try {
     state.sending = true
     console.log('handleClickCreateComment',state.replyInfo);
+    
     const res = await api.createComment({
       content: state.commentVal,
       eventId: state.eventId,
-      parentCommentId:state.replyInfo.parentCommentId?state.replyInfo.parentCommentId:state.replyInfo.guid,
-      toUserAddress:state.replyInfo.userAddress
+      parentCommentId:state.replyInfo?state.replyInfo.parentCommentId?state.replyInfo.parentCommentId:state.replyInfo.guid:null,
+      toUserAddress:state.replyInfo?state.replyInfo.userAddress:null
     })
     if(res.success){
       toast.success('Comment successfully')

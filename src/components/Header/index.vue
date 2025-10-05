@@ -26,11 +26,11 @@ const marketList = [
 ]
 
 const porfileList = [
-  //   {
-  //   title: 'My Profile',
-  //   icon: profile_icon1,
-  //   path:'/profile'
-  // },
+    {
+    title: 'My Profile',
+    icon: profile_icon1,
+    path:'/profile'
+  },
   {
     title: 'Setting',
     icon: settingImg,
