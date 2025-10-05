@@ -101,18 +101,22 @@ async function handleClickCreateComment() {
     })
     if(res.success){
       toast.success('Comment successfully')
+      // console.log('state.replyInfo',state.replyInfo);
+      
       if(state.replyInfo){
         if(state.replyInfo.subCommentsCopy){
           state.replyInfo.subCommentsCopy.unshift(res.obj.comment)
+        } else if(!state.replyInfo.parentCommentId && !state.replyInfo.subCommentsCopy){
+          state.replyInfo.subCommentsCopy = []
+          state.replyInfo.subCommentsCopy.unshift(res.obj.comment)
         }else{
           for (const item of state.commentList) {
+            console.log('item',item);
             if(item.guid === state.replyInfo.parentCommentId){
               item.subCommentsCopy.unshift(res.obj.comment)
             }
           }
         }
-        
-        // state.replyInfo.subCommentsCopy.unshift(res.obj.comment)
       }else{
         state.commentList.unshift(res.obj.comment)
       }
