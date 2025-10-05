@@ -1,0 +1,33 @@
+:root {
+  /* 亮色主题变量 */
+  --color-primary: #2A7EEB;
+  --color-background: #fff; /* #ffffff */
+  --color-surface: 248 250 252; /* #f8fafc */
+  --color-text-primary: #000; /* #1f2937 */
+  --color-text-secondary: 107 114 128; /* #6b7280 */
+  --color-border: 229 231 235; /* #e5e7eb */
+  --color-accent: 59 130 246; /* #3b82f6 */
+  
+  /* Header 背景色 */
+  --color-header-bg: #F4F4F4; /* rgba(248, 250, 252, 0.8) */
+}
+
+:root.dark {
+  /* 暗色主题变量 */
+  --color-background: #000; /* #000000 */
+  --color-surface: 26 26 26; /* #1a1a1a */
+  --color-text-primary: #fff; /* #ffffff */
+  --color-text-secondary: 209 213 219; /* #d1d5db */
+  --color-border: 55 65 81; /* #374151 */
+  --color-accent: 96 165 250; /* #60a5fa */
+  
+  /* Header 背景色 */
+  --color-header-bg: #181818; /* rgba(2, 54, 24, 0.5) */
+}
+
+/* 基础样式 */
+body {
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}

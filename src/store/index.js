@@ -8,6 +8,7 @@ import * as uniapp from '@/utils/uni-app'
 import { defineStore } from 'pinia'
 import { api } from '@/apis'
 import { truncateDecimals } from '@/utils'
+import { useTheme } from '@/composables/useTheme'
 
 export const store = {
   useAppStore: defineStore('appStore', () => {
@@ -407,6 +408,26 @@ export const store = {
       tomeStateC,
       mStateSimple,
       ...actions,
+    }
+  }),
+  
+  // 主题管理 store
+  useThemeStore: defineStore('themeStore', () => {
+    const theme = useTheme()
+    
+    // 初始化主题
+    theme.initTheme()
+    
+    return {
+      // 状态
+      currentTheme: theme.currentTheme,
+      isDark: theme.isDark,
+      isLight: theme.isLight,
+      
+      // 方法
+      toggleTheme: theme.toggleTheme,
+      setTheme: theme.setTheme,
+      THEMES: theme.THEMES
     }
   }),
 }

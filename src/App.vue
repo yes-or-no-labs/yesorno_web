@@ -9,6 +9,7 @@ import Tabbar from '@/components/Tabbar/index.vue'
 import { api } from './apis'
 
 const router = useRouter()
+const themeStore = store.useThemeStore()
 
 // console.log('router', router.currentRoute.value)
 
@@ -39,7 +40,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="bg-[#000]">
+  <div class="min-h-screen">
     <Header v-if="currenRoutePath !== '/login'" />
     <div class="max-w-[1440px] mx-auto">
       <RouterView />

@@ -53,6 +53,7 @@ const state = reactive({
 })
 
 const appStore = store.useAppStore()
+const themeStore = store.useThemeStore()
 
 const router = useRouter()
 
@@ -118,13 +119,12 @@ async function getTokenBalance() {
 
 <template>
   <div
-    class="w-full h-[60px] sticky lg:h-[80px] top-0 left-0 z-[999]"
-    style="backdrop-filter: blur(15px); background: #02361880"
+    class="w-full h-[60px] sticky lg:h-[80px] top-0 left-0 z-[999] transition-all duration-300 backdrop-blur-[15px] bg-[var(--color-header-bg)]"
   >
     <div
       class="hidden lg:flex max-w-[1440px] mx-auto items-center justify-between !px-[32px] h-full gap-[70px]"
     >
-      <div class="flex items-center lg:gap-[40px] gap-[25px] h-full">
+      <div class="flex items-center lg:gap-[40px] gap-[25px] h-full text-[16px] font-[600] ">
         <div
           class="flex items-center lg:gap-[20px] gap-[40px] cursor-pointer w-[120px] h-[30px] lg:w-[160px] lg:h-[40px]"
           @click="$router.push('/')"
@@ -140,25 +140,25 @@ async function getTokenBalance() {
           </div> -->
         </div>
         <div
-          class="text-[#fff] lg:text-[14px] text-[16px] font-[600] cursor-pointer"
+          class="cursor-pointer transition-colors duration-300 text-text-primary"
+          :class="{ 'text-primary': currenRoutePath === '/' }"
           style="font-family: Geist"
           @click="$router.push('/')"
-          :class="currenRoutePath === '/' ? '!text-[#6DDD25]' : ''"
         >
           Home
         </div>
-        <!-- <div
-          class="text-[#fff] lg:text-[14px] text-[16px] font-[600] cursor-pointer"
+        <div
+          class="cursor-pointer"
           style="font-family: Geist"
           @click="$router.push('/market')"
-          :class="currenRoutePath=== '/market'?'!text-[#6DDD25]':''"
+          :class="currenRoutePath=== '/market'?'text-primary':''"
         >
-          
-        </div> -->
+        Market
+        </div>
         <!-- <v-menu transition="scale-transition" :offset="[10, 0]">
           <template v-slot:activator="{ props }">
             <div
-              class="text-[#fff] lg:text-[14px] text-[16px] font-[600] cursor-pointer whitespace-nowrap flex items-center"
+              class="text-[#fff] cursor-pointer whitespace-nowrap flex items-center"
               v-bind="props"
             >
             <div>Market</div>
@@ -168,47 +168,47 @@ async function getTokenBalance() {
           <v-list>
             <v-list-item v-for="(item, index) in marketList" :key="index" :value="index" @click="$router.push(item.path)">
               <v-list-item-title>
-                <div :class="currenRoutePath=== item.path?'!text-[#6DDD25]':'text-[#fff]'">{{ item.title }}</div>
+                <div :class="currenRoutePath=== item.path?'text-primary':'text-[#fff]'">{{ item.title }}</div>
               </v-list-item-title>
             </v-list-item>
           </v-list>
         </v-menu> -->
         <div
-          class="text-[#fff] lg:text-[14px] text-[16px] font-[600] cursor-pointer whitespace-nowrap"
+          class="cursor-pointer whitespace-nowrap"
           style="font-family: Geist"
           @click="$router.push('/market_pricePrediction')"
-          :class="currenRoutePath === '/market_pricePrediction' ? '!text-[#6DDD25]' : ''"
+          :class="currenRoutePath === '/market_pricePrediction' ? 'text-primary' : ''"
         >
           Price Prediction
         </div>
         <div
-          class="text-[#fff] lg:text-[14px] text-[16px] font-[600] cursor-pointer whitespace-nowrap"
+          class="cursor-pointer whitespace-nowrap"
           style="font-family: Geist"
           @click="$router.push('/ai_predictions')"
-          :class="currenRoutePath === '/ai_predictions' ? '!text-[#6DDD25]' : ''"
+          :class="currenRoutePath === '/ai_predictions' ? 'text-primary' : ''"
         >
           AI Predictions
         </div>
         <div
-          class="text-[#fff] lg:text-[14px] text-[16px] font-[600] cursor-pointer"
+          class="cursor-pointer"
           style="font-family: Geist"
           @click="$router.push('/task')"
-          :class="currenRoutePath === '/task' ? '!text-[#6DDD25]' : ''"
+          :class="currenRoutePath === '/task' ? 'text-primary' : ''"
         >
           Tasks
         </div>
         <div
-          class="text-[#fff] lg:text-[14px] text-[16px] font-[600] cursor-pointer"
+          class="cursor-pointer"
           style="font-family: Geist"
           @click="$router.push('/leaderboard')"
-          :class="currenRoutePath === '/leaderboard' ? '!text-[#6DDD25]' : ''"
+          :class="currenRoutePath === '/leaderboard' ? 'text-primary' : ''"
         >
           Ranking
         </div>
         <!-- <v-menu transition="scale-transition" :offset="[10, 0]">
           <template v-slot:activator="{ props }">
             <div
-              class="text-[#fff] lg:text-[14px] text-[16px] font-[600] cursor-pointer whitespace-nowrap flex items-center"
+              class="text-[#fff] cursor-pointer whitespace-nowrap flex items-center"
               v-bind="props"
             >
             <div>Docs</div>
@@ -230,29 +230,62 @@ async function getTokenBalance() {
         </div> -->
       </div>
       <div class="flex items-center gap-[45px] h-full">
+        <!-- 主题切换按钮 -->
+        <div class="flex items-center">
+          <button
+            @click="themeStore.toggleTheme"
+            class="flex items-center justify-center w-[40px] h-[40px] rounded-full border-2 border-white/20 bg-white/10 hover:bg-white/20 transition-all duration-300 backdrop-blur-sm"
+            :title="themeStore.isDark ? '切换到亮色主题' : '切换到暗色主题'"
+          >
+            <!-- 太阳图标 (亮色主题) -->
+            <svg
+              v-if="!themeStore.isDark"
+              class="w-5 h-5 text-yellow-400"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"
+                clip-rule="evenodd"
+              />
+            </svg>
+            <!-- 月亮图标 (暗色主题) -->
+            <svg
+              v-else
+              class="w-5 h-5 text-blue-200"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path
+                d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"
+              />
+            </svg>
+          </button>
+        </div>
         <div
           class="flex items-center gap-[45px] h-full flex-1"
           v-show="appStore.tomeState.curWalletAddress && appStore.tomeState.token"
         >
           <div class="flex flex-col items-center gap-[5px]">
             <div
-              class="text-[#fff] lg:text-[12px] text-[13px] leading-[13px] whitespace-nowrap"
+              class="lg:text-[12px] text-[13px] leading-[13px] whitespace-nowrap"
               style="font-family: Inter"
             >
               My Points
             </div>
-            <div class="text-[#81F963] lg:text-[16px] text-[20px] leading-[20px]">
+            <div class="text-primary lg:text-[16px] text-[20px] leading-[20px]">
               {{ $formatAmount(pointsInfo?.available_points || 0) }}
             </div>
           </div>
           <div class="flex flex-col items-center gap-[5px]">
             <div
-              class="text-[#fff] lg:text-[12px] text-[13px] leading-[13px] whitespace-nowrap"
+              class="lg:text-[12px] text-[13px] leading-[13px] whitespace-nowrap"
               style="font-family: Inter"
             >
               Balance(MON)
             </div>
-            <div class="text-[#81F963] lg:text-[16px] text-[20px] leading-[20px]">
+            <div class="text-primary lg:text-[16px] text-[20px] leading-[20px]">
               {{ $formatAmount(balanceOfMon) }}
             </div>
           </div>
@@ -352,13 +385,46 @@ async function getTokenBalance() {
       <div class="flex items-center gap-[40px] cursor-pointer" @click="$router.push('/')">
         <img src="@/assets/img/logo.png" mode="scaleToFill" class="w-[120px] h-[30px]" />
       </div>
-      <VBtnConnect
-        class="rounded-[106px] !h-[34px] !px-[10px] !py-[6px]"
-        v-show="!appStore.tomeState.curWalletAddress"
-        @click="$router.push('/login')"
-      >
-        Connect Wallet
-      </VBtnConnect>
+      <div class="flex items-center gap-[20px]">
+        <!-- 移动端主题切换按钮 -->
+        <button
+          @click="themeStore.toggleTheme"
+          class="flex items-center justify-center w-[34px] h-[34px] rounded-full border-2 border-white/20 bg-white/10 hover:bg-white/20 transition-all duration-300 backdrop-blur-sm"
+          :title="themeStore.isDark ? '切换到亮色主题' : '切换到暗色主题'"
+        >
+          <!-- 太阳图标 (亮色主题) -->
+          <svg
+            v-if="!themeStore.isDark"
+            class="w-4 h-4 text-yellow-400"
+            fill="currentColor"
+            viewBox="0 0 20 20"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"
+              clip-rule="evenodd"
+            />
+          </svg>
+          <!-- 月亮图标 (暗色主题) -->
+          <svg
+            v-else
+            class="w-4 h-4 text-blue-200"
+            fill="currentColor"
+            viewBox="0 0 20 20"
+          >
+            <path
+              d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"
+            />
+          </svg>
+        </button>
+        <VBtnConnect
+          class="rounded-[106px] !h-[34px] !px-[10px] !py-[6px]"
+          v-show="!appStore.tomeState.curWalletAddress"
+          @click="$router.push('/login')"
+        >
+          Connect Wallet
+        </VBtnConnect>
+      </div>
     </div>
   </div>
 </template>

@@ -1,5 +1,6 @@
 /* @import './base.css'; */
 @import 'vuetify/styles';
+@import './theme.css';
 
 @import 'tailwindcss';
 
@@ -14,9 +15,9 @@
   scrollbar-width: none;
 }
 
-body {
+/* body {
   background-color: #000;
-}
+} */
 
 @font-face {
   font-family: 'Inter';
