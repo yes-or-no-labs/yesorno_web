@@ -80,7 +80,7 @@ function handleClickCopy() {
 async function handleClickItem(index) {
   console.log('handleClickItem', index)
 
-  if (index == 1) {
+  if (porfileList[index].title == 'Log Out') {
     await appStore.onDisConnectClick()
     return
   }
